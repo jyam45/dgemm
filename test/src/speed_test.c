@@ -21,11 +21,11 @@ int main(int argc, char** arv){
 	myblas.C = C;
 
 	peak_flops( &cpu );
-	double mpeak = cpu.mflops_double_max;
-	double bpeak = cpu.mflops_double_base;
+	double mpeak = cpu.mflops_double_max  / cpu.num_cores;
+	double bpeak = cpu.mflops_double_base / cpu.num_cores;
 
-	printf("Max  Peak MFlops : %G MFlops \n",mpeak);
-	printf("Base Peak MFlops : %G MFlops \n",bpeak);
+	printf("Max  Peak MFlops per Core: %G MFlops \n",mpeak);
+	printf("Base Peak MFlops per Core: %G MFlops \n",bpeak);
 
 	printf("size  , elapsed time[s],          MFlops,   base ratio[%%],    max ratio[%%] \n");
 	for( size_t n=16; n<=MAX_SIZE; n=n*2 ){

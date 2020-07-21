@@ -10,6 +10,9 @@ void peak_flops( flops_info_t* out ){
 	size_t base_freq = info.proc_freq_info.proc_base_freq;
 	size_t max_freq  = info.proc_freq_info.max_freq; // on Tarbo Boost
 
+	// Number of cores
+	size_t num_cores = info.topology.num_log_procs;
+
 	// Number of Floting-point operators
 	size_t fp_operator = 2;
 
@@ -25,14 +28,15 @@ void peak_flops( flops_info_t* out ){
 	if( info.more_feature[0].features[1] & F_AVX512F ){ vlen_bits = 512; } // introduced ZMM registers
 
 	out->base_freq    = base_freq;
+	out->num_cores    = num_cores;
 	out->max_freq     = max_freq;
 	out->fp_operator  = fp_operator;
 	out->fp_operation = fp_operation;
 	out->vlen_bits    = vlen_bits;
 
-	out->mflops_single_base = fp_operator * fp_operation * (vlen_bits/(8*sizeof(float))) * base_freq; 
-	out->mflops_single_max  = fp_operator * fp_operation * (vlen_bits/(8*sizeof(float))) * max_freq; 
+	out->mflops_single_base = num_cores * fp_operator * fp_operation * (vlen_bits/(8*sizeof(float))) * base_freq; 
+	out->mflops_single_max  = num_cores * fp_operator * fp_operation * (vlen_bits/(8*sizeof(float))) * max_freq; 
 
-	out->mflops_double_base = fp_operator * fp_operation * (vlen_bits/(8*sizeof(double))) * base_freq; 
-	out->mflops_double_max  = fp_operator * fp_operation * (vlen_bits/(8*sizeof(double))) * max_freq; 
+	out->mflops_double_base = num_cores * fp_operator * fp_operation * (vlen_bits/(8*sizeof(double))) * base_freq; 
+	out->mflops_double_max  = num_cores * fp_operator * fp_operation * (vlen_bits/(8*sizeof(double))) * max_freq; 
 }
