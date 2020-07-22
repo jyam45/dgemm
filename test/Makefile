@@ -8,7 +8,7 @@ CBLASLIBS= -lcblas -lblas
 
 all: libs test
 
-libs: lib/libblas.a lib/libcblas.a lib/libcpuid.a lib/libtimer.a
+libs: ./lib ./include lib/libblas.a lib/libcblas.a lib/libcpuid.a lib/libtimer.a
 
 test: unit_test speed_test total_test
 

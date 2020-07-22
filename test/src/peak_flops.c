@@ -11,7 +11,10 @@ void peak_flops( flops_info_t* out ){
 	size_t max_freq  = info.proc_freq_info.max_freq; // on Tarbo Boost
 
 	// Number of cores
-	size_t num_cores = info.topology.num_log_procs;
+	size_t num_cores = 0;
+	for( int i=0; i< info.num_tplevel; i++ ){
+		num_cores += info.topology[i].num_log_procs;
+	}
 
 	// Number of Floting-point operators
 	size_t fp_operator = 2;
