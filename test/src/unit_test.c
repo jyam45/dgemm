@@ -46,7 +46,7 @@ int main(int argc, char** arv){
 	            myblas.TransA = transposes[itransa];
 	            myblas.TransB = transposes[itransb];
 
-	            printf("Case : Order-%s, TransA=%s, TransB=%s ... ",cmajor[iorder],ctrans[itransa],ctrans[itransb]);
+	            printf("Case : Order=%s, TransA=%s, TransB=%s ... ",cmajor[iorder],ctrans[itransa],ctrans[itransb]);
 
 	            init_matrix( SIZE, SIZE, cblas.C , 1, SIZE, 0e0 );
 	            init_matrix( SIZE, SIZE, myblas.C, 1, SIZE, 0e0 );
