@@ -31,8 +31,8 @@ typedef struct _dgemm_test_t {
 
 typedef struct _flops_info_t {
 	size_t base_freq;
-	size_t num_cores;
 	size_t max_freq;
+	size_t num_cores;
 	size_t fp_operator;
 	size_t fp_operation;
 	size_t vlen_bits;
