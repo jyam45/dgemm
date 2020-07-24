@@ -1,4 +1,5 @@
 #include "dgemm_test.h"
+#include "myblas.h"
 #include <stdio.h>
 
 #define  SIZE 1023
@@ -14,7 +15,7 @@ int main(int argc, char** arv){
 
 	double *A, *B, *C, *D;
 	dgemm_test_t cblas = { cblas_dgemm, CblasRowMajor, CblasNoTrans, CblasNoTrans, SIZE, SIZE, SIZE, 1e0, NULL, SIZE, NULL, SIZE, 1e0, NULL, SIZE };
-	dgemm_test_t myblas= { cblas_dgemm, CblasRowMajor, CblasNoTrans, CblasNoTrans, SIZE, SIZE, SIZE, 1e0, NULL, SIZE, NULL, SIZE, 1e0, NULL, SIZE };
+	dgemm_test_t myblas= {myblas_dgemm, CblasRowMajor, CblasNoTrans, CblasNoTrans, SIZE, SIZE, SIZE, 1e0, NULL, SIZE, NULL, SIZE, 1e0, NULL, SIZE };
 
 	A = calloc( SIZE*SIZE, sizeof(double) );
 	B = calloc( SIZE*SIZE, sizeof(double) );

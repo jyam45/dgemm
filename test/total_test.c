@@ -1,4 +1,5 @@
 #include "dgemm_test.h"
+#include "myblas.h"
 #include <stdio.h>
 
 #define  MAX_SIZE 2048
@@ -10,7 +11,7 @@ int main(int argc, char** arv){
 	flops_info_t cpu;
 
 	double *A, *B, *C;
-	dgemm_test_t myblas = { cblas_dgemm, CblasRowMajor, CblasNoTrans, CblasNoTrans, MAX_SIZE, MAX_SIZE, MAX_SIZE, 1e0, NULL, MAX_SIZE, NULL, MAX_SIZE, 1e0, NULL, MAX_SIZE };
+	dgemm_test_t myblas = {myblas_dgemm, CblasRowMajor, CblasNoTrans, CblasNoTrans, MAX_SIZE, MAX_SIZE, MAX_SIZE, 1e0, NULL, MAX_SIZE, NULL, MAX_SIZE, 1e0, NULL, MAX_SIZE };
 
 	A = calloc( MAX_SIZE*MAX_SIZE, sizeof(double) );
 	B = calloc( MAX_SIZE*MAX_SIZE, sizeof(double) );
@@ -21,14 +22,14 @@ int main(int argc, char** arv){
 	myblas.C = C;
 
 	peak_flops( &cpu );
-	double mpeak = cpu.mflops_double_max  / cpu.num_cores;
-	double bpeak = cpu.mflops_double_base / cpu.num_cores;
+	double mpeak = cpu.mflops_double_max;
+	double bpeak = cpu.mflops_double_base;
 
-	printf("Max  Peak MFlops per Core: %G MFlops \n",mpeak);
-	printf("Base Peak MFlops per Core: %G MFlops \n",bpeak);
+	printf("Max  Peak MFlops : %G MFlops \n",mpeak);
+	printf("Base Peak MFlops : %G MFlops \n",bpeak);
 
 	printf("size  , elapsed time[s],          MFlops,   base ratio[%%],    max ratio[%%] \n");
-	for( size_t n=16; n<=MAX_SIZE; n=n*2 ){
+	for( size_t n=32; n<=MAX_SIZE; n=n+32 ){
 
 		myblas.M   = n;
 		myblas.N   = n;
