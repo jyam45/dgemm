@@ -11,7 +11,7 @@ int main(int argc, char** arv){
 	flops_info_t cpu;
 
 	double *A, *B, *C;
-	dgemm_test_t myblas = {myblas_dgemm, CblasColMajor, CblasTrans, CblasNoTrans, MAX_SIZE, MAX_SIZE, MAX_SIZE, 1e0, NULL, MAX_SIZE, NULL, MAX_SIZE, 1e0, NULL, MAX_SIZE };
+	dgemm_test_t myblas = {myblas_dgemm, CblasColMajor, CblasNoTrans, CblasNoTrans, MAX_SIZE, MAX_SIZE, MAX_SIZE, 1e0, NULL, MAX_SIZE, NULL, MAX_SIZE, 1e0, NULL, MAX_SIZE };
 
 	A = calloc( MAX_SIZE*MAX_SIZE, sizeof(double) );
 	B = calloc( MAX_SIZE*MAX_SIZE, sizeof(double) );
@@ -38,7 +38,7 @@ int main(int argc, char** arv){
 		myblas.ldb = n;
 		myblas.ldc = n;
 
-		double nflop = ((double)myblas.M) * ((double)myblas.K) * ((double)myblas.N) * 2; // MUL + ADD
+		double nflop = ((double)myblas.M) * ((double)myblas.K) * ((double)myblas.N) * 2 + ((double)myblas.M) * ((double)myblas.N) * 2 ; // A*B+C, alpha*AB, beta*C
 		double dt = check_speed( &myblas );
 		double mflops = nflop / dt / 1000 / 1000;
 
