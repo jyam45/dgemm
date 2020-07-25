@@ -3,7 +3,7 @@
 #include <float.h>
 #include <math.h>
 
-static int check_matrix( const int m, const int n, 
+static int check_matrix( const int m, const int n, const int k,
                          const double *C1, const int di1, const int dj1,
                          const double *C2, const int di2, const int dj2 )
 {
@@ -14,9 +14,11 @@ static int check_matrix( const int m, const int n,
 			double c2 = fabs(*C2);
 			double cmax = ( c1>c2 ? c1 : c2 );
 			double cdiff = fabs(c1-c2);
+			double sqrtk = sqrt((double)k);
+			double eps = DBL_EPSILON * sqrtk * cmax;
 
-			if( cdiff > DBL_EPSILON * cmax ){
-				fprintf(stderr,"[ERROR] An element C(%d,%d) is invalid : t1=%G, t2=%G\n",i,j,*C1,*C2);
+			if( cdiff > eps  ){
+				fprintf(stderr,"[ERROR] An element C(%d,%d) is invalid : t1=%G, t2=%G, diff=%G, eps=%G\n",i,j,*C1,*C2,cdiff,eps);
 				return 1;
 			}
 			C1 = C1 + di1;
@@ -46,23 +48,24 @@ int check_error( const dgemm_test_t* t1, const dgemm_test_t* t2 ){
 
 	int m = t1->M;
 	int n = t1->N;
+	int k = t1->K;
 
 	int error = 0;
 	if( t1->Order == CblasRowMajor && t2->Order == CblasRowMajor ){
 
-		error = check_matrix( m, n, C1, 1, ldc1, C2, 1, ldc2 );
+		error = check_matrix( m, n, k, C1, 1, ldc1, C2, 1, ldc2 );
 
 	}else if( t1->Order == CblasColMajor && t2->Order == CblasRowMajor ){
 
-		error = check_matrix( m, n, C1, ldc1, 1, C2, 1, ldc2 );
+		error = check_matrix( m, n, k, C1, ldc1, 1, C2, 1, ldc2 );
 
 	}else if( t1->Order == CblasRowMajor && t2->Order == CblasColMajor ){
 
-		error = check_matrix( m, n, C1, 1, ldc1, C2, ldc2, 1 );
+		error = check_matrix( m, n, k, C1, 1, ldc1, C2, ldc2, 1 );
 
 	}else if( t1->Order == CblasColMajor && t2->Order == CblasColMajor ){
 
-		error = check_matrix( m, n, C1, ldc1, 1, C2, ldc2, 1 );
+		error = check_matrix( m, n, k, C1, ldc1, 1, C2, ldc2, 1 );
 
 	}
 
