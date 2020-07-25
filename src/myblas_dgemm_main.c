@@ -9,8 +9,8 @@
 #define MYBLAS_BLOCK_K  128
 
 #define MYBLAS_TILE_M    32
-#define MYBLAS_TILE_N    16
-#define MYBLAS_TILE_K    64
+#define MYBLAS_TILE_N    32
+#define MYBLAS_TILE_K    32
 
 #define MIN(x,y)  (((x)<(y))?(x):(y))
 
@@ -106,33 +106,6 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	            C = C - M + ldc;
 	        }
 	        C = C - ldc*N; // retern to head of pointer.
-
-	        //for( size_t j3=0 ; j3<N; j3+=MIN(N-j3,MYBLAS_PANEL_N) ){
-	        //for( size_t j2=j3; j2<MIN(j3+MYBLAS_PANEL_N,N); j2+=MIN(N-j2,MYBLAS_BLOCK_N) ){
-	        //for( size_t j1=j2; j1<MIN(j2+MYBLAS_BLOCK_N,N); j1+=MIN(N-j1,MYBLAS_TILE_N ) ){
-	        //for( size_t j =j1; j <MIN(j1+MYBLAS_TILE_N ,N); j++ ){
-	        //    for( size_t i3=0 ; i3<M; i3+=MIN(M-i3,MYBLAS_PANEL_M) ){
-	        //    for( size_t i2=i3; i2<MIN(i3+MYBLAS_PANEL_M,M); i2+=MIN(M-i2,MYBLAS_BLOCK_M) ){
-	        //    for( size_t i1=i2; i1<MIN(i2+MYBLAS_BLOCK_M,M); i1+=MIN(M-i1,MYBLAS_TILE_M ) ){
-	        //    for( size_t i =i1; i <MIN(i1+MYBLAS_TILE_M ,M); i++ ){
-		//	AB=0e0;
-	        //        for( size_t k3=0 ; k3<K; k3+=MIN(K-k3,MYBLAS_PANEL_K) ){
-	        //        for( size_t k2=k3; k2<MIN(k3+MYBLAS_PANEL_K,K); k2+=MIN(K-k2,MYBLAS_BLOCK_K) ){
-	        //        for( size_t k1=k2; k1<MIN(k2+MYBLAS_BLOCK_K,K); k1+=MIN(K-k1,MYBLAS_TILE_K ) ){
-	        //        for( size_t k =k1; k <MIN(k1+MYBLAS_TILE_K ,K); k++ ){
-	        //           AB = AB + (*A)*(*B);
-	        //           A += lda;
-	        //           B++;
-	        //        }}}}
-		//	*C=(*C) + alpha*AB;
-	        //        A = A - lda*K + 1;
-	        //        B = B - K;
-	        //        C++;
-	        //    }}}}
-	        //    A = A - M;
-	        //    B = B + ldb;
-	        //    C = C - M + ldc;
-	        //}}}}
 
 	        // L3 cache
 	        for( size_t j3=0 ; j3<N; j3+=MIN(N-j3,MYBLAS_PANEL_N) ){
