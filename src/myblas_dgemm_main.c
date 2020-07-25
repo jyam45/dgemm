@@ -1,5 +1,19 @@
 #include "myblas_internal.h"
 
+#define MYBLAS_PANEL_M  512
+#define MYBLAS_PANEL_N  512
+#define MYBLAS_PANEL_K  256
+
+#define MYBLAS_BLOCK_M   64
+#define MYBLAS_BLOCK_N   64
+#define MYBLAS_BLOCK_K   32
+
+#define MYBLAS_UNROLL_M   4
+#define MYBLAS_UNROLL_N   4
+#define MYBLAS_UNROLL_K   4
+
+#define MIN(x,y)  (((x)<(y))?(x):(y))
+
 void myblas_dgemm_main( gemm_args_t* args ){
 
 	size_t       TransA = args->TransA;
@@ -83,23 +97,29 @@ void myblas_dgemm_main( gemm_args_t* args ){
 
 	    }else{
 
-	        for( size_t j=0; j<N; j++ ){
-	            for( size_t i=0; i<M; i++ ){
+	        for( size_t j3=0 ; j3<N; j3+=MIN(N-j3,MYBLAS_PANEL_N) ){
+	        for( size_t j2=j3; j2<MIN(j3+MYBLAS_PANEL_N,N); j2+=MIN(N-j2,MYBLAS_BLOCK_N) ){
+	        for( size_t j1=j2; j1<MIN(j2+MYBLAS_BLOCK_N,N); j1++ ){
+	            for( size_t i3=0 ; i3<M; i3+=MIN(M-i3,MYBLAS_PANEL_M) ){
+	            for( size_t i2=i3; i2<MIN(i3+MYBLAS_PANEL_M,M); i2+=MIN(M-i2,MYBLAS_BLOCK_M) ){
+	            for( size_t i1=i2; i1<MIN(i2+MYBLAS_BLOCK_M,M); i1++ ){
 			AB=0e0;
-	                for( size_t k=0; k<K; k++ ){
+	                for( size_t k3=0 ; k3<K; k3+=MIN(K-k3,MYBLAS_PANEL_K) ){
+	                for( size_t k2=k3; k2<MIN(k3+MYBLAS_PANEL_K,K); k2+=MIN(K-k2,MYBLAS_BLOCK_K) ){
+	                for( size_t k1=k2; k1<MIN(k2+MYBLAS_BLOCK_K,K); k1++ ){
 	                   AB = AB + (*A)*(*B);
 	                   A += lda;
 	                   B++;
-	                }
+	                }}}
 			*C=beta*(*C) + alpha*AB;
 	                A = A - lda*K + 1;
 	                B = B - K;
 	                C++;
-	            }
+	            }}}
 	            A = A - M;
 	            B = B + ldb;
 	            C = C - M + ldc;
-	        }
+	        }}}
 
 	    }
 	}
