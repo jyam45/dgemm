@@ -131,10 +131,10 @@ void myblas_dgemm_main( gemm_args_t* args ){
 
 	                // On L2-Cache Copy for A
 	                A = A + lda*k2 + i2;
-	                for( size_t i1=i2; i1<i2+M2; i1+=MIN(M-i1,MYBLAS_TILE_M ) ){
-	                  size_t M1 = MIN(MYBLAS_TILE_M ,M-i1);
-	                  for( size_t k1=k2; k1<k2+K2; k1+=MIN(K-k1,MYBLAS_TILE_K ) ){
-	                    size_t K1 = MIN(MYBLAS_TILE_K ,K-k1);
+	                for( size_t k1=k2; k1<k2+K2; k1+=MIN(K-k1,MYBLAS_TILE_K ) ){
+	                  size_t K1 = MIN(MYBLAS_TILE_K ,K-k1);
+	                  for( size_t i1=i2; i1<i2+M2; i1+=MIN(M-i1,MYBLAS_TILE_M ) ){
+	                    size_t M1 = MIN(MYBLAS_TILE_M ,M-i1);
 	                    for( size_t i =i1; i < i1+M1; i++ ){
 	                      for( size_t k =k1; k < k1+K1; k++ ){
 	                        (*A2) = (*A);
@@ -144,22 +144,20 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	                      A  = A  - lda *K1 + 1;
 	                      A2 = A2 - lda2*K1 + 1;
 	                    }
-	                    A = A - M1 + lda *K1;
-	                    A2= A2- M1 + lda2*K1;
 	                  }
-	                  A = A  - lda *K2 + M1;
-	                  A2= A2 - lda2*K2 + M1;
+	                  A = A  - M2 + lda *K1;
+	                  A2= A2 - M2 + lda2*K1;
 	                }
-	                A = A  - M2;
-	                A2= A2 - M2;
+	                A = A  - lda *K2;
+	                A2= A2 - lda2*K2;
 	                A = A - lda*k2 - i2; // return to head
 
 	                // On L2-Cache Copy for B
 	                B = B + ldb*j2 + k2;
-	                for( size_t j1=j2; j1<j2+N2; j1+=MIN(N-j1,MYBLAS_TILE_N ) ){
-	                  size_t N1 = MIN(MYBLAS_TILE_N ,N-j1);
-	                  for( size_t k1=k2; k1<k2+K2; k1+=MIN(K-k1,MYBLAS_TILE_K ) ){
-	                    size_t K1 = MIN(MYBLAS_TILE_K ,K-k1);
+	                for( size_t k1=k2; k1<k2+K2; k1+=MIN(K-k1,MYBLAS_TILE_K ) ){
+	                  size_t K1 = MIN(MYBLAS_TILE_K ,K-k1);
+	                  for( size_t j1=j2; j1<j2+N2; j1+=MIN(N-j1,MYBLAS_TILE_N ) ){
+	                    size_t N1 = MIN(MYBLAS_TILE_N ,N-j1);
 	                    for( size_t j =j1; j < j1+N1; j++ ){
 	                      for( size_t k =k1; k < k1+K1; k++ ){
 	                        *B2=*B;
@@ -169,25 +167,23 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	                      B  = B  - K1 + ldb ;
 	                      B2 = B2 - K1 + ldb2;
 	                    }
-	                    B  = B  - ldb *N1 + K1;
-	                    B2 = B2 - ldb2*N1 + K1;
 	                  }
-	                  B  = B  - K2 + ldb *N1;
-	                  B2 = B2 - K2 + ldb2*N1;
+	                  B  = B  - ldb *N2 + K1;
+	                  B2 = B2 - ldb2*N2 + K1;
 	                }
-	                B  = B  - ldb *N2;
-	                B2 = B2 - ldb2*N2;
+	                B  = B  - K2;
+	                B2 = B2 - K2;
 	                B  = B  - ldb*j2 - k2; // return to head
 
 	                // L1 cache
-	                for( size_t j1=j2; j1<j2+N2; j1+=MIN(N-j1,MYBLAS_TILE_N ) ){
-	                for( size_t i1=i2; i1<i2+M2; i1+=MIN(M-i1,MYBLAS_TILE_M ) ){
 	                for( size_t k1=k2; k1<k2+K2; k1+=MIN(K-k1,MYBLAS_TILE_K ) ){
+	                for( size_t j1=j2; j1<j2+N2; j1+=MIN(N-j1,MYBLAS_TILE_N ) ){
+	                    B2 = B2 + ldb2*(j1-j2) + (k1-k2);
+	                for( size_t i1=i2; i1<i2+M2; i1+=MIN(M-i1,MYBLAS_TILE_M ) ){
 
 	                    C = C + ldc*j1 + i1;
 
 	                    A2 = A2 + lda2*(k1-k2) + (i1-i2);
-	                    B2 = B2 + ldb2*(j1-j2) + (k1-k2);
 
 	                    size_t M1 = MIN(MYBLAS_TILE_M ,M-i1);
 	                    size_t N1 = MIN(MYBLAS_TILE_N ,N-j1);
@@ -217,9 +213,11 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	                    C = C - ldc*j1 - i1;
 
 	                    A2 = A2 - lda2*(k1-k2) - (i1-i2);
-	                    B2 = B2 - ldb2*(j1-j2) - (k1-k2);
 
-	                }}}
+	                }
+	                    B2 = B2 - ldb2*(j1-j2) - (k1-k2);
+	                }
+	                }
 
 	            }}}
 
