@@ -115,51 +115,47 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	        size_t  ldb2 = MYBLAS_BLOCK_K;
 
 	        // L3 cache
+	        for( size_t k3=0 ; k3<K; k3+=MIN(K-k3,MYBLAS_PANEL_K) ){
 	        for( size_t j3=0 ; j3<N; j3+=MIN(N-j3,MYBLAS_PANEL_N) ){
 	        for( size_t i3=0 ; i3<M; i3+=MIN(M-i3,MYBLAS_PANEL_M) ){
-	        for( size_t k3=0 ; k3<K; k3+=MIN(K-k3,MYBLAS_PANEL_K) ){
 	            size_t M3 = MIN(MYBLAS_PANEL_M ,M-i3);
 	            size_t N3 = MIN(MYBLAS_PANEL_N ,N-j3);
 	            size_t K3 = MIN(MYBLAS_PANEL_K ,K-k3);
 	            // L2 cache
+	            for( size_t k2=k3; k2<k3+K3; k2+=MIN(K-k2,MYBLAS_BLOCK_K) ){
 	            for( size_t j2=j3; j2<j3+N3; j2+=MIN(N-j2,MYBLAS_BLOCK_N) ){
 	            for( size_t i2=i3; i2<i3+M3; i2+=MIN(M-i2,MYBLAS_BLOCK_M) ){
-	            for( size_t k2=k3; k2<k3+K3; k2+=MIN(K-k2,MYBLAS_BLOCK_K) ){
 	                size_t M2 = MIN(MYBLAS_BLOCK_M ,M-i2);
 	                size_t N2 = MIN(MYBLAS_BLOCK_N ,N-j2);
 	                size_t K2 = MIN(MYBLAS_BLOCK_K ,K-k2);
 
 	                // On L2-Cache Copy for A
 	                A = A + lda*k2 + i2;
-	                for( size_t i1=i2; i1<i2+M2; i1+=MIN(M-i1,MYBLAS_TILE_M ) ){
-	                  size_t M1 = MIN(MYBLAS_TILE_M ,M-i1);
-	                  for( size_t k1=k2; k1<k2+K2; k1+=MIN(K-k1,MYBLAS_TILE_K ) ){
-	                    size_t K1 = MIN(MYBLAS_TILE_K ,K-k1);
+	                for( size_t k1=k2; k1<k2+K2; k1+=MIN(K-k1,MYBLAS_TILE_K ) ){
+	                  size_t K1 = MIN(MYBLAS_TILE_K ,K-k1);
+	                  for( size_t i1=i2; i1<i2+M2; i1+=MIN(M-i1,MYBLAS_TILE_M )  ){
+	                    size_t M1 = MIN(MYBLAS_TILE_M ,M-i1);
 	                    for( size_t i =i1; i < i1+M1; i++ ){
 	                      for( size_t k =k1; k < k1+K1; k++ ){
 	                        (*A2) = (*A);
 	                        A += lda ;
-	                        A2+= lda2;
+	                        A2++;
 	                      }
 	                      A  = A  - lda *K1 + 1;
-	                      A2 = A2 - lda2*K1 + 1;
 	                    }
-	                    A = A - M1 + lda *K1;
-	                    A2= A2- M1 + lda2*K1;
 	                  }
-	                  A = A  - lda *K2 + M1;
-	                  A2= A2 - lda2*K2 + M1;
+	                  A = A  - M2 + lda *K1;
 	                }
-	                A = A  - M2;
-	                A2= A2 - M2;
+	                A2 = A2  - M2*K2;
+	                A = A  - lda*K2;
 	                A = A - lda*k2 - i2; // return to head
 
 	                // On L2-Cache Copy for B
 	                B = B + ldb*j2 + k2;
-	                for( size_t j1=j2; j1<j2+N2; j1+=MIN(N-j1,MYBLAS_TILE_N ) ){
-	                  size_t N1 = MIN(MYBLAS_TILE_N ,N-j1);
-	                  for( size_t k1=k2; k1<k2+K2; k1+=MIN(K-k1,MYBLAS_TILE_K ) ){
-	                    size_t K1 = MIN(MYBLAS_TILE_K ,K-k1);
+	                for( size_t k1=k2; k1<k2+K2; k1+=MIN(K-k1,MYBLAS_TILE_K ) ){
+	                  size_t K1 = MIN(MYBLAS_TILE_K ,K-k1);
+	                  for( size_t j1=j2; j1<j2+N2; j1+=MIN(N-j1,MYBLAS_TILE_N ) ){
+	                    size_t N1 = MIN(MYBLAS_TILE_N ,N-j1);
 	                    for( size_t j =j1; j < j1+N1; j++ ){
 	                      for( size_t k =k1; k < k1+K1; k++ ){
 	                        *B2=*B;
@@ -167,59 +163,58 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	                        B2++;
 	                      }
 	                      B  = B  - K1 + ldb ;
-	                      B2 = B2 - K1 + ldb2;
 	                    }
-	                    B  = B  - ldb *N1 + K1;
-	                    B2 = B2 - ldb2*N1 + K1;
 	                  }
-	                  B  = B  - K2 + ldb *N1;
-	                  B2 = B2 - K2 + ldb2*N1;
+	                  B  = B  - ldb *N2 + K1;
 	                }
-	                B  = B  - ldb *N2;
-	                B2 = B2 - ldb2*N2;
+	                B2 = B2 - K2*N2;
+	                B  = B  - K2;
 	                B  = B  - ldb*j2 - k2; // return to head
 
 	                // L1 cache
-	                for( size_t j1=j2; j1<j2+N2; j1+=MIN(N-j1,MYBLAS_TILE_N ) ){
-	                for( size_t i1=i2; i1<i2+M2; i1+=MIN(M-i1,MYBLAS_TILE_M ) ){
+	                C = C + ldc*j2 + i2;
 	                for( size_t k1=k2; k1<k2+K2; k1+=MIN(K-k1,MYBLAS_TILE_K ) ){
-
-	                    C = C + ldc*j1 + i1;
-
-	                    A2 = A2 + lda2*(k1-k2) + (i1-i2);
-	                    B2 = B2 + ldb2*(j1-j2) + (k1-k2);
-
-	                    size_t M1 = MIN(MYBLAS_TILE_M ,M-i1);
+	                  size_t K1 = MIN(MYBLAS_TILE_K ,K-k1);
+	                  for( size_t j1=j2; j1<j2+N2; j1+=MIN(N-j1,MYBLAS_TILE_N ) ){
 	                    size_t N1 = MIN(MYBLAS_TILE_N ,N-j1);
-	                    size_t K1 = MIN(MYBLAS_TILE_K ,K-k1);
-	                    for( size_t j =j1; j < j1+N1; j++ ){
-	                      for( size_t i =i1; i < i1+M1; i++ ){
-		                AB=0e0;
-	                        for( size_t k =k1; k < k1+K1; k++ ){
-	                          AB = AB + (*A2)*(*B2);
-	                          //printf("A(%d,%d)=%G A2(%d,%d)=%G\n",i,k,*A,i,k,*A2);
-	                          //printf("B(%d,%d)=%G B2(%d,%d)=%G\n",k,j,*B,k,j,*B2);
-	                          A2+= lda2;
-	                          B2++;
+	                    for( size_t i1=i2; i1<i2+M2; i1+=MIN(M-i1,MYBLAS_TILE_M ) ){
+	                      size_t M1 = MIN(MYBLAS_TILE_M ,M-i1);
+
+	                      for( size_t j =j1; j < j1+N1; j++ ){
+	                        for( size_t i =i1; i < i1+M1; i++ ){
+		                  AB=0e0;
+	                          for( size_t k =k1; k < k1+K1; k++ ){
+	                            AB = AB + (*A2)*(*B2);
+	                            //printf("A2(%d,%d)=%G A2(%d,%d)=%G\n",i,k,*A2,i,k,*A2);
+	                            //printf("B2(%d,%d)=%G B2(%d,%d)=%G\n",k,j,*B2,k,j,*B2);
+	                            A2++;
+	                            B2++;
+	                          }
+			          *C = (*C) + alpha*AB;
+	                          B2 = B2 - K1;
+	                          C++;
 	                        }
-			        *C = (*C) + alpha*AB;
-	                        A2 = A2 - lda2*K1 + 1;
-	                        B2 = B2 - K1;
-	                        C++;
+	                        A2 = A2 - M1*K1;
+	                        B2 = B2 + K1;
+	                        C  = C - M1 + ldc;
 	                      }
-	                      A2 = A2- M1;
-	                      B2 = B2 + ldb2;
-	                      C  = C - M1 + ldc;
-	                    }
-	                    B2 = B2 - ldb2*N1;
-	                    C  = C - ldc*N1;
+	                      A2 = A2 + M1*K1;
+	                      B2 = B2 - K1*N1;
+	                      C  = C - ldc*N1 + M1;
 
-	                    C = C - ldc*j1 - i1;
+	                    }// i1
+	                    A2 = A2 - M2*K1;
+	                    B2 = B2 + K1*N1;
+	                    C  = C - M2 + ldc*N1;
 
-	                    A2 = A2 - lda2*(k1-k2) - (i1-i2);
-	                    B2 = B2 - ldb2*(j1-j2) - (k1-k2);
+	                  }// j1
+	                  A2 = A2 + M2*K1;
+	                  C  = C - ldc*N2;
 
-	                }}}
+	                }// k1
+	                A2 = A2 - M2*K2;
+	                B2 = B2 - K2*N2;
+	                C = C - ldc*j2 - i2;
 
 	            }}}
 
