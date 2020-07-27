@@ -115,16 +115,16 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	        size_t  ldb2 = MYBLAS_BLOCK_K;
 
 	        // L3 cache
-	        for( size_t k3=0 ; k3<K; k3+=MIN(K-k3,MYBLAS_PANEL_K) ){
 	        for( size_t j3=0 ; j3<N; j3+=MIN(N-j3,MYBLAS_PANEL_N) ){
 	        for( size_t i3=0 ; i3<M; i3+=MIN(M-i3,MYBLAS_PANEL_M) ){
+	        for( size_t k3=0 ; k3<K; k3+=MIN(K-k3,MYBLAS_PANEL_K) ){
 	            size_t M3 = MIN(MYBLAS_PANEL_M ,M-i3);
 	            size_t N3 = MIN(MYBLAS_PANEL_N ,N-j3);
 	            size_t K3 = MIN(MYBLAS_PANEL_K ,K-k3);
 	            // L2 cache
-	            for( size_t k2=k3; k2<k3+K3; k2+=MIN(K-k2,MYBLAS_BLOCK_K) ){
 	            for( size_t j2=j3; j2<j3+N3; j2+=MIN(N-j2,MYBLAS_BLOCK_N) ){
 	            for( size_t i2=i3; i2<i3+M3; i2+=MIN(M-i2,MYBLAS_BLOCK_M) ){
+	            for( size_t k2=k3; k2<k3+K3; k2+=MIN(K-k2,MYBLAS_BLOCK_K) ){
 	                size_t M2 = MIN(MYBLAS_BLOCK_M ,M-i2);
 	                size_t N2 = MIN(MYBLAS_BLOCK_N ,N-j2);
 	                size_t K2 = MIN(MYBLAS_BLOCK_K ,K-k2);
