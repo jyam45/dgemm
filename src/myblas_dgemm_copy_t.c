@@ -1,5 +1,6 @@
 #include "myblas_internal.h"
 
+// On L2-Cache Copy for A
 void myblas_dgemm_copy_t(const double* A, size_t lda, double* A2, const block2d_info_t* info ){
 
 	size_t M2     = info->M2    ;
@@ -12,58 +13,22 @@ void myblas_dgemm_copy_t(const double* A, size_t lda, double* A2, const block2d_
 	size_t KQ = K2/tile_K;
 	size_t KR = K2%tile_K;
 
-	// On L2-Cache Copy for A
-	size_t k2 = KQ;
-	while( k2-- ){
-	  size_t K1 = tile_K;
-	  size_t m2 = MQ;
-	  while( m2-- ){
-	    size_t M1 = tile_M;
-	    size_t m1 = M1;
-	    while( m1-- ){
-	      size_t k1 = K1;
-	      while( k1-- ){
-	        (*A2) = (*A);
-	        A += lda ;
-	        A2++;
-	      }
-	      A  = A  - lda *K1 + 1;
-	    }
-	  }{
-	    size_t M1 = MR;
-	    size_t m1 = M1;
-	    while( m1-- ){
-	      size_t k1 = K1;
-	      while( k1-- ){
-	        (*A2) = (*A);
-	        A += lda ;
-	        A2++;
-	      }
-	      A  = A  - lda *K1 + 1;
-	    }
-	  }
-	  A = A  - M2 + lda *K1;
-	}{
-	  size_t K1 = KR;
-	  size_t m2 = MQ;
-	  while( m2-- ){
-	    size_t M1 = tile_M;
-	    size_t m1 = M1;
-	    while( m1-- ){
-	      size_t k1 = K1;
-	      while( k1-- ){
-	        (*A2) = (*A);
-	        A += lda ;
-	        A2++;
-	      }
-	      A  = A  - lda *K1 + 1;
-	    }
-	  }{
-	    size_t M1 = MR;
-	    size_t m1 = M1;
-	    while( m1-- ){
-	      size_t k1 = K1;
-	      while( k1-- ){
+	if( MR >  0 ){ MQ++; }
+	if( MR == 0 ){ MR = tile_M; }
+	if( KR >  0 ){ KQ++; }
+	if( KR == 0 ){ KR = tile_K; }
+
+	// L1-cache blocking
+	size_t k1 = KQ;
+	while( k1-- ){
+	  size_t K1 = tile_K; if( k1==0 ){ K1=KR; }
+	  size_t m1 = MQ;
+	  while( m1-- ){
+	    size_t M1 = tile_M; if( m1==0 ){ M1=MR; }
+	    size_t m = M1;
+	    while( m-- ){
+	      size_t k = K1;
+	      while( k-- ){
 	        (*A2) = (*A);
 	        A += lda ;
 	        A2++;

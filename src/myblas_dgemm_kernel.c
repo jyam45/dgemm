@@ -19,23 +19,31 @@ void myblas_dgemm_kernel(double alpha, const double *A2, const double *B2,
 
 	double       AB;
 
-	size_t k2 = KQ;
-	while( k2-- ){
-	  size_t K1 = tile_K;
+	if( MR >  0 ){ MQ++; }
+	if( MR == 0 ){ MR = tile_M; }
+	if( NR >  0 ){ NQ++; }
+	if( NR == 0 ){ NR = tile_N; }
+	if( KR >  0 ){ KQ++; }
+	if( KR == 0 ){ KR = tile_K; }
 
-	  size_t n2 = NQ;
-	  while( n2-- ){
-	    size_t N1 = tile_N;
+	// L1-cache blocking
+	size_t k1 = KQ;
+	while( k1-- ){
+	  size_t K1 = tile_K; if( k1==0 ){ K1=KR; }
 
-	    size_t m2 = MQ;
-	    while( m2-- ){
-	      size_t M1 = tile_M;
+	  size_t n1 = NQ;
+	  while( n1-- ){
+	    size_t N1 = tile_N; if( n1==0 ){ N1=NR; }
+
+	    size_t m1 = MQ;
+	    while( m1-- ){
+	      size_t M1 = tile_M; if( m1==0 ){ M1=MR; }
 
 	      // Kernel ----
-	      size_t n1 = N1;
-	      while( n1-- ){
-	        size_t m1 = M1;
-	        while( m1-- ){
+	      size_t n = N1;
+	      while( n-- ){
+	        size_t m = M1;
+	        while( m-- ){
 	          AB=0e0;
 	          size_t k = K1;
 	          while( k-- ){
@@ -55,256 +63,15 @@ void myblas_dgemm_kernel(double alpha, const double *A2, const double *B2,
 	      B2 = B2 - K1*N1;
 	      C  = C - ldc*N1 + M1;
 	      // ---- Kernel
-
-	    }{ // rest of m2-loop
-	      size_t M1 = MR;
-
-	      // Kernel ----
-	      size_t n1 = N1;
-	      while( n1-- ){
-	        size_t m1 = M1;
-	        while( m1-- ){
-	          AB=0e0;
-	          size_t k = K1;
-	          while( k-- ){
-	            AB = AB + (*A2)*(*B2);
-	            A2++;
-	            B2++;
-	          }
-	          *C = (*C) + alpha*AB;
-	          B2 = B2 - K1;
-	          C++;
-	        }
-	        A2 = A2 - M1*K1;
-	        B2 = B2 + K1;
-	        C  = C - M1 + ldc;
-	      }
-	      A2 = A2 + M1*K1;
-	      B2 = B2 - K1*N1;
-	      C  = C - ldc*N1 + M1;
-	      // ---- Kernel
-
 
 	    } // end of m2-loop
 	    A2 = A2 - M2*K1;
 	    B2 = B2 + K1*N1;
 	    C  = C - M2 + ldc*N1;
-
-	  }{ // rest of n2-loop
-
-	    size_t N1 = NR;
-
-	    size_t m2 = MQ;
-	    while( m2-- ){
-	      size_t M1 = tile_M;
-
-	      // Kernel ----
-	      size_t n1 = N1;
-	      while( n1-- ){
-	        size_t m1 = M1;
-	        while( m1-- ){
-	          AB=0e0;
-	          size_t k = K1;
-	          while( k-- ){
-	            AB = AB + (*A2)*(*B2);
-	            A2++;
-	            B2++;
-	          }
-	          *C = (*C) + alpha*AB;
-	          B2 = B2 - K1;
-	          C++;
-	        }
-	        A2 = A2 - M1*K1;
-	        B2 = B2 + K1;
-	        C  = C - M1 + ldc;
-	      }
-	      A2 = A2 + M1*K1;
-	      B2 = B2 - K1*N1;
-	      C  = C - ldc*N1 + M1;
-	      // ---- Kernel
-
-	    }{ // rest of m2-loop
-	      size_t M1 = MR;
-
-	      // Kernel ----
-	      size_t n1 = N1;
-	      while( n1-- ){
-	        size_t m1 = M1;
-	        while( m1-- ){
-	          AB=0e0;
-	          size_t k = K1;
-	          while( k-- ){
-	            AB = AB + (*A2)*(*B2);
-	            A2++;
-	            B2++;
-	          }
-	          *C = (*C) + alpha*AB;
-	          B2 = B2 - K1;
-	          C++;
-	        }
-	        A2 = A2 - M1*K1;
-	        B2 = B2 + K1;
-	        C  = C - M1 + ldc;
-	      }
-	      A2 = A2 + M1*K1;
-	      B2 = B2 - K1*N1;
-	      C  = C - ldc*N1 + M1;
-	      // ---- Kernel
-
-
-	    } // end of m2-loop
-	    A2 = A2 - M2*K1;
-	    B2 = B2 + K1*N1;
-	    C  = C - M2 + ldc*N1;
-
 
 	  } // end of n2-loop
 	  A2 = A2 + M2*K1;
 	  C  = C - ldc*N2;
-
-	}{// rest of k2-loop
-
-	  size_t K1 = KR;
-
-	  size_t n2 = NQ;
-	  while( n2-- ){
-	    size_t N1 = tile_N;
-
-	    size_t m2 = MQ;
-	    while( m2-- ){
-	      size_t M1 = tile_M;
-
-	      // Kernel ----
-	      size_t n1 = N1;
-	      while( n1-- ){
-	        size_t m1 = M1;
-	        while( m1-- ){
-	          AB=0e0;
-	          size_t k = K1;
-	          while( k-- ){
-	            AB = AB + (*A2)*(*B2);
-	            A2++;
-	            B2++;
-	          }
-	          *C = (*C) + alpha*AB;
-	          B2 = B2 - K1;
-	          C++;
-	        }
-	        A2 = A2 - M1*K1;
-	        B2 = B2 + K1;
-	        C  = C - M1 + ldc;
-	      }
-	      A2 = A2 + M1*K1;
-	      B2 = B2 - K1*N1;
-	      C  = C - ldc*N1 + M1;
-	      // ---- Kernel
-
-	    }{ // rest of m2-loop
-	      size_t M1 = MR;
-
-	      // Kernel ----
-	      size_t n1 = N1;
-	      while( n1-- ){
-	        size_t m1 = M1;
-	        while( m1-- ){
-	          AB=0e0;
-	          size_t k = K1;
-	          while( k-- ){
-	            AB = AB + (*A2)*(*B2);
-	            A2++;
-	            B2++;
-	          }
-	          *C = (*C) + alpha*AB;
-	          B2 = B2 - K1;
-	          C++;
-	        }
-	        A2 = A2 - M1*K1;
-	        B2 = B2 + K1;
-	        C  = C - M1 + ldc;
-	      }
-	      A2 = A2 + M1*K1;
-	      B2 = B2 - K1*N1;
-	      C  = C - ldc*N1 + M1;
-	      // ---- Kernel
-
-
-	    } // end of m2-loop
-	    A2 = A2 - M2*K1;
-	    B2 = B2 + K1*N1;
-	    C  = C - M2 + ldc*N1;
-
-	  }{ // rest of n2-loop
-
-	    size_t N1 = NR;
-
-	    size_t m2 = MQ;
-	    while( m2-- ){
-	      size_t M1 = tile_M;
-
-	      // Kernel ----
-	      size_t n1 = N1;
-	      while( n1-- ){
-	        size_t m1 = M1;
-	        while( m1-- ){
-	          AB=0e0;
-	          size_t k = K1;
-	          while( k-- ){
-	            AB = AB + (*A2)*(*B2);
-	            A2++;
-	            B2++;
-	          }
-	          *C = (*C) + alpha*AB;
-	          B2 = B2 - K1;
-	          C++;
-	        }
-	        A2 = A2 - M1*K1;
-	        B2 = B2 + K1;
-	        C  = C - M1 + ldc;
-	      }
-	      A2 = A2 + M1*K1;
-	      B2 = B2 - K1*N1;
-	      C  = C - ldc*N1 + M1;
-	      // ---- Kernel
-
-	    }{ // rest of m2-loop
-	      size_t M1 = MR;
-
-	      // Kernel ----
-	      size_t n1 = N1;
-	      while( n1-- ){
-	        size_t m1 = M1;
-	        while( m1-- ){
-	          AB=0e0;
-	          size_t k = K1;
-	          while( k-- ){
-	            AB = AB + (*A2)*(*B2);
-	            A2++;
-	            B2++;
-	          }
-	          *C = (*C) + alpha*AB;
-	          B2 = B2 - K1;
-	          C++;
-	        }
-	        A2 = A2 - M1*K1;
-	        B2 = B2 + K1;
-	        C  = C - M1 + ldc;
-	      }
-	      A2 = A2 + M1*K1;
-	      B2 = B2 - K1*N1;
-	      C  = C - ldc*N1 + M1;
-	      // ---- Kernel
-
-
-	    } // end of m2-loop
-	    A2 = A2 - M2*K1;
-	    B2 = B2 + K1*N1;
-	    C  = C - M2 + ldc*N1;
-
-
-	  } // end of n2-loop
-	  A2 = A2 + M2*K1;
-	  C  = C - ldc*N2;
-
 
 	} // end of k2-loop
 	A2 = A2 - M2*K2;
