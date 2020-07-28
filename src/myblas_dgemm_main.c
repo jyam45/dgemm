@@ -100,14 +100,8 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	    }else{
 
 	        // scaling beta*C
-	        for( size_t j=0; j<N; j++ ){
-	            for( size_t i=0; i<M; i++ ){
-			*C=beta*(*C);
-	                C++;
-	            }
-	            C = C - M + ldc;
-	        }
-	        C = C - ldc*N; // retern to head of pointer.
+	        block2d_info_t infoC = {1,1,M,N,1,1,1,1};
+	        myblas_dgemm_scale2d(beta,C,ldc,&infoC);
 
 		double*   A2 = calloc( MYBLAS_BLOCK_M*MYBLAS_BLOCK_K, sizeof(double) );
 	        size_t  lda2 = MYBLAS_BLOCK_M;
@@ -130,91 +124,16 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	                size_t K2 = MIN(MYBLAS_BLOCK_K ,K-k2);
 
 	                // On L2-Cache Copy for A
-	                A = A + lda*k2 + i2;
-	                for( size_t k1=k2; k1<k2+K2; k1+=MIN(K-k1,MYBLAS_TILE_K ) ){
-	                  size_t K1 = MIN(MYBLAS_TILE_K ,K-k1);
-	                  for( size_t i1=i2; i1<i2+M2; i1+=MIN(M-i1,MYBLAS_TILE_M )  ){
-	                    size_t M1 = MIN(MYBLAS_TILE_M ,M-i1);
-	                    for( size_t i =i1; i < i1+M1; i++ ){
-	                      for( size_t k =k1; k < k1+K1; k++ ){
-	                        (*A2) = (*A);
-	                        A += lda ;
-	                        A2++;
-	                      }
-	                      A  = A  - lda *K1 + 1;
-	                    }
-	                  }
-	                  A = A  - M2 + lda *K1;
-	                }
-	                A2 = A2  - M2*K2;
-	                A = A  - lda*K2;
-	                A = A - lda*k2 - i2; // return to head
+	                block2d_info_t infoA = {i2,k2,M,K,M2,K2,MYBLAS_TILE_M,MYBLAS_TILE_K};
+	                myblas_dgemm_copy_t(A+lda*k2+i2,lda,A2,&infoA);
 
 	                // On L2-Cache Copy for B
-	                B = B + ldb*j2 + k2;
-	                for( size_t k1=k2; k1<k2+K2; k1+=MIN(K-k1,MYBLAS_TILE_K ) ){
-	                  size_t K1 = MIN(MYBLAS_TILE_K ,K-k1);
-	                  for( size_t j1=j2; j1<j2+N2; j1+=MIN(N-j1,MYBLAS_TILE_N ) ){
-	                    size_t N1 = MIN(MYBLAS_TILE_N ,N-j1);
-	                    for( size_t j =j1; j < j1+N1; j++ ){
-	                      for( size_t k =k1; k < k1+K1; k++ ){
-	                        *B2=*B;
-	                        B++;
-	                        B2++;
-	                      }
-	                      B  = B  - K1 + ldb ;
-	                    }
-	                  }
-	                  B  = B  - ldb *N2 + K1;
-	                }
-	                B2 = B2 - K2*N2;
-	                B  = B  - K2;
-	                B  = B  - ldb*j2 - k2; // return to head
+	                block2d_info_t infoB = {k2,j2,K,N,K2,N2,MYBLAS_TILE_K,MYBLAS_TILE_N};
+	                myblas_dgemm_copy_n(B+ldb*j2+k2,ldb,B2,&infoB);
 
 	                // L1 cache
-	                C = C + ldc*j2 + i2;
-	                for( size_t k1=k2; k1<k2+K2; k1+=MIN(K-k1,MYBLAS_TILE_K ) ){
-	                  size_t K1 = MIN(MYBLAS_TILE_K ,K-k1);
-	                  for( size_t j1=j2; j1<j2+N2; j1+=MIN(N-j1,MYBLAS_TILE_N ) ){
-	                    size_t N1 = MIN(MYBLAS_TILE_N ,N-j1);
-	                    for( size_t i1=i2; i1<i2+M2; i1+=MIN(M-i1,MYBLAS_TILE_M ) ){
-	                      size_t M1 = MIN(MYBLAS_TILE_M ,M-i1);
-
-	                      for( size_t j =j1; j < j1+N1; j++ ){
-	                        for( size_t i =i1; i < i1+M1; i++ ){
-		                  AB=0e0;
-	                          for( size_t k =k1; k < k1+K1; k++ ){
-	                            AB = AB + (*A2)*(*B2);
-	                            //printf("A2(%d,%d)=%G A2(%d,%d)=%G\n",i,k,*A2,i,k,*A2);
-	                            //printf("B2(%d,%d)=%G B2(%d,%d)=%G\n",k,j,*B2,k,j,*B2);
-	                            A2++;
-	                            B2++;
-	                          }
-			          *C = (*C) + alpha*AB;
-	                          B2 = B2 - K1;
-	                          C++;
-	                        }
-	                        A2 = A2 - M1*K1;
-	                        B2 = B2 + K1;
-	                        C  = C - M1 + ldc;
-	                      }
-	                      A2 = A2 + M1*K1;
-	                      B2 = B2 - K1*N1;
-	                      C  = C - ldc*N1 + M1;
-
-	                    }// i1
-	                    A2 = A2 - M2*K1;
-	                    B2 = B2 + K1*N1;
-	                    C  = C - M2 + ldc*N1;
-
-	                  }// j1
-	                  A2 = A2 + M2*K1;
-	                  C  = C - ldc*N2;
-
-	                }// k1
-	                A2 = A2 - M2*K2;
-	                B2 = B2 - K2*N2;
-	                C = C - ldc*j2 - i2;
+	                block3d_info_t info3d = {i2,j2,k2,M,N,K,M2,N2,K2,MYBLAS_TILE_M,MYBLAS_TILE_N,MYBLAS_TILE_K};
+	                myblas_dgemm_kernel(alpha,A2,B2,C+ldc*j2+i2,ldc,&info3d);
 
 	            }}}
 

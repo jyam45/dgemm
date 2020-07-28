@@ -6,7 +6,8 @@ LDFLAGS=-L./lib/
 LIBS=-lcpuid -ltimer
 CBLASLIBS= -lcblas -lblas
 
-MYBLAS_OBJS= src/myblas_dgemm.o src/myblas_dgemm_main.o src/myblas_xerbla.o
+MYBLAS_OBJS= src/myblas_dgemm.o src/myblas_dgemm_main.o src/myblas_xerbla.o \
+             src/myblas_dgemm_scale2d.o src/myblas_dgemm_copy_n.o src/myblas_dgemm_copy_t.o src/myblas_dgemm_kernel.o
 
 all: libs test
 
@@ -31,9 +32,13 @@ test/speed_test.o  : test/speed_test.c test/dgemm_test.h
 test/unit_test.o   : test/unit_test.c test/dgemm_test.h
 test/total_test.o  : test/total_test.c test/dgemm_test.h
 test/dgemm_test.h  : include/cblas.h
+src/myblas_xerbla.o     : src/myblas_xerbla.c src/myblas_internal.h
 src/myblas_dgemm.o      : src/myblas_dgemm.c src/myblas.h src/myblas_internal.h
 src/myblas_dgemm_main.o : src/myblas_dgemm_main.c src/myblas_internal.h
-src/myblas_xerbla.o     : src/myblas_xerbla.c src/myblas_internal.h
+src/myblas_dgemm_scale2d.o : src/myblas_dgemm_scale2d.c src/myblas_internal.h
+src/myblas_dgemm_copy_n.o  : src/myblas_dgemm_copy_n.c src/myblas_internal.h
+src/myblas_dgemm_copy_t.o  : src/myblas_dgemm_copy_t.c src/myblas_internal.h
+src/myblas_dgemm_kernel.o  : src/myblas_dgemm_kernel.c src/myblas_internal.h
 
 ./lib:
 	mkdir -p lib

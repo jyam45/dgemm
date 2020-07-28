@@ -1,5 +1,6 @@
 #include "myblas_internal.h"
 
+#define MIN(x,y)  (((x)<(y))?(x):(y))
 void myblas_dgemm_kernel(double alpha, const double *A2, const double *B2, 
                          double *C, size_t ldc, const block3d_info_t* info ){
 

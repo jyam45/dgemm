@@ -52,7 +52,7 @@ typedef struct _block2d_info_t {
 
 void myblas_dgemm_main( gemm_args_t* args );
 
-void myblas_dgemm_scale2d(double beta, double *C, size_t ldc, const block2d_info_t* info ){
+void myblas_dgemm_scale2d(double beta, double *C, size_t ldc, const block2d_info_t* info );
 void myblas_dgemm_copy_t(const double* A, size_t lda, double* A2, const block2d_info_t* info );
 void myblas_dgemm_copy_n(const double* B, size_t ldb, double* B2, const block2d_info_t* info );
 void myblas_dgemm_kernel(double alpha, const double *A2, const double *B2, 
