@@ -23,12 +23,12 @@ typedef struct _gemm_args_t {
 } gemm_args_t;
 
 typedef struct _block3d_info_t {
-	size_t i2;
-	size_t j2;
-	size_t k2;
-	size_t M;
-	size_t N;
-	size_t K;
+	//size_t i2;
+	//size_t j2;
+	//size_t k2;
+	//size_t M;
+	//size_t N;
+	//size_t K;
 	size_t M2;
 	size_t N2;
 	size_t K2;
@@ -38,10 +38,10 @@ typedef struct _block3d_info_t {
 } block3d_info_t;
 
 typedef struct _block2d_info_t {
-	size_t i2;
-	size_t j2;
-	size_t M;
-	size_t N;
+	//size_t i2;
+	//size_t j2;
+	//size_t M;
+	//size_t N;
 	size_t M2;
 	size_t N2;
 	size_t tile_M;

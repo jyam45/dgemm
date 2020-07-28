@@ -100,7 +100,7 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	    }else{
 
 	        // scaling beta*C
-	        block2d_info_t infoC = {1,1,M,N,1,1,1,1};
+	        block2d_info_t infoC = {M,N,1,1};
 	        myblas_dgemm_scale2d(beta,C,ldc,&infoC);
 
 		double*   A2 = calloc( MYBLAS_BLOCK_M*MYBLAS_BLOCK_K, sizeof(double) );
@@ -124,15 +124,15 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	                size_t K2 = MIN(MYBLAS_BLOCK_K ,K-k2);
 
 	                // On L2-Cache Copy for A
-	                block2d_info_t infoA = {i2,k2,M,K,M2,K2,MYBLAS_TILE_M,MYBLAS_TILE_K};
+	                block2d_info_t infoA = {M2,K2,MYBLAS_TILE_M,MYBLAS_TILE_K};
 	                myblas_dgemm_copy_t(A+lda*k2+i2,lda,A2,&infoA);
 
 	                // On L2-Cache Copy for B
-	                block2d_info_t infoB = {k2,j2,K,N,K2,N2,MYBLAS_TILE_K,MYBLAS_TILE_N};
+	                block2d_info_t infoB = {K2,N2,MYBLAS_TILE_K,MYBLAS_TILE_N};
 	                myblas_dgemm_copy_n(B+ldb*j2+k2,ldb,B2,&infoB);
 
 	                // L1 cache
-	                block3d_info_t info3d = {i2,j2,k2,M,N,K,M2,N2,K2,MYBLAS_TILE_M,MYBLAS_TILE_N,MYBLAS_TILE_K};
+	                block3d_info_t info3d = {M2,N2,K2,MYBLAS_TILE_M,MYBLAS_TILE_N,MYBLAS_TILE_K};
 	                myblas_dgemm_kernel(alpha,A2,B2,C+ldc*j2+i2,ldc,&info3d);
 
 	            }}}
