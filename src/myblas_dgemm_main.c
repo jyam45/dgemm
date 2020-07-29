@@ -55,19 +55,40 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	    size_t N3 = MIN(MYBLAS_PANEL_N ,N-j3);
 	    size_t K3 = MIN(MYBLAS_PANEL_K ,K-k3);
 
-	    // L2 cache
-	    for( size_t k2=k3; k2<k3+K3; k2+=MIN(K-k2,MYBLAS_BLOCK_K) ){
-	      size_t K2 = MIN(MYBLAS_BLOCK_K ,K-k2);
+	    size_t M3B = M3/MYBLAS_BLOCK_M; // number of full blocks
+	    size_t M3R = M3%MYBLAS_BLOCK_M; // size of the final block
+	    size_t N3B = N3/MYBLAS_BLOCK_N; // number of full blocks
+	    size_t N3R = N3%MYBLAS_BLOCK_N; // size of the final block
+	    size_t K3B = K3/MYBLAS_BLOCK_K; // number of full blocks
+	    size_t K3R = K3%MYBLAS_BLOCK_K; // size of the final block
 
-	      for( size_t i2=i3; i2<i3+M3; i2+=MIN(M-i2,MYBLAS_BLOCK_M) ){
-	        size_t M2 = MIN(MYBLAS_BLOCK_M ,M-i2);
+	    M3B = M3B + (M3R>0?1:0); // number of blocks
+	    N3B = N3B + (N3R>0?1:0); // number of blocks
+	    K3B = K3B + (K3R>0?1:0); // number of blocks
+
+	    if( M3R==0 ) M3R = MYBLAS_BLOCK_M;
+	    if( N3R==0 ) N3R = MYBLAS_BLOCK_N;
+	    if( K3R==0 ) K3R = MYBLAS_BLOCK_K;
+
+	    // L2 cache
+	    size_t l2 = K3B; // block index
+	    size_t k2 = k3;  // element index
+	    while( l2-- ){
+	      size_t K2 = MYBLAS_BLOCK_K; if( l2==0 ){ K2=K3R; }
+
+	      size_t m2 = M3B; // block index
+	      size_t i2 = i3;  // element index
+	      while( m2-- ){
+	        size_t M2 = MYBLAS_BLOCK_M; if( m2==0 ){ M2=M3R; }
 
 	        // On L2-Cache Copy for A
 	        block2d_info_t infoA = {k2,i2,K2,M2,MYBLAS_TILE_K,MYBLAS_TILE_M};
 	        myblas_dgemm_copy_A(A,lda,A2,&infoA);
 
-	        for( size_t j2=j3; j2<j3+N3; j2+=MIN(N-j2,MYBLAS_BLOCK_N) ){
-	          size_t N2 = MIN(MYBLAS_BLOCK_N ,N-j2);
+	        size_t n2 = N3B; // block index
+	        size_t j2 = j3;  // element index
+	        while( n2-- ){
+	          size_t N2 = MYBLAS_BLOCK_N; if( n2==0 ){ N2=N3R; }
 
 	          // On L2-Cache Copy for B
 	          block2d_info_t infoB = {k2,j2,K2,N2,MYBLAS_TILE_K,MYBLAS_TILE_N};
@@ -77,8 +98,11 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	          block3d_info_t info3d = {M2,N2,K2,MYBLAS_TILE_M,MYBLAS_TILE_N,MYBLAS_TILE_K};
 	          myblas_dgemm_kernel(alpha,A2,B2,C+ldc*j2+i2,ldc,&info3d);
 
+	          j2 += N2;
 	        }
+	        i2 += M2;
 	      }
+	      k2 += K2;
 	    }
 
 	}}}
