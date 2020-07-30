@@ -76,19 +76,41 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	    while( l2-- ){
 	      size_t K2 = MYBLAS_BLOCK_K; if( l2==0 ){ K2=K3R; }
 
-	      size_t m2 = M3B; // block index
+	      size_t m2n2 = M3B*N3B; // m2n2=m2*N3B+n2
+	      size_t m2 = M3B-1;
+	      size_t n2 = N3B-1;
 	      size_t i2 = i3;  // element index
-	      while( m2-- ){
-	        size_t M2 = MYBLAS_BLOCK_M; if( m2==0 ){ M2=M3R; }
+	      size_t j2 = j3;  // element index
+	      size_t M2 = MYBLAS_BLOCK_M; if( i2+M2 >= i3+M3 ){ M2=M3R; }
+	      size_t N2 = MYBLAS_BLOCK_N; if( j2+N2 >= j3+N3 ){ N2=N3R; }
 
+	      // First Blocks
+	      {
+
+	        //printf("m2=%d n2=%d  A(%d,%d)[%d,%d] x B(%d,%d)[%d,%d] = C(%d,%d)[%d,%d]\n",m2,n2,i2,k2,M2,K2,k2,j2,K2,N2,i2,j2,M2,N2); 
 	        // On L2-Cache Copy for A
 	        block2d_info_t infoA = {k2,i2,K2,M2,MYBLAS_TILE_K,MYBLAS_TILE_M};
 	        myblas_dgemm_copy_A(A,lda,A2,&infoA);
 
-	        size_t n2 = N3B; // block index
-	        size_t j2 = j3;  // element index
-	        while( n2-- ){
-	          size_t N2 = MYBLAS_BLOCK_N; if( n2==0 ){ N2=N3R; }
+	        // On L2-Cache Copy for B
+	        block2d_info_t infoB = {k2,j2,K2,N2,MYBLAS_TILE_K,MYBLAS_TILE_N};
+	        myblas_dgemm_copy_B(B,ldb,B2,&infoB);
+
+	        // L1 cache
+	        block3d_info_t info3d = {M2,N2,K2,MYBLAS_TILE_M,MYBLAS_TILE_N,MYBLAS_TILE_K};
+	        myblas_dgemm_kernel(alpha,A2,B2,C+ldc*j2+i2,ldc,&info3d);
+
+	        m2n2--;
+	      }
+
+	      while( m2n2-- ){
+
+	        if( n2 > 0 ){ 
+	          n2--; 
+	          if( j2+N2 < j3+N3 ){ j2+=N2; }else{ j2=j3; }
+	          N2 = MYBLAS_BLOCK_N; if( j2+N2 >= j3+N3 ){ N2=N3R; }
+
+	          //printf("m2=%d n2=%d  A(%d,%d)[%d,%d] x B(%d,%d)[%d,%d] = C(%d,%d)[%d,%d]\n",m2,n2,i2,k2,M2,K2,k2,j2,K2,N2,i2,j2,M2,N2); 
 
 	          // On L2-Cache Copy for B
 	          block2d_info_t infoB = {k2,j2,K2,N2,MYBLAS_TILE_K,MYBLAS_TILE_N};
@@ -98,9 +120,24 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	          block3d_info_t info3d = {M2,N2,K2,MYBLAS_TILE_M,MYBLAS_TILE_N,MYBLAS_TILE_K};
 	          myblas_dgemm_kernel(alpha,A2,B2,C+ldc*j2+i2,ldc,&info3d);
 
-	          j2 += N2;
+	        }else{ 
+	          m2--;
+	          i2 += M2;
+	          M2 = MYBLAS_BLOCK_M; if( i2+M2 >= i3+M3 ){ M2=M3R; }
+
+	          //printf("m2=%d n2=%d  A(%d,%d)[%d,%d] x B(%d,%d)[%d,%d] = C(%d,%d)[%d,%d]\n",m2,n2,i2,k2,M2,K2,k2,j2,K2,N2,i2,j2,M2,N2); 
+
+	          // On L2-Cache Copy for A
+	          block2d_info_t infoA = {k2,i2,K2,M2,MYBLAS_TILE_K,MYBLAS_TILE_M};
+	          myblas_dgemm_copy_A(A,lda,A2,&infoA);
+
+	          // L1 cache
+	          block3d_info_t info3d = {M2,N2,K2,MYBLAS_TILE_M,MYBLAS_TILE_N,MYBLAS_TILE_K};
+	          myblas_dgemm_kernel(alpha,A2,B2,C+ldc*j2+i2,ldc,&info3d);
+
+	          n2 = N3B-1; 
 	        }
-	        i2 += M2;
+
 	      }
 	      k2 += K2;
 	    }
