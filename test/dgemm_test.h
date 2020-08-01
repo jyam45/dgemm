@@ -55,4 +55,10 @@ int    check_error( const dgemm_test_t *test1, const dgemm_test_t *test2 );
 
 double check_speed( dgemm_test_t* test );
 
+int    check_matrix( const int m, const int n, const int k,
+                     const double *C1, const int di1, const int dj1,
+                     const double *C2, const int di2, const int dj2 );
+
+int    check_array( const size_t n, const double *a, const double *b );
+
 #endif//DTEMM_TEST_H
