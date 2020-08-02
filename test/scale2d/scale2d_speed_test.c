@@ -5,7 +5,6 @@
 #include <stdio.h>
 
 #define MAX_SIZE 2048
-#define SEED 13892393
 
 static void do_scale2d( scale2d_test_t *test ){
 
@@ -20,8 +19,6 @@ int main( int argc, char** argv ){
 
 	double  beta = 1.3923842e0;
 	double* C = calloc(MAX_SIZE*MAX_SIZE,sizeof(double));
-
-	rand_matrix(MAX_SIZE,MAX_SIZE,C,MAX_SIZE,1,SEED);
 
 	test.beta = beta;
 	test.C    = C;
