@@ -14,7 +14,7 @@ int check_array( const size_t n, const double *a, const double *b )
 		double eps = DBL_EPSILON * cmax;
 
 		if( cdiff > eps  ){
-			fprintf(stderr,"[ERROR] An element a(%d) is invalid : t1=%G, t2=%G, diff=%G, eps=%G\n",j,*a,*b,cdiff,eps);
+			fprintf(stderr,"[ERROR] An element a(%d) is invalid : t1=%G, t2=%G, diff=%G, eps=%G\n",j,a[j],b[j],cdiff,eps);
 			return 1;
 		}
 	}
