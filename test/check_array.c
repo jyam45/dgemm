@@ -7,8 +7,8 @@ int check_array( const size_t n, const double *a, const double *b )
 {
 	for( size_t j=0; j<n; j++ ){
 
-		double c1 = fabs(*a);
-		double c2 = fabs(*b);
+		double c1 = fabs(a[j]);
+		double c2 = fabs(b[j]);
 		double cmax = ( c1>c2 ? c1 : c2 );
 		double cdiff = fabs(c1-c2);
 		double eps = DBL_EPSILON * cmax;
