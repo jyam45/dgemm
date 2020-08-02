@@ -65,7 +65,70 @@ void myblas_dgemm_kernel(double alpha, const double *A2, const double *B2,
 	        size_t n4 = ( n >> 2 ); // unrolling N
 	        while( n4-- ){
 	          size_t m = M1;
-	          while( m-- ){
+	          if( m >> 2 ){
+	            size_t m4 = ( m >> 2 ); // unrolling M
+	            while( m4-- ){
+	              //AB=0e0;
+	              c00=0e0;c01=0e0;c02=0e0;c03=0e0;
+	              c10=0e0;c11=0e0;c12=0e0;c13=0e0;
+	              c20=0e0;c21=0e0;c22=0e0;c23=0e0;
+	              c30=0e0;c31=0e0;c32=0e0;c33=0e0;
+	              size_t k = K1;
+	              while( k-- ){
+	                a00  = *(A2 + 0*K1 );
+	                a01  = *(A2 + 1*K1 );
+	                a02  = *(A2 + 2*K1 );
+	                a03  = *(A2 + 3*K1 );
+	                b00  = *(B2 + 0*K1 );
+	                b01  = *(B2 + 1*K1 );
+	                b02  = *(B2 + 2*K1 );
+	                b03  = *(B2 + 3*K1 );
+	                c00 += a00 * b00;
+	                c01 += a00 * b01;
+	                c02 += a00 * b02;
+	                c03 += a00 * b03;
+	                c10 += a01 * b00;
+	                c11 += a01 * b01;
+	                c12 += a01 * b02;
+	                c13 += a01 * b03;
+	                c20 += a02 * b00;
+	                c21 += a02 * b01;
+	                c22 += a02 * b02;
+	                c23 += a02 * b03;
+	                c30 += a03 * b00;
+	                c31 += a03 * b01;
+	                c32 += a03 * b02;
+	                c33 += a03 * b03;
+	                //AB = AB + (*A2)*(*B2);
+	                A2++;
+	                B2++;
+	              }
+	              //*C = (*C) + alpha*AB;
+	              *(C+0+0*ldc) += alpha*c00;
+	              *(C+0+1*ldc) += alpha*c01;
+	              *(C+0+2*ldc) += alpha*c02;
+	              *(C+0+3*ldc) += alpha*c03;
+	              *(C+1+0*ldc) += alpha*c10;
+	              *(C+1+1*ldc) += alpha*c11;
+	              *(C+1+2*ldc) += alpha*c12;
+	              *(C+1+3*ldc) += alpha*c13;
+	              *(C+2+0*ldc) += alpha*c20;
+	              *(C+2+1*ldc) += alpha*c21;
+	              *(C+2+2*ldc) += alpha*c22;
+	              *(C+2+3*ldc) += alpha*c23;
+	              *(C+3+0*ldc) += alpha*c30;
+	              *(C+3+1*ldc) += alpha*c31;
+	              *(C+3+2*ldc) += alpha*c32;
+	              *(C+3+3*ldc) += alpha*c33;
+	              A2 = A2 - K1 + 4*K1;
+	              B2 = B2 - K1;
+	              C+=4;
+	            }
+	          }
+	          if( m & 3 ){
+	            size_t mr = ( m & 3 ); // unrolling M
+	            while( mr-- ){
+	          //  while( m-- ){
 	              //AB=0e0;
 	              c00=0e0;c01=0e0;c02=0e0;c03=0e0;
 	              size_t k = K1;
@@ -90,6 +153,7 @@ void myblas_dgemm_kernel(double alpha, const double *A2, const double *B2,
 	              *(C+0+3*ldc) += alpha*c03;
 	              B2 = B2 - K1;
 	              C++;
+	            }
 	          }
 	          A2 = A2 - M1*K1;
 	          B2 = B2 + 4*K1;
