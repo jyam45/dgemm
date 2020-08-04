@@ -1,18 +1,21 @@
 #include "myblas_internal.h"
+#include <stdio.h>
 
 void myblas_dgemm_scale2d(double beta, double *C, size_t ldc, const block2d_info_t* info ){
 
 	size_t M      = info->M2    ;
 	size_t N      = info->N2    ;
-	size_t tile_M = info->tile_M;
-	size_t tile_N = info->tile_N;
 
-	double ymm0 ,ymm1 ,ymm2 ,ymm3 ;
-	double ymm4 ,ymm5 ,ymm6 ,ymm7 ;
-	double ymm8 ,ymm9 ,ymm10,ymm11;
-	double ymm12,ymm13,ymm14,ymm15;
+	double* c0 = C;
+	double* c1 = C + ldc;
+	size_t  ldc2 = 2*ldc*sizeof(double); // *** byte unit ***
 
-	ymm15 = beta;
+	//printf("M=%d, N=%d, ldc=%d\n",M,N,ldc);
+
+	__asm__ __volatile__ (
+	   "vbroadcastsd  %[beta],  %%ymm15\n\t"
+	   :: [beta]"m"(beta)
+	);
 
 	// scaling beta*C
 	size_t n = N;
@@ -24,94 +27,273 @@ void myblas_dgemm_scale2d(double beta, double *C, size_t ldc, const block2d_info
 	        if( m >> 3 ){
 	            size_t m8 = ( m >> 3 );
 	            while( m8-- ){
-	                size_t m8a = 4; // YMM Vector-length
-	                size_t m8b = 4; // YMM Vector-length
-	                while( m8a-- ){ // vectorizing
-	                    ymm0 = *(C+0*ldc);
-	                    ymm1 = *(C+1*ldc);
-	                    ymm2 = *(C+2*ldc);
-	                    ymm3 = *(C+3*ldc);
-	                    ymm0 *= ymm15;
-	                    ymm1 *= ymm15;
-	                    ymm2 *= ymm15;
-	                    ymm3 *= ymm15;
-	                    *(C+0*ldc) = ymm0;
-	                    *(C+1*ldc) = ymm1;
-	                    *(C+2*ldc) = ymm2;
-	                    *(C+3*ldc) = ymm3;
-	                    C++;
-	                }
-	                while( m8b-- ){ // vectorizing
-	                    ymm8 = *(C+0*ldc);
-	                    ymm9 = *(C+1*ldc);
-	                    ymm10= *(C+2*ldc);
-	                    ymm11= *(C+3*ldc);
-	                    ymm8  *= ymm15;
-	                    ymm9  *= ymm15;
-	                    ymm10 *= ymm15;
-	                    ymm11 *= ymm15;
-	                    *(C+0*ldc) = ymm8 ;
-	                    *(C+1*ldc) = ymm9 ;
-	                    *(C+2*ldc) = ymm10;
-	                    *(C+3*ldc) = ymm11;
-	                    C++;
-	                }
 
+	                __asm__ __volatile__ (
+	                    "vmovupd   0*8(%[c0]        ), %%ymm0\n\t"
+	                    "vmovupd   0*8(%[c1]        ), %%ymm1\n\t"
+	                    "vmovupd   0*8(%[c0],%[ldc2]), %%ymm2\n\t"
+	                    "vmovupd   0*8(%[c1],%[ldc2]), %%ymm3\n\t"
+	                    "vmulpd    %%ymm15,  %%ymm0 ,  %%ymm0\n\t"
+	                    "vmulpd    %%ymm15,  %%ymm1 ,  %%ymm1\n\t"
+	                    "vmulpd    %%ymm15,  %%ymm2 ,  %%ymm2\n\t"
+	                    "vmulpd    %%ymm15,  %%ymm3 ,  %%ymm3\n\t"
+	                    "vmovupd   %%ymm0,   0*8(%[c0]        )\n\t"
+	                    "vmovupd   %%ymm1,   0*8(%[c1]        )\n\t"
+	                    "vmovupd   %%ymm2,   0*8(%[c0],%[ldc2])\n\t"
+	                    "vmovupd   %%ymm3,   0*8(%[c1],%[ldc2])\n\t"
+	                    "\n\t"
+	                    "vmovupd   4*8(%[c0]        ), %%ymm8 \n\t"
+	                    "vmovupd   4*8(%[c1]        ), %%ymm9 \n\t"
+	                    "vmovupd   4*8(%[c0],%[ldc2]), %%ymm10\n\t"
+	                    "vmovupd   4*8(%[c1],%[ldc2]), %%ymm11\n\t"
+	                    "vmulpd    %%ymm15,  %%ymm8 ,  %%ymm8 \n\t"
+	                    "vmulpd    %%ymm15,  %%ymm9 ,  %%ymm9 \n\t"
+	                    "vmulpd    %%ymm15,  %%ymm10,  %%ymm10\n\t"
+	                    "vmulpd    %%ymm15,  %%ymm11,  %%ymm11\n\t"
+	                    "vmovupd   %%ymm8 ,   4*8(%[c0]        )\n\t"
+	                    "vmovupd   %%ymm9 ,   4*8(%[c1]        )\n\t"
+	                    "vmovupd   %%ymm10,   4*8(%[c0],%[ldc2])\n\t"
+	                    "vmovupd   %%ymm11,   4*8(%[c1],%[ldc2])\n\t"
+	                    "\n\t"
+	                    "addq   $8*8, %[c0]\n\t"
+	                    "addq   $8*8, %[c1]\n\t"
+	                    "\n\t"
+	                    :[c0]"=r"(c0),[c1]"=r"(c1)
+	                    :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
+	                    );
 	            }
 	        }
-	        if( m & 0x4 ){
-	            size_t m4 = 4;
-	            while( m4-- )
-	            {
-	                ymm0 = *(C+0*ldc);
-	                ymm1 = *(C+1*ldc);
-	                ymm2 = *(C+2*ldc);
-	                ymm3 = *(C+3*ldc);
-	                ymm0 *= ymm15;
-	                ymm1 *= ymm15;
-	                ymm2 *= ymm15;
-	                ymm3 *= ymm15;
-	                *(C+0*ldc) = ymm0;
-	                *(C+1*ldc) = ymm1;
-	                *(C+2*ldc) = ymm2;
-	                *(C+3*ldc) = ymm3;
-	                C++;
-	            }
+	        if( m & 4 ){
+
+	            __asm__ __volatile__ (
+	                "vmovupd   0*8(%[c0]        ), %%ymm0\n\t"
+	                "vmovupd   0*8(%[c1]        ), %%ymm1\n\t"
+	                "vmovupd   0*8(%[c0],%[ldc2]), %%ymm2\n\t"
+	                "vmovupd   0*8(%[c1],%[ldc2]), %%ymm3\n\t"
+	                "vmulpd    %%ymm15,  %%ymm0 ,  %%ymm0\n\t"
+	                "vmulpd    %%ymm15,  %%ymm1 ,  %%ymm1\n\t"
+	                "vmulpd    %%ymm15,  %%ymm2 ,  %%ymm2\n\t"
+	                "vmulpd    %%ymm15,  %%ymm3 ,  %%ymm3\n\t"
+	                "vmovupd   %%ymm0,   0*8(%[c0]        )\n\t"
+	                "vmovupd   %%ymm1,   0*8(%[c1]        )\n\t"
+	                "vmovupd   %%ymm2,   0*8(%[c0],%[ldc2])\n\t"
+	                "vmovupd   %%ymm3,   0*8(%[c1],%[ldc2])\n\t"
+	                "\n\t"
+	                "addq   $4*8, %[c0]\n\t"
+	                "addq   $4*8, %[c1]\n\t"
+	                "\n\t"
+	                :[c0]"=r"(c0),[c1]"=r"(c1)
+	                :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
+	                );
+	
 		}
-	        if( m & 0x3 ){
-	            size_t mr = ( m & 0x3 );
-	            while( mr-- ){
-	                ymm0 = *(C+0*ldc);
-	                ymm1 = *(C+1*ldc);
-	                ymm2 = *(C+2*ldc);
-	                ymm3 = *(C+3*ldc);
-	                ymm0 *= ymm15;
-	                ymm1 *= ymm15;
-	                ymm2 *= ymm15;
-	                ymm3 *= ymm15;
-	                *(C+0*ldc) = ymm0;
-	                *(C+1*ldc) = ymm1;
-	                *(C+2*ldc) = ymm2;
-	                *(C+3*ldc) = ymm3;
-	                C++;
-	            }
+	        if( m & 2 ){
+
+	            __asm__ __volatile__ (
+	                "movupd   0*8(%[c0]        ), %%xmm0\n\t"
+	                "movupd   0*8(%[c1]        ), %%xmm1\n\t"
+	                "movupd   0*8(%[c0],%[ldc2]), %%xmm2\n\t"
+	                "movupd   0*8(%[c1],%[ldc2]), %%xmm3\n\t"
+	                "mulpd    %%xmm15,  %%xmm0 \n\t"
+	                "mulpd    %%xmm15,  %%xmm1 \n\t"
+	                "mulpd    %%xmm15,  %%xmm2 \n\t"
+	                "mulpd    %%xmm15,  %%xmm3 \n\t"
+	                "movupd   %%xmm0,   0*8(%[c0]        )\n\t"
+	                "movupd   %%xmm1,   0*8(%[c1]        )\n\t"
+	                "movupd   %%xmm2,   0*8(%[c0],%[ldc2])\n\t"
+	                "movupd   %%xmm3,   0*8(%[c1],%[ldc2])\n\t"
+	                "\n\t"
+	                "addq   $2*8, %[c0]\n\t"
+	                "addq   $2*8, %[c1]\n\t"
+	                "\n\t"
+	                :[c0]"=r"(c0),[c1]"=r"(c1)
+	                :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
+	                );
+	
+	        }
+	        if( m & 1 ){
+
+	            __asm__ __volatile__ (
+	                "movsd   0*8(%[c0]        ), %%xmm0\n\t"
+	                "movsd   0*8(%[c1]        ), %%xmm1\n\t"
+	                "movsd   0*8(%[c0],%[ldc2]), %%xmm2\n\t"
+	                "movsd   0*8(%[c1],%[ldc2]), %%xmm3\n\t"
+	                "mulsd    %%xmm15,  %%xmm0 \n\t"
+	                "mulsd    %%xmm15,  %%xmm1 \n\t"
+	                "mulsd    %%xmm15,  %%xmm2 \n\t"
+	                "mulsd    %%xmm15,  %%xmm3 \n\t"
+	                "movlpd   %%xmm0,   0*8(%[c0]        )\n\t"
+	                "movlpd   %%xmm1,   0*8(%[c1]        )\n\t"
+	                "movlpd   %%xmm2,   0*8(%[c0],%[ldc2])\n\t"
+	                "movlpd   %%xmm3,   0*8(%[c1],%[ldc2])\n\t"
+	                "\n\t"
+	                "addq   $1*8, %[c0]\n\t"
+	                "addq   $1*8, %[c1]\n\t"
+	                "\n\t"
+	                :[c0]"=r"(c0),[c1]"=r"(c1)
+	                :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
+	                );
+
 		}
-	        C = C - M + 4*ldc;
+	        c0= c0- M + 4*ldc;
+	        c1= c1- M + 4*ldc;
 	    }
 	}
-	if( n & 0x3 ){
-	  size_t nr = ( n & 0x3 );
-	  while( nr-- ){
-	      size_t m = M;
-	      while( m-- ){
-	  	*C=beta*(*C);
-	         C++;
-	      }
-	      C = C - M + ldc;
-	  }
-	}
-	C = C - ldc*N; // retern to head of pointer.
+	if( n & 2 ){
+	    size_t m = M;
+	    if( m >> 3 ){
+	        size_t m8 = ( m >> 3 );
+	        while( m8-- ){
+	        
+	            __asm__ __volatile__ (
+	                "vmovupd   0*8(%[c0]        ), %%ymm0\n\t"
+	                "vmovupd   0*8(%[c1]        ), %%ymm1\n\t"
+	                "vmulpd    %%ymm15,  %%ymm0 ,  %%ymm0\n\t"
+	                "vmulpd    %%ymm15,  %%ymm1 ,  %%ymm1\n\t"
+	                "vmovupd   %%ymm0,   0*8(%[c0]        )\n\t"
+	                "vmovupd   %%ymm1,   0*8(%[c1]        )\n\t"
+	                "\n\t"
+	                "vmovupd   4*8(%[c0]        ), %%ymm8 \n\t"
+	                "vmovupd   4*8(%[c1]        ), %%ymm9 \n\t"
+	                "vmulpd    %%ymm15,  %%ymm8 ,  %%ymm8 \n\t"
+	                "vmulpd    %%ymm15,  %%ymm9 ,  %%ymm9 \n\t"
+	                "vmovupd   %%ymm8 ,   4*8(%[c0]        )\n\t"
+	                "vmovupd   %%ymm9 ,   4*8(%[c1]        )\n\t"
+	                "\n\t"
+	                "addq   $8*8, %[c0]\n\t"
+	                "addq   $8*8, %[c1]\n\t"
+	                "\n\t"
+	                :[c0]"=r"(c0),[c1]"=r"(c1)
+	                :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
+	                );
+	        }
+	    }
+	    if( m & 4 ){
 
+	        __asm__ __volatile__ (
+	            "vmovupd   0*8(%[c0]        ), %%ymm0\n\t"
+	            "vmovupd   0*8(%[c1]        ), %%ymm1\n\t"
+	            "vmulpd    %%ymm15,  %%ymm0 ,  %%ymm0\n\t"
+	            "vmulpd    %%ymm15,  %%ymm1 ,  %%ymm1\n\t"
+	            "vmovupd   %%ymm0,   0*8(%[c0]        )\n\t"
+	            "vmovupd   %%ymm1,   0*8(%[c1]        )\n\t"
+	            "\n\t"
+	            "addq   $4*8, %[c0]\n\t"
+	            "addq   $4*8, %[c1]\n\t"
+	            "\n\t"
+	            :[c0]"=r"(c0),[c1]"=r"(c1)
+	            :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
+	            );
+	
+	    }
+	    if( m & 2 ){
+
+	        __asm__ __volatile__ (
+	            "movupd   0*8(%[c0]        ), %%xmm0\n\t"
+	            "movupd   0*8(%[c1]        ), %%xmm1\n\t"
+	            "mulpd    %%xmm15,  %%xmm0 \n\t"
+	            "mulpd    %%xmm15,  %%xmm1 \n\t"
+	            "movupd   %%xmm0,   0*8(%[c0]        )\n\t"
+	            "movupd   %%xmm1,   0*8(%[c1]        )\n\t"
+	            "\n\t"
+	            "addq   $2*8, %[c0]\n\t"
+	            "addq   $2*8, %[c1]\n\t"
+	            "\n\t"
+	            :[c0]"=r"(c0),[c1]"=r"(c1)
+	            :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
+	            );
+	
+	    }
+	    if( m & 1 ){
+
+	        __asm__ __volatile__ (
+	            "movsd   0*8(%[c0]        ), %%xmm0\n\t"
+	            "movsd   0*8(%[c1]        ), %%xmm1\n\t"
+	            "mulsd    %%xmm15,  %%xmm0 \n\t"
+	            "mulsd    %%xmm15,  %%xmm1 \n\t"
+	            "movlpd   %%xmm0,   0*8(%[c0]        )\n\t"
+	            "movlpd   %%xmm1,   0*8(%[c1]        )\n\t"
+	            "\n\t"
+	            "addq   $1*8, %[c0]\n\t"
+	            "addq   $1*8, %[c1]\n\t"
+	            "\n\t"
+	            :[c0]"=r"(c0),[c1]"=r"(c1)
+	            :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
+	            );
+
+	    }
+	    c0= c0- M + 2*ldc;
+	    c1= c1- M + 2*ldc;
+
+	}
+	if( n & 1 ){
+	    size_t m = M;
+	    if( m >> 3 ){
+	        size_t m8 = ( m >> 3 );
+	        while( m8-- ){
+	    
+	            __asm__ __volatile__ (
+	                "vmovupd   0*8(%[c0]        ), %%ymm0\n\t"
+	                "vmulpd    %%ymm15,  %%ymm0 ,  %%ymm0\n\t"
+	                "vmovupd   %%ymm0,   0*8(%[c0]        )\n\t"
+	                "\n\t"
+	                "vmovupd   4*8(%[c0]        ), %%ymm8 \n\t"
+	                "vmulpd    %%ymm15,  %%ymm8 ,  %%ymm8 \n\t"
+	                "vmovupd   %%ymm8 ,   4*8(%[c0]        )\n\t"
+	                "\n\t"
+	                "addq   $8*8, %[c0]\n\t"
+	                "\n\t"
+	                :[c0]"=r"(c0)
+	                :"0"(c0)
+	                );
+	        }
+	    }
+	    if( m & 4 ){
+	   
+	        __asm__ __volatile__ (
+	            "vmovupd   0*8(%[c0]        ), %%ymm0\n\t"
+	            "vmulpd    %%ymm15,  %%ymm0 ,  %%ymm0\n\t"
+	            "vmovupd   %%ymm0,   0*8(%[c0]        )\n\t"
+	            "\n\t"
+	            "addq   $4*8, %[c0]\n\t"
+	            "\n\t"
+	            :[c0]"=r"(c0)
+	            :"0"(c0)
+	            );
+	
+	    }
+	    if( m & 2 ){
+
+	        __asm__ __volatile__ (
+	            "movupd   0*8(%[c0]        ), %%xmm0\n\t"
+	            "mulpd    %%xmm15,  %%xmm0 \n\t"
+	            "movupd   %%xmm0,   0*8(%[c0]        )\n\t"
+	            "\n\t"
+	            "addq   $2*8, %[c0]\n\t"
+	            "\n\t"
+	            :[c0]"=r"(c0)
+	            :"0"(c0)
+	            );
+	
+	    }
+	    if( m & 1 ){
+	    
+	        __asm__ __volatile__ (
+	            "movsd   0*8(%[c0]        ), %%xmm0\n\t"
+	            "mulsd    %%xmm15,  %%xmm0 \n\t"
+	            "movlpd   %%xmm0,   0*8(%[c0]        )\n\t"
+	            "\n\t"
+	            "addq   $1*8, %[c0]\n\t"
+	            "\n\t"
+	            :[c0]"=r"(c0)
+	            :"0"(c0)
+	            );
+
+	    }
+	    c0= c0- M + ldc;
+
+	}
+	c0= c0- ldc*N; // retern to head of pointer.
 
 }
 
