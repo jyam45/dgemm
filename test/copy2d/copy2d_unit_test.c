@@ -10,6 +10,12 @@
 #define TILE_N     32
 #define SEED 13892393
 
+#define F_TRANS 0x0001
+#define F_CORE  0x0002
+
+static copy2d_func_t myblas_funcs[] = { myblas_dgemm_copy_n, myblas_dgemm_copy_t, myblas_dgemm_copy_n_core, myblas_dgemm_copy_t_core };
+static copy2d_func_t basic_funcs[]  = { myblas_basic_copy_n, myblas_basic_copy_t, myblas_basic_copy_n_core, myblas_basic_copy_t_core };
+
 static void do_copy2d( copy2d_test_t *test ){
 
 	test->func( test->A, test->lda, test->buf, test->info );
@@ -25,20 +31,24 @@ static int copy2d_check_error( const copy2d_test_t *test1, const copy2d_test_t *
 int main( int argc, char** argv ){
 
 	block2d_info_t sizes={0,0,MAX_SIZE,MAX_SIZE,TILE_M,TILE_N};
-	copy2d_test_t test1 ={myblas_basic_copy_n,NULL,MAX_SIZE,NULL,&sizes};
-	copy2d_test_t test2 ={myblas_dgemm_copy_n,NULL,MAX_SIZE,NULL,&sizes};
+	copy2d_test_t test1 ={NULL,NULL,MAX_SIZE,NULL,&sizes};
+	copy2d_test_t test2 ={NULL,NULL,MAX_SIZE,NULL,&sizes};
 
 	opterr = 0;
+	int flags = 0;
 	int c;
-	while((c=getopt(argc,argv,"t")) != -1 ){
+	while((c=getopt(argc,argv,"tk")) != -1 ){
 		if( c == 't' ){
-			test1.func = myblas_basic_copy_t;
-			test2.func = myblas_dgemm_copy_t;
+			flags |= F_TRANS;
+		}else if( c == 'k' ){
+			flags |= F_CORE;
 		}else{
 			printf("Unknown option : %c\n",c);
 			return -1;
 		}
 	}
+	test1.func = basic_funcs[flags];
+	test2.func = myblas_funcs[flags];
 
 
 	double* A    = calloc(MAX_SIZE*MAX_SIZE,sizeof(double));

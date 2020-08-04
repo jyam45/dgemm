@@ -15,6 +15,8 @@ void myblas_basic_copy_t(const double* A, size_t lda, double* A2, const block2d_
 	size_t KQ = K2/tile_K;
 	size_t KR = K2%tile_K;
 
+	block2d_info_t tile = { 0, 0, 0, 0, 0, 0 };
+
 	A = A + lda*k2 + i2; // start point
 
 	if( MR >  0 ){ MQ++; }
@@ -29,18 +31,34 @@ void myblas_basic_copy_t(const double* A, size_t lda, double* A2, const block2d_
 	  size_t m1 = MQ;
 	  while( m1-- ){
 	    size_t M1 = tile_M; if( m1==0 ){ M1=MR; }
-	    size_t m = M1;
-	    while( m-- ){
-	      size_t k = K1;
-	      while( k-- ){
-	        (*A2) = (*A);
-	        A += lda ;
-	        A2++;
-	      }
-	      A  = A  - lda *K1 + 1;
-	    }
+
+	    tile.M2 = K1; tile.N2 = M1;
+	    myblas_basic_copy_t_core( A, lda, A2, &tile );
+
+	    A  = A  + M1;
+	    A2 = A2 + M1*K1;
 	  }
 	  A = A  - M2 + lda *K1;
 	}
 
 }
+
+
+void myblas_basic_copy_t_core(const double* A, size_t lda, double* A2, const block2d_info_t* info ){
+
+	size_t K1     = info->M2    ;
+	size_t M1     = info->N2    ;
+
+	size_t m = M1;
+	while( m-- ){
+	  size_t k = K1;
+	  while( k-- ){
+	    (*A2) = (*A);
+	    A += lda ;
+	    A2++;
+	  }
+	  A  = A  - lda *K1 + 1;
+	}
+
+}
+
