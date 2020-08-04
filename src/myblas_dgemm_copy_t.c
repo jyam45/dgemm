@@ -15,6 +15,8 @@ void myblas_dgemm_copy_t(const double* A, size_t lda, double* A2, const block2d_
 	size_t KQ = K2/tile_K;
 	size_t KR = K2%tile_K;
 
+	block2d_info_t tile = { 0,0,0,0,0,0 };
+
 	A = A + lda*k2 + i2; // start point
 
 	if( MR >  0 ){ MQ++; }
@@ -30,7 +32,7 @@ void myblas_dgemm_copy_t(const double* A, size_t lda, double* A2, const block2d_
 	  while( m1-- ){
 	    size_t M1 = tile_M; if( m1==0 ){ M1=MR; }
 
-	    block2d_info_t tile = { 0, 0, K1, M1 };
+	    tile.M2 = K1; tile.N2 = M1;
 	    myblas_dgemm_copy_t_core( A, lda, A2, &tile );
 
 	    A  = A  + M1;

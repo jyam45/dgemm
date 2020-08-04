@@ -17,6 +17,8 @@ void myblas_dgemm_kernel(double alpha, const double *A2, const double *B2,
 	size_t KQ = K2/tile_K;
 	size_t KR = K2%tile_K;
 
+	block3d_info_t tile = { 0, 0, 0, 0, 0, 0 };
+
 	if( MR >  0 ){ MQ++; }
 	if( MR == 0 ){ MR = tile_M; }
 	if( NR >  0 ){ NQ++; }
@@ -37,7 +39,7 @@ void myblas_dgemm_kernel(double alpha, const double *A2, const double *B2,
 	    while( m1-- ){
 	      size_t M1 = tile_M; if( m1==0 ){ M1=MR; }
 
-	      block3d_info_t tile = { M1, N1, K1 };
+	      tile.M2 = M1; tile.N2 = N1; tile.K2 = K1;
 	      myblas_dgemm_kernel_core( alpha, A2, B2, C, ldc, &tile );
 	
               A2 = A2 + M1*K1;
