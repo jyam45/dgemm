@@ -60,69 +60,69 @@ void myblas_dgemm_copy_t_core(const double* A, size_t lda, double* A2, const blo
 	A = A + lda*k1 + i1; // start point
 
 	size_t m = M1;
-	if( m >> 3 ){//1
-	  size_t m8 = ( m >> 3 ); // unrolling
-	  while( m8-- ){//2
-	    size_t k = K1;
+	//if( m >> 3 ){//1
+	//  size_t m8 = ( m >> 3 ); // unrolling
+	//  while( m8-- ){//2
+	//    size_t k = K1;
 
-	    if( k >> 2 ){//3
-	      size_t k4 = ( k >> 2 ); // unrolling
-	      while( k4-- ){//4
-	        ymm0  = *(A + 0 + 0*lda); ymm4  = *(A + 0 + 1*lda); ymm8  = *(A + 0 + 2*lda); ymm12 = *(A + 0 + 3*lda);
-	        ymm1  = *(A + 1 + 0*lda); ymm5  = *(A + 1 + 1*lda); ymm9  = *(A + 1 + 2*lda); ymm13 = *(A + 1 + 3*lda);
-	        ymm2  = *(A + 2 + 0*lda); ymm6  = *(A + 2 + 1*lda); ymm10 = *(A + 2 + 2*lda); ymm14 = *(A + 2 + 3*lda);
-	        ymm3  = *(A + 3 + 0*lda); ymm7  = *(A + 3 + 1*lda); ymm11 = *(A + 3 + 2*lda); ymm15 = *(A + 3 + 3*lda);
-	        *(A2 + 0 + 0*K1) = ymm0 ; *(A2 + 1 + 0*K1) = ymm4 ; *(A2 + 2 + 0*K1) = ymm8 ; *(A2 + 3 + 0*K1) = ymm12;
-	        *(A2 + 0 + 1*K1) = ymm1 ; *(A2 + 1 + 1*K1) = ymm5 ; *(A2 + 2 + 1*K1) = ymm9 ; *(A2 + 3 + 1*K1) = ymm13;
-	        *(A2 + 0 + 2*K1) = ymm2 ; *(A2 + 1 + 2*K1) = ymm6 ; *(A2 + 2 + 2*K1) = ymm10; *(A2 + 3 + 2*K1) = ymm14;
-	        *(A2 + 0 + 3*K1) = ymm3 ; *(A2 + 1 + 3*K1) = ymm7 ; *(A2 + 2 + 3*K1) = ymm11; *(A2 + 3 + 3*K1) = ymm15;
-	        ymm0  = *(A + 4 + 0*lda); ymm4  = *(A + 4 + 1*lda); ymm8  = *(A + 4 + 2*lda); ymm12 = *(A + 4 + 3*lda);
-	        ymm1  = *(A + 5 + 0*lda); ymm5  = *(A + 5 + 1*lda); ymm9  = *(A + 5 + 2*lda); ymm13 = *(A + 5 + 3*lda);
-	        ymm2  = *(A + 6 + 0*lda); ymm6  = *(A + 6 + 1*lda); ymm10 = *(A + 6 + 2*lda); ymm14 = *(A + 6 + 3*lda);
-	        ymm3  = *(A + 7 + 0*lda); ymm7  = *(A + 7 + 1*lda); ymm11 = *(A + 7 + 2*lda); ymm15 = *(A + 7 + 3*lda);
-	        *(A2 + 0 + 4*K1) = ymm0 ; *(A2 + 1 + 4*K1) = ymm4 ; *(A2 + 2 + 4*K1) = ymm8 ; *(A2 + 3 + 4*K1) = ymm12;
-	        *(A2 + 0 + 5*K1) = ymm1 ; *(A2 + 1 + 5*K1) = ymm5 ; *(A2 + 2 + 5*K1) = ymm9 ; *(A2 + 3 + 5*K1) = ymm13;
-	        *(A2 + 0 + 6*K1) = ymm2 ; *(A2 + 1 + 6*K1) = ymm6 ; *(A2 + 2 + 6*K1) = ymm10; *(A2 + 3 + 6*K1) = ymm14;
-	        *(A2 + 0 + 7*K1) = ymm3 ; *(A2 + 1 + 7*K1) = ymm7 ; *(A2 + 2 + 7*K1) = ymm11; *(A2 + 3 + 7*K1) = ymm15;
-	        A += 4*lda ;
-	        A2+= 4;;
-	      }//4
-	    }//3
-	    if( k & 3 ){//5
-	      size_t kr = ( k & 3 ); 
-	      while( kr-- ){//6
-	        ymm0  = *(A + 0 + 0*lda);
-	        ymm1  = *(A + 1 + 0*lda);
-	        ymm2  = *(A + 2 + 0*lda);
-	        ymm3  = *(A + 3 + 0*lda);
-	        *(A2 + 0 + 0*K1) = ymm0 ;
-	        *(A2 + 0 + 1*K1) = ymm1 ;
-	        *(A2 + 0 + 2*K1) = ymm2 ;
-	        *(A2 + 0 + 3*K1) = ymm3 ;
-	        ymm0  = *(A + 4 + 0*lda);
-	        ymm1  = *(A + 5 + 0*lda);
-	        ymm2  = *(A + 6 + 0*lda);
-	        ymm3  = *(A + 7 + 0*lda);
-	        *(A2 + 0 + 4*K1) = ymm0 ;
-	        *(A2 + 0 + 5*K1) = ymm1 ;
-	        *(A2 + 0 + 6*K1) = ymm2 ;
-	        *(A2 + 0 + 7*K1) = ymm3 ;
-	        //(*A2) = (*A);
-	        A += lda ;
-	        A2++;
-	      }//6
-	    }//5
-	    A  = A  - lda *K1 + 8;
-	    A2 = A2 - K1 + 8*K1;
+	//    if( k >> 2 ){//3
+	//      size_t k4 = ( k >> 2 ); // unrolling
+	//      while( k4-- ){//4
+	//        ymm0  = *(A + 0 + 0*lda); ymm4  = *(A + 0 + 1*lda); ymm8  = *(A + 0 + 2*lda); ymm12 = *(A + 0 + 3*lda);
+	//        ymm1  = *(A + 1 + 0*lda); ymm5  = *(A + 1 + 1*lda); ymm9  = *(A + 1 + 2*lda); ymm13 = *(A + 1 + 3*lda);
+	//        ymm2  = *(A + 2 + 0*lda); ymm6  = *(A + 2 + 1*lda); ymm10 = *(A + 2 + 2*lda); ymm14 = *(A + 2 + 3*lda);
+	//        ymm3  = *(A + 3 + 0*lda); ymm7  = *(A + 3 + 1*lda); ymm11 = *(A + 3 + 2*lda); ymm15 = *(A + 3 + 3*lda);
+	//        *(A2 + 0 + 0*K1) = ymm0 ; *(A2 + 1 + 0*K1) = ymm4 ; *(A2 + 2 + 0*K1) = ymm8 ; *(A2 + 3 + 0*K1) = ymm12;
+	//        *(A2 + 0 + 1*K1) = ymm1 ; *(A2 + 1 + 1*K1) = ymm5 ; *(A2 + 2 + 1*K1) = ymm9 ; *(A2 + 3 + 1*K1) = ymm13;
+	//        *(A2 + 0 + 2*K1) = ymm2 ; *(A2 + 1 + 2*K1) = ymm6 ; *(A2 + 2 + 2*K1) = ymm10; *(A2 + 3 + 2*K1) = ymm14;
+	//        *(A2 + 0 + 3*K1) = ymm3 ; *(A2 + 1 + 3*K1) = ymm7 ; *(A2 + 2 + 3*K1) = ymm11; *(A2 + 3 + 3*K1) = ymm15;
+	//        ymm0  = *(A + 4 + 0*lda); ymm4  = *(A + 4 + 1*lda); ymm8  = *(A + 4 + 2*lda); ymm12 = *(A + 4 + 3*lda);
+	//        ymm1  = *(A + 5 + 0*lda); ymm5  = *(A + 5 + 1*lda); ymm9  = *(A + 5 + 2*lda); ymm13 = *(A + 5 + 3*lda);
+	//        ymm2  = *(A + 6 + 0*lda); ymm6  = *(A + 6 + 1*lda); ymm10 = *(A + 6 + 2*lda); ymm14 = *(A + 6 + 3*lda);
+	//        ymm3  = *(A + 7 + 0*lda); ymm7  = *(A + 7 + 1*lda); ymm11 = *(A + 7 + 2*lda); ymm15 = *(A + 7 + 3*lda);
+	//        *(A2 + 0 + 4*K1) = ymm0 ; *(A2 + 1 + 4*K1) = ymm4 ; *(A2 + 2 + 4*K1) = ymm8 ; *(A2 + 3 + 4*K1) = ymm12;
+	//        *(A2 + 0 + 5*K1) = ymm1 ; *(A2 + 1 + 5*K1) = ymm5 ; *(A2 + 2 + 5*K1) = ymm9 ; *(A2 + 3 + 5*K1) = ymm13;
+	//        *(A2 + 0 + 6*K1) = ymm2 ; *(A2 + 1 + 6*K1) = ymm6 ; *(A2 + 2 + 6*K1) = ymm10; *(A2 + 3 + 6*K1) = ymm14;
+	//        *(A2 + 0 + 7*K1) = ymm3 ; *(A2 + 1 + 7*K1) = ymm7 ; *(A2 + 2 + 7*K1) = ymm11; *(A2 + 3 + 7*K1) = ymm15;
+	//        A += 4*lda ;
+	//        A2+= 4;;
+	//      }//4
+	//    }//3
+	//    if( k & 3 ){//5
+	//      size_t kr = ( k & 3 ); 
+	//      while( kr-- ){//6
+	//        ymm0  = *(A + 0 + 0*lda);
+	//        ymm1  = *(A + 1 + 0*lda);
+	//        ymm2  = *(A + 2 + 0*lda);
+	//        ymm3  = *(A + 3 + 0*lda);
+	//        *(A2 + 0 + 0*K1) = ymm0 ;
+	//        *(A2 + 0 + 1*K1) = ymm1 ;
+	//        *(A2 + 0 + 2*K1) = ymm2 ;
+	//        *(A2 + 0 + 3*K1) = ymm3 ;
+	//        ymm0  = *(A + 4 + 0*lda);
+	//        ymm1  = *(A + 5 + 0*lda);
+	//        ymm2  = *(A + 6 + 0*lda);
+	//        ymm3  = *(A + 7 + 0*lda);
+	//        *(A2 + 0 + 4*K1) = ymm0 ;
+	//        *(A2 + 0 + 5*K1) = ymm1 ;
+	//        *(A2 + 0 + 6*K1) = ymm2 ;
+	//        *(A2 + 0 + 7*K1) = ymm3 ;
+	//        //(*A2) = (*A);
+	//        A += lda ;
+	//        A2++;
+	//      }//6
+	//    }//5
+	//    A  = A  - lda *K1 + 8;
+	//    A2 = A2 - K1 + 8*K1;
 
-	  }//2
-	}//1
+	//  }//2
+	//}//1
 
-	//if( m >> 2 ){
-	//  size_t m4 = ( m >> 2 ); // unrolling
-	//  while( m4-- ){
-	if( m & 4 ){//7
-	  {
+	if( m >> 2 ){
+	  size_t m4 = ( m >> 2 ); // unrolling
+	  while( m4-- ){
+	//if( m & 4 ){//7
+	//  {
 	    size_t k = K1;
 
 	    if( k >> 2 ){
@@ -132,12 +132,12 @@ void myblas_dgemm_copy_t_core(const double* A, size_t lda, double* A2, const blo
 	        ymm1  = *(A + 1 + 0*lda); ymm5  = *(A + 1 + 1*lda); ymm9  = *(A + 1 + 2*lda); ymm13 = *(A + 1 + 3*lda);
 	        ymm2  = *(A + 2 + 0*lda); ymm6  = *(A + 2 + 1*lda); ymm10 = *(A + 2 + 2*lda); ymm14 = *(A + 2 + 3*lda);
 	        ymm3  = *(A + 3 + 0*lda); ymm7  = *(A + 3 + 1*lda); ymm11 = *(A + 3 + 2*lda); ymm15 = *(A + 3 + 3*lda);
-	        *(A2 + 0 + 0*K1) = ymm0 ; *(A2 + 1 + 0*K1) = ymm4 ; *(A2 + 2 + 0*K1) = ymm8 ; *(A2 + 3 + 0*K1) = ymm12;
-	        *(A2 + 0 + 1*K1) = ymm1 ; *(A2 + 1 + 1*K1) = ymm5 ; *(A2 + 2 + 1*K1) = ymm9 ; *(A2 + 3 + 1*K1) = ymm13;
-	        *(A2 + 0 + 2*K1) = ymm2 ; *(A2 + 1 + 2*K1) = ymm6 ; *(A2 + 2 + 2*K1) = ymm10; *(A2 + 3 + 2*K1) = ymm14;
-	        *(A2 + 0 + 3*K1) = ymm3 ; *(A2 + 1 + 3*K1) = ymm7 ; *(A2 + 2 + 3*K1) = ymm11; *(A2 + 3 + 3*K1) = ymm15;
+	        *(A2 + 0 + 0*4) = ymm0 ; *(A2 + 1 + 0*4) = ymm4 ; *(A2 + 2 + 0*4) = ymm8 ; *(A2 + 3 + 0*4) = ymm12;
+	        *(A2 + 0 + 1*4) = ymm1 ; *(A2 + 1 + 1*4) = ymm5 ; *(A2 + 2 + 1*4) = ymm9 ; *(A2 + 3 + 1*4) = ymm13;
+	        *(A2 + 0 + 2*4) = ymm2 ; *(A2 + 1 + 2*4) = ymm6 ; *(A2 + 2 + 2*4) = ymm10; *(A2 + 3 + 2*4) = ymm14;
+	        *(A2 + 0 + 3*4) = ymm3 ; *(A2 + 1 + 3*4) = ymm7 ; *(A2 + 2 + 3*4) = ymm11; *(A2 + 3 + 3*4) = ymm15;
 	        A += 4*lda ;
-	        A2+= 4;;
+	        A2+= 16;;
 	      }
 	    }
 	    if( k & 3 ){
@@ -147,17 +147,17 @@ void myblas_dgemm_copy_t_core(const double* A, size_t lda, double* A2, const blo
 	        ymm1  = *(A + 1 + 0*lda);
 	        ymm2  = *(A + 2 + 0*lda);
 	        ymm3  = *(A + 3 + 0*lda);
-	        *(A2 + 0 + 0*K1) = ymm0 ;
-	        *(A2 + 0 + 1*K1) = ymm1 ;
-	        *(A2 + 0 + 2*K1) = ymm2 ;
-	        *(A2 + 0 + 3*K1) = ymm3 ;
+	        *(A2 + 0 + 0*4) = ymm0 ;
+	        *(A2 + 0 + 1*4) = ymm1 ;
+	        *(A2 + 0 + 2*4) = ymm2 ;
+	        *(A2 + 0 + 3*4) = ymm3 ;
 	        //(*A2) = (*A);
 	        A += lda ;
-	        A2++;
+	        A2+=4;
 	      }
 	    }
 	    A  = A  - lda *K1 + 4;
-	    A2 = A2 - K1 + 4*K1;
+	    //A2 = A2 - K1 + 4*K1;
 
 	  }
 	}

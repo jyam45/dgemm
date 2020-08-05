@@ -2,7 +2,7 @@
 #include "myblas.h"
 #include <stdio.h>
 
-#define  SIZE 1023
+#define  SIZE 1024
 #define  SEED 23091
 
 int main(int argc, char** arv){
