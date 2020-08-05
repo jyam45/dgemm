@@ -63,7 +63,7 @@ int main( int argc, char** argv ){
 		double t2 = get_realtime();
 		double dt = t2 - t1;
 		double bytes = test.info->M2 * test.info->N2 * sizeof(double);
-		printf("%6u, %15G, %15G, %15G \n",n,dt,bytes/2014,bytes/dt/(1024*1024));
+		printf("%6u, %15G, %15G, %15G \n",n,dt,bytes/1024,bytes/dt/(1024*1024));
 	}
 
 	free(A);
