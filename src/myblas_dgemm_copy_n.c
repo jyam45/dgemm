@@ -63,7 +63,6 @@ void myblas_dgemm_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	  size_t n4 = ( n >> 2 ); // unrolling with 8 elements
 	  while( n4-- ) {
 	    size_t k = K1;
-/*
 	    if( k >> 3 ){
 	      size_t k8 = ( k >> 3 ); // unrolling with 8 elements
 	      while( k8-- ){
@@ -88,10 +87,9 @@ void myblas_dgemm_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	      }
 	    }
 	    if( k & 4 ){
-*/
-	    if( k >> 2 ){
-	      size_t k4 = ( k >> 2 ); // unrolling with 8 elements
-	      while( k4-- ){
+	    //if( k >> 2 ){
+	    //  size_t k4 = ( k >> 2 ); // unrolling with 8 elements
+	    //  while( k4-- ){
 	          ymm0  = *(B+0+0*ldb); ymm4  = *(B+1+0*ldb); ymm8  = *(B+2+0*ldb); ymm12 = *(B+3+0*ldb);
 	          ymm1  = *(B+0+1*ldb); ymm5  = *(B+1+1*ldb); ymm9  = *(B+2+1*ldb); ymm13 = *(B+3+1*ldb);
 	          ymm2  = *(B+0+2*ldb); ymm6  = *(B+1+2*ldb); ymm10 = *(B+2+2*ldb); ymm14 = *(B+3+2*ldb);
@@ -102,7 +100,7 @@ void myblas_dgemm_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	          *(B2+0+3*4) = ymm3 ; *(B2+1+3*4) = ymm7 ; *(B2+2+3*4) = ymm11; *(B2+3+3*4) = ymm15;
 	          B+=4;
 	          B2+=16;
-	      }
+	    //  }
 	    }
 	    if( k & 2 ){
 	        ymm0  = *(B+0+0*ldb); ymm4  = *(B+1+0*ldb);
@@ -150,7 +148,6 @@ void myblas_dgemm_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	if( n & 2 ){
 
 	    size_t k = K1;
-/*
 	    if( k >> 3 ){
 	      size_t k8 = ( k >> 3 ); // unrolling with 8 elements
 	      while( k8-- ){
@@ -167,17 +164,16 @@ void myblas_dgemm_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	      }
 	    }
 	    if( k & 4 ){
-*/
-	    if( k >> 2 ){
-	      size_t k4 = ( k >> 2 ); // unrolling with 8 elements
-	      while( k4-- ){
+	    //if( k >> 2 ){
+	    //  size_t k4 = ( k >> 2 ); // unrolling with 8 elements
+	    //  while( k4-- ){
 	          ymm0  = *(B+0+0*ldb); ymm4  = *(B+1+0*ldb); ymm8  = *(B+2+0*ldb); ymm12 = *(B+3+0*ldb);
 	          ymm1  = *(B+0+1*ldb); ymm5  = *(B+1+1*ldb); ymm9  = *(B+2+1*ldb); ymm13 = *(B+3+1*ldb);
 	          *(B2+0+0*4) = ymm0 ; *(B2+1+0*4) = ymm4 ; *(B2+2+0*4) = ymm8 ; *(B2+3+0*4) = ymm12;
 	          *(B2+0+1*4) = ymm1 ; *(B2+1+1*4) = ymm5 ; *(B2+2+1*4) = ymm9 ; *(B2+3+1*4) = ymm13;
 	          B+=4;
 	          B2+=8;
-	      }
+	    //  }
 	    }
 	    if( k & 2 ){
 	        ymm0  = *(B+0+0*ldb); ymm4  = *(B+1+0*ldb);
@@ -202,7 +198,6 @@ void myblas_dgemm_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	if( n & 1 ){
 
 	    size_t k = K1;
-/*
 	    if( k >> 3 ){
 	      size_t k8 = ( k >> 3 ); // unrolling with 8 elements
 	      while( k8-- ){
@@ -215,15 +210,14 @@ void myblas_dgemm_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	      }
 	    }
 	    if( k & 4 ){
-*/
-	    if( k >> 2 ){
-	      size_t k4 = ( k >> 2 ); // unrolling with 8 elements
-	      while( k4-- ){
+	    //if( k >> 2 ){
+	    //  size_t k4 = ( k >> 2 ); // unrolling with 8 elements
+	    //  while( k4-- ){
 	          ymm0  = *(B+0+0*ldb); ymm4  = *(B+1+0*ldb); ymm8  = *(B+2+0*ldb); ymm12 = *(B+3+0*ldb);
 	          *(B2+0+0*4) = ymm0 ; *(B2+1+0*4) = ymm4 ; *(B2+2+0*4) = ymm8 ; *(B2+3+0*4) = ymm12;
 	          B+=4;
 	          B2+=4;
-	      }
+	    //  }
 	    }
 	    if( k & 2 ){
 	        ymm0  = *(B+0+0*ldb); ymm4  = *(B+1+0*ldb);

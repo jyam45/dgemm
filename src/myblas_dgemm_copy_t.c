@@ -64,7 +64,6 @@ void myblas_dgemm_copy_t_core(const double* A, size_t lda, double* A2, const blo
 	  size_t m4 = ( m >> 2 ); // unrolling
 	  while( m4-- ){
 	    size_t k = K1;
-/*
 	    if( k >> 3 ){
 	      size_t k8 = ( k >> 3 ); // unrolling
 	      while( k8-- ){
@@ -89,10 +88,9 @@ void myblas_dgemm_copy_t_core(const double* A, size_t lda, double* A2, const blo
 	      }
 	    }
 	    if( k & 4 ){
-*/
-	    if( k >> 2 ){
-	      size_t k4 = ( k >> 2 ); // unrolling
-	      while( k4-- ){
+	    //if( k >> 2 ){
+	    //  size_t k4 = ( k >> 2 ); // unrolling
+	    //  while( k4-- ){
 	        ymm0  = *(A + 0 + 0*lda); ymm4  = *(A + 0 + 1*lda); ymm8  = *(A + 0 + 2*lda); ymm12 = *(A + 0 + 3*lda);
 	        ymm1  = *(A + 1 + 0*lda); ymm5  = *(A + 1 + 1*lda); ymm9  = *(A + 1 + 2*lda); ymm13 = *(A + 1 + 3*lda);
 	        ymm2  = *(A + 2 + 0*lda); ymm6  = *(A + 2 + 1*lda); ymm10 = *(A + 2 + 2*lda); ymm14 = *(A + 2 + 3*lda);
@@ -103,7 +101,7 @@ void myblas_dgemm_copy_t_core(const double* A, size_t lda, double* A2, const blo
 	        *(A2 + 0 + 3*4) = ymm3 ; *(A2 + 1 + 3*4) = ymm7 ; *(A2 + 2 + 3*4) = ymm11; *(A2 + 3 + 3*4) = ymm15;
 	        A += 4*lda ;
 	        A2+= 16;;
-	      }
+	    //  }
 	    }
 	    if( k & 2 ){
 	        ymm0  = *(A + 0 + 0*lda); ymm4  = *(A + 0 + 1*lda);
@@ -151,7 +149,6 @@ void myblas_dgemm_copy_t_core(const double* A, size_t lda, double* A2, const blo
 	if( m & 2 ){
 
 	    size_t k = K1;
-/*
 	    if( k >> 3 ){
 	      size_t k8 = ( k >> 3 ); // unrolling
 	      while( k8-- ){
@@ -168,17 +165,16 @@ void myblas_dgemm_copy_t_core(const double* A, size_t lda, double* A2, const blo
 	      }
 	    }
 	    if( k & 4 ){
-*/
-	    if( k >> 2 ){
-	      size_t k4 = ( k >> 2 ); // unrolling
-	      while( k4-- ){
+	    //if( k >> 2 ){
+	    //  size_t k4 = ( k >> 2 ); // unrolling
+	    //  while( k4-- ){
 	        ymm0  = *(A + 0 + 0*lda); ymm4  = *(A + 0 + 1*lda); ymm8  = *(A + 0 + 2*lda); ymm12 = *(A + 0 + 3*lda);
 	        ymm1  = *(A + 1 + 0*lda); ymm5  = *(A + 1 + 1*lda); ymm9  = *(A + 1 + 2*lda); ymm13 = *(A + 1 + 3*lda);
 	        *(A2 + 0 + 0*4) = ymm0 ; *(A2 + 1 + 0*4) = ymm4 ; *(A2 + 2 + 0*4) = ymm8 ; *(A2 + 3 + 0*4) = ymm12;
 	        *(A2 + 0 + 1*4) = ymm1 ; *(A2 + 1 + 1*4) = ymm5 ; *(A2 + 2 + 1*4) = ymm9 ; *(A2 + 3 + 1*4) = ymm13;
 	        A += 4*lda ;
 	        A2+= 8;;
-	      }
+	    //  }
 	    }
 	    if( k & 2 ){
 	        ymm0  = *(A + 0 + 0*lda); ymm4  = *(A + 0 + 1*lda);
@@ -203,7 +199,6 @@ void myblas_dgemm_copy_t_core(const double* A, size_t lda, double* A2, const blo
 	if( m & 1 ){
 
 	    size_t k = K1;
-/*
 	    if( k >> 3 ){
 	      size_t k8 = ( k >> 3 ); // unrolling
 	      while( k8-- ){
@@ -216,15 +211,14 @@ void myblas_dgemm_copy_t_core(const double* A, size_t lda, double* A2, const blo
 	      }
 	    }
 	    if( k & 4 ){
-*/
-	    if( k >> 2 ){
-	      size_t k4 = ( k >> 2 ); // unrolling
-	      while( k4-- ){
+	    //if( k >> 2 ){
+	    //  size_t k4 = ( k >> 2 ); // unrolling
+	    //  while( k4-- ){
 	        ymm0  = *(A + 0 + 0*lda); ymm4  = *(A + 0 + 1*lda); ymm8  = *(A + 0 + 2*lda); ymm12 = *(A + 0 + 3*lda);
 	        *(A2 + 0 + 0*4) = ymm0 ; *(A2 + 1 + 0*4) = ymm4 ; *(A2 + 2 + 0*4) = ymm8 ; *(A2 + 3 + 0*4) = ymm12;
 	        A += 4*lda ;
 	        A2+= 4;;
-	      }
+	    //  }
 	    }
 	    if( k & 2 ){
 	        ymm0  = *(A + 0 + 0*lda); ymm4  = *(A + 0 + 1*lda);
