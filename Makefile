@@ -6,12 +6,13 @@ LDFLAGS=-L./lib/
 LIBS=-lcpuid -ltimer
 CBLASLIBS= -lcblas -lblas
 
-MYBLAS_OBJS= src/myblas_dgemm.o src/myblas_dgemm_main.o src/myblas_xerbla.o \
-             src/myblas_dgemm_scale2d.o src/myblas_dgemm_copy_n.o src/myblas_dgemm_copy_t.o src/myblas_dgemm_kernel.o
 
 MYBLAS_COPY_OBJS=src/myblas_dgemm_copy_n.o src/myblas_dgemm_copy_t.o
 MYBLAS_SCAL_OBJS=src/myblas_dgemm_scale2d.o
-MYBLAS_KRNL_OBJS=src/myblas_dgemm_kernel.o
+MYBLAS_KRNL_OBJS=src/myblas_dgemm_kernel.o src/myblas_dgemm_kernel_detail.o
+
+MYBLAS_OBJS= src/myblas_dgemm.o src/myblas_dgemm_main.o src/myblas_xerbla.o $(MYBLAS_COPY_OBJS) $(MYBLAS_SCAL_OBJS) $(MYBLAS_KRNL_OBJS)
+
 
 all: libs test
 
@@ -46,6 +47,8 @@ src/myblas_dgemm_scale2d.o : src/myblas_dgemm_scale2d.c src/myblas_internal.h
 src/myblas_dgemm_copy_n.o  : src/myblas_dgemm_copy_n.c src/myblas_internal.h
 src/myblas_dgemm_copy_t.o  : src/myblas_dgemm_copy_t.c src/myblas_internal.h
 src/myblas_dgemm_kernel.o  : src/myblas_dgemm_kernel.c src/myblas_internal.h
+
+src/myblas_dgemm_kernel_detail.o  : src/myblas_dgemm_kernel_detail.c src/myblas_internal.h
 
 copy2d_unit_test: test/copy2d/copy2d_unit_test.o test/copy2d/myblas_basic_copy_n.o test/copy2d/myblas_basic_copy_t.o test/check_array.o test/init_matrix.o $(MYBLAS_COPY_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS) $(CBLASLIBS)

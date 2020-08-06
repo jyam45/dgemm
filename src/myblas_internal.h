@@ -64,4 +64,9 @@ void myblas_dgemm_copy_t_core(const double* A, size_t lda, double* A2, const blo
 void myblas_dgemm_kernel_core(double alpha, const double *A2, const double *B2, 
                               double *C, size_t ldc, const block3d_info_t* info );
 
+
+void myblas_dgemm_kernel_detail(size_t M, size_t N, size_t K,
+                                double alpha, const double *A2, const double *B2, 
+                                double *C, size_t ldc );
+
 #endif//MYBLAS_INTERNAL_H
