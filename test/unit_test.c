@@ -22,6 +22,10 @@ int main(int argc, char** argv){
 	size_t N=SIZE;
 	size_t K=SIZE;
 
+	size_t lda[2]={0,0};
+	size_t ldb[2]={0,0};
+	size_t ldc[2]={0,0};
+
 	char*  argend;
 
 	opterr = 0;
@@ -43,8 +47,8 @@ int main(int argc, char** argv){
 	C = calloc( M*N, sizeof(double) );
 	D = calloc( M*N, sizeof(double) );
 
-	rand_matrix( M, K, A, 1, K, SEED ); // RowMajor
-	rand_matrix( K, N, B, 1, N, SEED ); // RowMajor
+	rand_matrix( M, K, A, 1, K, SEED ); // ColMajor
+	rand_matrix( K, N, B, 1, N, SEED ); // ColMajor
 
 	cblas.A = A;
 	cblas.B = B;
@@ -52,9 +56,6 @@ int main(int argc, char** argv){
 	cblas.M = M;
 	cblas.N = N;
 	cblas.K = K;
-	cblas.lda = M;
-	cblas.ldb = K;
-	cblas.ldc = M;
 
 	myblas.A = A;
 	myblas.B = B;
@@ -62,9 +63,13 @@ int main(int argc, char** argv){
 	myblas.M = M;
 	myblas.N = N;
 	myblas.K = K;
-	myblas.lda = M;
-	myblas.ldb = K;
-	myblas.ldc = M;
+
+	lda[0]=K; // Row-major
+	lda[1]=M; // Col-major
+	ldb[0]=N; // Row-major
+	ldb[1]=K; // Col-major
+	ldc[0]=N; // Row-major
+	ldc[1]=M; // Col-major
 
 	int error = 0;
 
@@ -75,10 +80,16 @@ int main(int argc, char** argv){
 	            cblas.Order   = majors[iorder];
 	            cblas.TransA  = transposes[itransa];
 	            cblas.TransB  = transposes[itransb];
+	            cblas.lda     = lda[iorder];
+	            cblas.ldb     = ldb[iorder];
+	            cblas.ldc     = ldc[iorder];
 
 	            myblas.Order  = majors[iorder];
 	            myblas.TransA = transposes[itransa];
 	            myblas.TransB = transposes[itransb];
+	            myblas.lda    = lda[iorder];
+	            myblas.ldb    = ldb[iorder];
+	            myblas.ldc    = ldc[iorder];
 
 	            printf("Case : Order=%s, TransA=%s, TransB=%s ... ",cmajor[iorder],ctrans[itransa],ctrans[itransb]);
 
@@ -92,7 +103,7 @@ int main(int argc, char** argv){
 
 	            if( error ){
 	                printf("NG\n");
-			break ;
+			//break ;
 	            }else{
 	                printf("OK\n"); 
 	            }
