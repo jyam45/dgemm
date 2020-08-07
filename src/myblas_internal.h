@@ -66,6 +66,8 @@ void myblas_dgemm_kernel_core(double alpha, const double *A2, const double *B2,
 
 
 void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, size_t ldc );
+void myblas_dgemm_copy_n_detail(size_t K1, size_t N1, const double* B, size_t k, size_t j, size_t ldb, double* B2 );
+void myblas_dgemm_copy_t_detail(size_t K1, size_t M1, const double* A, size_t k, size_t i, size_t lda, double* A2 );
 void myblas_dgemm_kernel_detail(size_t M, size_t N, size_t K,
                                 double alpha, const double *A2, const double *B2, double *C, size_t ldc );
 
