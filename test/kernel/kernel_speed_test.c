@@ -11,6 +11,8 @@
 #define TILE_K     32
 #define SEED 13892393
 
+#define ALIGNMENT_B  32
+
 #define F_CORE  0x0001
 
 static kernel_func_t myblas_funcs[] = { myblas_dgemm_kernel, myblas_dgemm_kernel_core };
@@ -42,9 +44,12 @@ int main( int argc, char** argv ){
 
 	test.func = myblas_funcs[flags];
 
-	double* A = calloc(MAX_SIZE*MAX_SIZE,sizeof(double));
-	double* B = calloc(MAX_SIZE*MAX_SIZE,sizeof(double));
-	double* C = calloc(MAX_SIZE*MAX_SIZE,sizeof(double));
+	//double* A = calloc(MAX_SIZE*MAX_SIZE,sizeof(double));
+	//double* B = calloc(MAX_SIZE*MAX_SIZE,sizeof(double));
+	//double* C = calloc(MAX_SIZE*MAX_SIZE,sizeof(double));
+	double* A  = aligned_alloc(ALIGNMENT_B,MAX_SIZE*MAX_SIZE*sizeof(double));
+	double* B  = aligned_alloc(ALIGNMENT_B,MAX_SIZE*MAX_SIZE*sizeof(double));
+	double* C  = aligned_alloc(ALIGNMENT_B,MAX_SIZE*MAX_SIZE*sizeof(double));
 
 	rand_matrix( MAX_SIZE, MAX_SIZE, A, 1, MAX_SIZE, SEED ); // ColMajor
 	rand_matrix( MAX_SIZE, MAX_SIZE, B, 1, MAX_SIZE, SEED ); // ColMajor

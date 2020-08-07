@@ -6,6 +6,8 @@
 
 #define MAX_SIZE 2048
 
+#define ALIGNMENT_B 32 // AVX2
+
 static void do_scale2d( scale2d_test_t *test ){
 
 	test->func( test->beta, test->C, test->ldc, test->info );
@@ -18,7 +20,8 @@ int main( int argc, char** argv ){
 	scale2d_test_t test ={myblas_dgemm_scale2d,0e0,NULL,MAX_SIZE,&sizes};
 
 	double  beta = 1.3923842e0;
-	double* C = calloc(MAX_SIZE*MAX_SIZE,sizeof(double));
+	//double* C = calloc(MAX_SIZE*MAX_SIZE,sizeof(double));
+	double* C = aligned_alloc(ALIGNMENT_B,MAX_SIZE*MAX_SIZE*sizeof(double));
 
 	test.beta = beta;
 	test.C    = C;

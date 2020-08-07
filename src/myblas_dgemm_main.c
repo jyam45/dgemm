@@ -14,6 +14,8 @@
 #define MYBLAS_TILE_N    32
 #define MYBLAS_TILE_K    32
 
+#define ALIGNMENT_B      32  // for AVX
+
 #define MIN(x,y)  (((x)<(y))?(x):(y))
 
 static copy_func_t copy_funcs_A[] = {myblas_dgemm_copy_t,myblas_dgemm_copy_n};
@@ -44,8 +46,10 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	block2d_info_t infoC = {M,N,1,1};
 	myblas_dgemm_scale2d(beta,C,ldc,&infoC);
 
-	double*   A2 = calloc( MYBLAS_BLOCK_M*MYBLAS_BLOCK_K, sizeof(double) );
-	double*   B2 = calloc( MYBLAS_BLOCK_K*MYBLAS_BLOCK_N, sizeof(double) );
+	//double*   A2 = calloc( MYBLAS_BLOCK_M*MYBLAS_BLOCK_K, sizeof(double) );
+	//double*   B2 = calloc( MYBLAS_BLOCK_K*MYBLAS_BLOCK_N, sizeof(double) );
+	double*   A2 = aligned_alloc( ALIGNMENT_B, MYBLAS_BLOCK_M*MYBLAS_BLOCK_K*sizeof(double) ); // C11 standard
+	double*   B2 = aligned_alloc( ALIGNMENT_B, MYBLAS_BLOCK_K*MYBLAS_BLOCK_N*sizeof(double) ); // C11 standard
 
 	// L3 cache
 	for( size_t j3=0 ; j3<N; j3+=MIN(N-j3,MYBLAS_PANEL_N) ){

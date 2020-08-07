@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #define  MAX_SIZE 2048
+#define  ALIGNMENT_B  32 // AVX2
 
 int main(int argc, char** arv){
 
@@ -13,9 +14,12 @@ int main(int argc, char** arv){
 	double *A, *B, *C;
 	dgemm_test_t myblas = {myblas_dgemm, CblasColMajor, CblasNoTrans, CblasNoTrans, MAX_SIZE, MAX_SIZE, MAX_SIZE, 1e0, NULL, MAX_SIZE, NULL, MAX_SIZE, 1e0, NULL, MAX_SIZE };
 
-	A = calloc( MAX_SIZE*MAX_SIZE, sizeof(double) );
-	B = calloc( MAX_SIZE*MAX_SIZE, sizeof(double) );
-	C = calloc( MAX_SIZE*MAX_SIZE, sizeof(double) );
+	//A = calloc( MAX_SIZE*MAX_SIZE, sizeof(double) );
+	//B = calloc( MAX_SIZE*MAX_SIZE, sizeof(double) );
+	//C = calloc( MAX_SIZE*MAX_SIZE, sizeof(double) );
+	A = aligned_alloc( ALIGNMENT_B, MAX_SIZE*MAX_SIZE*sizeof(double) );
+	B = aligned_alloc( ALIGNMENT_B, MAX_SIZE*MAX_SIZE*sizeof(double) );
+	C = aligned_alloc( ALIGNMENT_B, MAX_SIZE*MAX_SIZE*sizeof(double) );
 
 	myblas.A = A;
 	myblas.B = B;

@@ -9,6 +9,8 @@
 #define TILE_M     32 
 #define TILE_N     32
 
+#define ALIGNMENT_B  32 // AVX2
+
 #define F_TRANS 0x0001
 #define F_CORE  0x0002
 
@@ -42,8 +44,10 @@ int main( int argc, char** argv ){
 	test.func = myblas_funcs[flags];
 
 	double  beta = 1.3923842e0;
-	double* A = calloc(MAX_SIZE*MAX_SIZE,sizeof(double));
-	double* A2= calloc(MAX_SIZE*MAX_SIZE,sizeof(double));
+	//double* A = calloc(MAX_SIZE*MAX_SIZE,sizeof(double));
+	//double* A2= calloc(MAX_SIZE*MAX_SIZE,sizeof(double));
+	double* A = aligned_alloc(ALIGNMENT_B,MAX_SIZE*MAX_SIZE*sizeof(double));
+	double* A2= aligned_alloc(ALIGNMENT_B,MAX_SIZE*MAX_SIZE*sizeof(double));
 
 	test.A    = A;
 	test.lda  = MAX_SIZE;
