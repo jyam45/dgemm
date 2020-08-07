@@ -69,8 +69,8 @@ void myblas_basic_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	    if( k >> 3 ){
 	      size_t k8 = ( k >> 3 );
 	      while( k8-- ){
-	        for( size_t j=0; j<4; j++ ){
-	          for( size_t l=0; l<8; l++ ){
+	        for( size_t l=0; l<8; l++ ){
+	          for( size_t j=0; j<4; j++ ){
 	            *B2=*(B+l+j*ldb);
 	            B2++;
 	          }
@@ -79,8 +79,8 @@ void myblas_basic_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	      }
 	    }
 	    if( k & 4  ){
-	        for( size_t j=0; j<4; j++ ){
-	          for( size_t l=0; l<4; l++ ){
+	        for( size_t l=0; l<4; l++ ){
+	          for( size_t j=0; j<4; j++ ){
 	            *B2=*(B+l+j*ldb);
 	            B2++;
 	          }
@@ -88,8 +88,8 @@ void myblas_basic_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	        B+=4;
 	    }
 	    if( k & 2 ){
-	        for( size_t j=0; j<4; j++ ){
-	          for( size_t l=0; l<2; l++ ){
+	        for( size_t l=0; l<2; l++ ){
+	          for( size_t j=0; j<4; j++ ){
 	            *B2=*(B+l+j*ldb);
 	            B2++;
 	          }
@@ -97,8 +97,8 @@ void myblas_basic_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	        B+=2;
 	    }
 	    if( k & 1 ){
-	        for( size_t j=0; j<4; j++ ){
-	          for( size_t l=0; l<1; l++ ){
+	        for( size_t l=0; l<1; l++ ){
+	          for( size_t j=0; j<4; j++ ){
 	            *B2=*(B+l+j*ldb);
 	            B2++;
 	          }
@@ -115,8 +115,8 @@ void myblas_basic_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	    if( k >> 3 ){
 	      size_t k8 = ( k >> 3 );
 	      while( k8-- ){
-	        for( size_t j=0; j<2; j++ ){
-	          for( size_t l=0; l<8; l++ ){
+	        for( size_t l=0; l<8; l++ ){
+	          for( size_t j=0; j<2; j++ ){
 	            *B2=*(B+l+j*ldb);
 	            B2++;
 	          }
@@ -125,8 +125,8 @@ void myblas_basic_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	      }
 	    }
 	    if( k & 4  ){
-	        for( size_t j=0; j<2; j++ ){
-	          for( size_t l=0; l<4; l++ ){
+	        for( size_t l=0; l<4; l++ ){
+	          for( size_t j=0; j<2; j++ ){
 	            *B2=*(B+l+j*ldb);
 	            B2++;
 	          }
@@ -134,8 +134,8 @@ void myblas_basic_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	        B+=4;
 	    }
 	    if( k & 2 ){
-	        for( size_t j=0; j<2; j++ ){
-	          for( size_t l=0; l<2; l++ ){
+	        for( size_t l=0; l<2; l++ ){
+	          for( size_t j=0; j<2; j++ ){
 	            *B2=*(B+l+j*ldb);
 	            B2++;
 	          }
@@ -143,8 +143,8 @@ void myblas_basic_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	        B+=2;
 	    }
 	    if( k & 1 ){
-	        for( size_t j=0; j<2; j++ ){
-	          for( size_t l=0; l<1; l++ ){
+	        for( size_t l=0; l<1; l++ ){
+	          for( size_t j=0; j<2; j++ ){
 	            *B2=*(B+l+j*ldb);
 	            B2++;
 	          }
@@ -160,8 +160,8 @@ void myblas_basic_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	    if( k >> 3 ){
 	      size_t k8 = ( k >> 3 );
 	      while( k8-- ){
-	        for( size_t j=0; j<1; j++ ){
-	          for( size_t l=0; l<8; l++ ){
+	        for( size_t l=0; l<8; l++ ){
+	          for( size_t j=0; j<1; j++ ){
 	            *B2=*(B+l+j*ldb);
 	            B2++;
 	          }
@@ -170,8 +170,8 @@ void myblas_basic_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	      }
 	    }
 	    if( k & 4 ){
-	        for( size_t j=0; j<1; j++ ){
-	          for( size_t l=0; l<4; l++ ){
+	        for( size_t l=0; l<4; l++ ){
+	          for( size_t j=0; j<1; j++ ){
 	            *B2=*(B+l+j*ldb);
 	            B2++;
 	          }
@@ -179,8 +179,8 @@ void myblas_basic_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	        B+=4;
 	    }
 	    if( k & 2 ){
-	        for( size_t j=0; j<1; j++ ){
-	          for( size_t l=0; l<2; l++ ){
+	        for( size_t l=0; l<2; l++ ){
+	          for( size_t j=0; j<1; j++ ){
 	            *B2=*(B+l+j*ldb);
 	            B2++;
 	          }
@@ -188,8 +188,8 @@ void myblas_basic_copy_n_core(const double* B, size_t ldb, double* B2, const blo
 	        B+=2;
 	    }
 	    if( k & 1 ){
-	        for( size_t j=0; j<1; j++ ){
-	          for( size_t l=0; l<1; l++ ){
+	        for( size_t l=0; l<1; l++ ){
+	          for( size_t j=0; j<1; j++ ){
 	            *B2=*(B+l+j*ldb);
 	            B2++;
 	          }

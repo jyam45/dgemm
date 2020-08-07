@@ -87,10 +87,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	        if( k >> 3 ){
 	          size_t k8 = ( k >> 3 );
 	          while( k8-- ){
-	            for( size_t j=0; j<4; j++ ){
-	              for( size_t i=0; i<4; i++ ){
-	                for( size_t l=0; l<8; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*8))*(*(B2+l+j*8));
+	            for( size_t l=0; l<8; l++ ){
+	              for( size_t j=0; j<4; j++ ){
+	                for( size_t i=0; i<4; i++ ){
+	                  c[i+4*j] += (*(A2+l*4+i))*(*(B2+l*4+j));
 	                }
 	              }
 	            }
@@ -99,10 +99,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	          }
 	        }
 	        if( k & 4 ){
-	            for( size_t j=0; j<4; j++ ){
-	              for( size_t i=0; i<4; i++ ){
-	                for( size_t l=0; l<4; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*4))*(*(B2+l+j*4));
+	            for( size_t l=0; l<4; l++ ){
+	              for( size_t j=0; j<4; j++ ){
+	                for( size_t i=0; i<4; i++ ){
+	                  c[i+4*j] += (*(A2+l*4+i))*(*(B2+l*4+j));
 	                }
 	              }
 	            }
@@ -110,10 +110,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=16;
 	        }
 	        if( k & 2 ){
-	            for( size_t j=0; j<4; j++ ){
-	              for( size_t i=0; i<4; i++ ){
-	                for( size_t l=0; l<2; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*2))*(*(B2+l+j*2));
+	            for( size_t l=0; l<2; l++ ){
+	              for( size_t j=0; j<4; j++ ){
+	                for( size_t i=0; i<4; i++ ){
+	                  c[i+4*j] += (*(A2+l*4+i))*(*(B2+l*4+j));
 	                }
 	              }
 	            }
@@ -121,10 +121,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=8;
 	        }
 	        if( k & 1 ){
-	            for( size_t j=0; j<4; j++ ){
-	              for( size_t i=0; i<4; i++ ){
-	                for( size_t l=0; l<1; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*1))*(*(B2+l+j*1));
+	            for( size_t l=0; l<1; l++ ){
+	              for( size_t j=0; j<4; j++ ){
+	                for( size_t i=0; i<4; i++ ){
+	                  c[i+4*j] += (*(A2+l*1+i))*(*(B2+l*1+j));
 	                }
 	              }
 	            }
@@ -150,10 +150,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	        if( k >> 3 ){
 	          size_t k8 = ( k >> 3 );
 	          while( k8-- ){
-	            for( size_t j=0; j<4; j++ ){
-	              for( size_t i=0; i<2; i++ ){
-	                for( size_t l=0; l<8; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*8))*(*(B2+l+j*8));
+	            for( size_t l=0; l<8; l++ ){
+	              for( size_t j=0; j<4; j++ ){
+	                for( size_t i=0; i<2; i++ ){
+	                  c[i+2*j] += (*(A2+l*2+i))*(*(B2+l*4+j));
 	                }
 	              }
 	            }
@@ -162,10 +162,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	          }
 	        }
 	        if( k & 4 ){
-	            for( size_t j=0; j<4; j++ ){
-	              for( size_t i=0; i<2; i++ ){
-	                for( size_t l=0; l<4; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*4))*(*(B2+l+j*4));
+	            for( size_t l=0; l<4; l++ ){
+	              for( size_t j=0; j<4; j++ ){
+	                for( size_t i=0; i<2; i++ ){
+	                  c[i+2*j] += (*(A2+l*2+i))*(*(B2+l*4+j));
 	                }
 	              }
 	            }
@@ -173,10 +173,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=16;
 	        }
 	        if( k & 2 ){
-	            for( size_t j=0; j<4; j++ ){
-	              for( size_t i=0; i<2; i++ ){
-	                for( size_t l=0; l<2; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*2))*(*(B2+l+j*2));
+	            for( size_t l=0; l<2; l++ ){
+	              for( size_t j=0; j<4; j++ ){
+	                for( size_t i=0; i<2; i++ ){
+	                  c[i+2*j] += (*(A2+l*2+i))*(*(B2+l*4+j));
 	                }
 	              }
 	            }
@@ -184,10 +184,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=8;
 	        }
 	        if( k & 1 ){
-	            for( size_t j=0; j<4; j++ ){
-	              for( size_t i=0; i<2; i++ ){
-	                for( size_t l=0; l<1; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*1))*(*(B2+l+j*1));
+	            for( size_t l=0; l<1; l++ ){
+	              for( size_t j=0; j<4; j++ ){
+	                for( size_t i=0; i<2; i++ ){
+	                  c[i+2*j] += (*(A2+l*2+i))*(*(B2+l*4+j));
 	                }
 	              }
 	            }
@@ -213,10 +213,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	        if( k >> 3 ){
 	          size_t k8 = ( k >> 3 );
 	          while( k8-- ){
-	            for( size_t j=0; j<4; j++ ){
-	              for( size_t i=0; i<1; i++ ){
-	                for( size_t l=0; l<8; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*8))*(*(B2+l+j*8));
+	            for( size_t l=0; l<8; l++ ){
+	              for( size_t j=0; j<4; j++ ){
+	                for( size_t i=0; i<1; i++ ){
+	                  c[i+1*j] += (*(A2+l*1+i))*(*(B2+l*4+j));
 	                }
 	              }
 	            }
@@ -225,10 +225,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	          }
 	        }
 	        if( k & 4 ){
-	            for( size_t j=0; j<4; j++ ){
-	              for( size_t i=0; i<1; i++ ){
-	                for( size_t l=0; l<4; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*4))*(*(B2+l+j*4));
+	            for( size_t l=0; l<4; l++ ){
+	              for( size_t j=0; j<4; j++ ){
+	                for( size_t i=0; i<1; i++ ){
+	                  c[i+1*j] += (*(A2+l*1+i))*(*(B2+l*4+j));
 	                }
 	              }
 	            }
@@ -236,10 +236,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=16;
 	        }
 	        if( k & 2 ){
-	            for( size_t j=0; j<4; j++ ){
-	              for( size_t i=0; i<1; i++ ){
-	                for( size_t l=0; l<2; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*2))*(*(B2+l+j*2));
+	            for( size_t l=0; l<2; l++ ){
+	              for( size_t j=0; j<4; j++ ){
+	                for( size_t i=0; i<1; i++ ){
+	                  c[i+1*j] += (*(A2+l*1+i))*(*(B2+l*4+j));
 	                }
 	              }
 	            }
@@ -247,10 +247,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=8;
 	        }
 	        if( k & 1 ){
-	            for( size_t j=0; j<4; j++ ){
-	              for( size_t i=0; i<1; i++ ){
-	                for( size_t l=0; l<1; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*1))*(*(B2+l+j*1));
+	            for( size_t l=0; l<1; l++ ){
+	              for( size_t j=0; j<4; j++ ){
+	                for( size_t i=0; i<1; i++ ){
+	                  c[i+1*j] += (*(A2+l*1+i))*(*(B2+l*4+j));
 	                }
 	              }
 	            }
@@ -286,10 +286,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	        if( k >> 3 ){
 	          size_t k8 = ( k >> 3 );
 	          while( k8-- ){
-	            for( size_t j=0; j<2; j++ ){
-	              for( size_t i=0; i<4; i++ ){
-	                for( size_t l=0; l<8; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*8))*(*(B2+l+j*8));
+	            for( size_t l=0; l<8; l++ ){
+	              for( size_t j=0; j<2; j++ ){
+	                for( size_t i=0; i<4; i++ ){
+	                  c[i+4*j] += (*(A2+l*4+i))*(*(B2+l*2+j));
 	                }
 	              }
 	            }
@@ -298,10 +298,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	          }
 	        }
 	        if( k & 4 ){
-	            for( size_t j=0; j<2; j++ ){
-	              for( size_t i=0; i<4; i++ ){
-	                for( size_t l=0; l<4; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*4))*(*(B2+l+j*4));
+	            for( size_t l=0; l<4; l++ ){
+	              for( size_t j=0; j<2; j++ ){
+	                for( size_t i=0; i<4; i++ ){
+	                  c[i+4*j] += (*(A2+l*4+i))*(*(B2+l*2+j));
 	                }
 	              }
 	            }
@@ -309,10 +309,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=8;
 	        }
 	        if( k & 2 ){
-	            for( size_t j=0; j<2; j++ ){
-	              for( size_t i=0; i<4; i++ ){
-	                for( size_t l=0; l<2; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*2))*(*(B2+l+j*2));
+	            for( size_t l=0; l<2; l++ ){
+	              for( size_t j=0; j<2; j++ ){
+	                for( size_t i=0; i<4; i++ ){
+	                  c[i+4*j] += (*(A2+l*4+i))*(*(B2+l*2+j));
 	                }
 	              }
 	            }
@@ -320,10 +320,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=4;
 	        }
 	        if( k & 1 ){
-	            for( size_t j=0; j<2; j++ ){
-	              for( size_t i=0; i<4; i++ ){
-	                for( size_t l=0; l<1; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*1))*(*(B2+l+j*1));
+	            for( size_t l=0; l<1; l++ ){
+	              for( size_t j=0; j<2; j++ ){
+	                for( size_t i=0; i<4; i++ ){
+	                  c[i+4*j] += (*(A2+l*4+i))*(*(B2+l*2+j));
 	                }
 	              }
 	            }
@@ -349,10 +349,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	        if( k >> 3 ){
 	          size_t k8 = ( k >> 3 );
 	          while( k8-- ){
-	            for( size_t j=0; j<2; j++ ){
-	              for( size_t i=0; i<2; i++ ){
-	                for( size_t l=0; l<8; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*8))*(*(B2+l+j*8));
+	            for( size_t l=0; l<8; l++ ){
+	              for( size_t j=0; j<2; j++ ){
+	                for( size_t i=0; i<2; i++ ){
+	                  c[i+2*j] += (*(A2+l*2+i))*(*(B2+l*2+j));
 	                }
 	              }
 	            }
@@ -361,10 +361,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	          }
 	        }
 	        if( k & 4 ){
-	            for( size_t j=0; j<2; j++ ){
-	              for( size_t i=0; i<2; i++ ){
-	                for( size_t l=0; l<4; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*4))*(*(B2+l+j*4));
+	            for( size_t l=0; l<4; l++ ){
+	              for( size_t j=0; j<2; j++ ){
+	                for( size_t i=0; i<2; i++ ){
+	                  c[i+2*j] += (*(A2+l*2+i))*(*(B2+l*2+j));
 	                }
 	              }
 	            }
@@ -372,10 +372,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=8;
 	        }
 	        if( k & 2 ){
-	            for( size_t j=0; j<2; j++ ){
-	              for( size_t i=0; i<2; i++ ){
-	                for( size_t l=0; l<2; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*2))*(*(B2+l+j*2));
+	            for( size_t l=0; l<2; l++ ){
+	              for( size_t j=0; j<2; j++ ){
+	                for( size_t i=0; i<2; i++ ){
+	                  c[i+2*j] += (*(A2+l*2+i))*(*(B2+l*2+j));
 	                }
 	              }
 	            }
@@ -383,10 +383,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=4;
 	        }
 	        if( k & 1 ){
-	            for( size_t j=0; j<2; j++ ){
-	              for( size_t i=0; i<2; i++ ){
-	                for( size_t l=0; l<1; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*1))*(*(B2+l+j*1));
+	            for( size_t l=0; l<1; l++ ){
+	              for( size_t j=0; j<2; j++ ){
+	                for( size_t i=0; i<2; i++ ){
+	                  c[i+2*j] += (*(A2+l*2+i))*(*(B2+l*2+j));
 	                }
 	              }
 	            }
@@ -412,10 +412,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	        if( k >> 3 ){
 	          size_t k8 = ( k >> 3 );
 	          while( k8-- ){
-	            for( size_t j=0; j<2; j++ ){
-	              for( size_t i=0; i<1; i++ ){
-	                for( size_t l=0; l<8; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*8))*(*(B2+l+j*8));
+	            for( size_t l=0; l<8; l++ ){
+	              for( size_t j=0; j<2; j++ ){
+	                for( size_t i=0; i<1; i++ ){
+	                  c[i+1*j] += (*(A2+l*1+i))*(*(B2+l*2+j));
 	                }
 	              }
 	            }
@@ -424,10 +424,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	          }
 	        }
 	        if( k & 4 ){
-	            for( size_t j=0; j<2; j++ ){
-	              for( size_t i=0; i<1; i++ ){
-	                for( size_t l=0; l<4; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*4))*(*(B2+l+j*4));
+	            for( size_t l=0; l<4; l++ ){
+	              for( size_t j=0; j<2; j++ ){
+	                for( size_t i=0; i<1; i++ ){
+	                  c[i+1*j] += (*(A2+l*1+i))*(*(B2+l*2+j));
 	                }
 	              }
 	            }
@@ -435,10 +435,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=8;
 	        }
 	        if( k & 2 ){
-	            for( size_t j=0; j<2; j++ ){
-	              for( size_t i=0; i<1; i++ ){
-	                for( size_t l=0; l<2; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*2))*(*(B2+l+j*2));
+	            for( size_t l=0; l<2; l++ ){
+	              for( size_t j=0; j<2; j++ ){
+	                for( size_t i=0; i<1; i++ ){
+	                  c[i+1*j] += (*(A2+l*1+i))*(*(B2+l*2+j));
 	                }
 	              }
 	            }
@@ -446,10 +446,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=4;
 	        }
 	        if( k & 1 ){
-	            for( size_t j=0; j<2; j++ ){
-	              for( size_t i=0; i<1; i++ ){
-	                for( size_t l=0; l<1; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*1))*(*(B2+l+j*1));
+	            for( size_t l=0; l<1; l++ ){
+	              for( size_t j=0; j<2; j++ ){
+	                for( size_t i=0; i<1; i++ ){
+	                  c[i+1*j] += (*(A2+l*1+i))*(*(B2+l*2+j));
 	                }
 	              }
 	            }
@@ -486,10 +486,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	        if( k >> 3 ){
 	          size_t k8 = ( k >> 3 );
 	          while( k8-- ){
-	            for( size_t j=0; j<1; j++ ){
-	              for( size_t i=0; i<4; i++ ){
-	                for( size_t l=0; l<8; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*8))*(*(B2+l+j*8));
+	            for( size_t l=0; l<8; l++ ){
+	              for( size_t j=0; j<1; j++ ){
+	                for( size_t i=0; i<4; i++ ){
+	                  c[i+4*j] += (*(A2+l*4+i))*(*(B2+l*1+j));
 	                }
 	              }
 	            }
@@ -498,10 +498,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	          }
 	        }
 	        if( k & 4 ){
-	            for( size_t j=0; j<1; j++ ){
-	              for( size_t i=0; i<4; i++ ){
-	                for( size_t l=0; l<4; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*4))*(*(B2+l+j*4));
+	            for( size_t l=0; l<4; l++ ){
+	              for( size_t j=0; j<1; j++ ){
+	                for( size_t i=0; i<4; i++ ){
+	                  c[i+4*j] += (*(A2+l*4+i))*(*(B2+l*1+j));
 	                }
 	              }
 	            }
@@ -509,10 +509,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=4;
 	        }
 	        if( k & 2 ){
-	            for( size_t j=0; j<1; j++ ){
-	              for( size_t i=0; i<4; i++ ){
-	                for( size_t l=0; l<2; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*2))*(*(B2+l+j*2));
+	            for( size_t l=0; l<2; l++ ){
+	              for( size_t j=0; j<1; j++ ){
+	                for( size_t i=0; i<4; i++ ){
+	                  c[i+4*j] += (*(A2+l*4+i))*(*(B2+l*1+j));
 	                }
 	              }
 	            }
@@ -520,10 +520,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=2;
 	        }
 	        if( k & 1 ){
-	            for( size_t j=0; j<1; j++ ){
-	              for( size_t i=0; i<4; i++ ){
-	                for( size_t l=0; l<1; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*1))*(*(B2+l+j*1));
+	            for( size_t l=0; l<1; l++ ){
+	              for( size_t j=0; j<1; j++ ){
+	                for( size_t i=0; i<4; i++ ){
+	                  c[i+4*j] += (*(A2+l*4+i))*(*(B2+l*1+j));
 	                }
 	              }
 	            }
@@ -549,10 +549,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	        if( k >> 3 ){
 	          size_t k8 = ( k >> 3 );
 	          while( k8-- ){
-	            for( size_t j=0; j<1; j++ ){
-	              for( size_t i=0; i<2; i++ ){
-	                for( size_t l=0; l<8; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*8))*(*(B2+l+j*8));
+	            for( size_t l=0; l<8; l++ ){
+	              for( size_t j=0; j<1; j++ ){
+	                for( size_t i=0; i<2; i++ ){
+	                  c[i+2*j] += (*(A2+l*2+i))*(*(B2+l*1+j));
 	                }
 	              }
 	            }
@@ -561,10 +561,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	          }
 	        }
 	        if( k & 4 ){
-	            for( size_t j=0; j<1; j++ ){
-	              for( size_t i=0; i<2; i++ ){
-	                for( size_t l=0; l<4; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*4))*(*(B2+l+j*4));
+	            for( size_t l=0; l<4; l++ ){
+	              for( size_t j=0; j<1; j++ ){
+	                for( size_t i=0; i<2; i++ ){
+	                  c[i+2*j] += (*(A2+l*2+i))*(*(B2+l*1+j));
 	                }
 	              }
 	            }
@@ -572,10 +572,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=4;
 	        }
 	        if( k & 2 ){
-	            for( size_t j=0; j<1; j++ ){
-	              for( size_t i=0; i<2; i++ ){
-	                for( size_t l=0; l<2; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*2))*(*(B2+l+j*2));
+	            for( size_t l=0; l<2; l++ ){
+	              for( size_t j=0; j<1; j++ ){
+	                for( size_t i=0; i<2; i++ ){
+	                  c[i+2*j] += (*(A2+l*2+i))*(*(B2+l*1+j));
 	                }
 	              }
 	            }
@@ -583,10 +583,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=2;
 	        }
 	        if( k & 1 ){
-	            for( size_t j=0; j<1; j++ ){
-	              for( size_t i=0; i<2; i++ ){
-	                for( size_t l=0; l<1; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*1))*(*(B2+l+j*1));
+	            for( size_t l=0; l<1; l++ ){
+	              for( size_t j=0; j<1; j++ ){
+	                for( size_t i=0; i<2; i++ ){
+	                  c[i+2*j] += (*(A2+l*2+i))*(*(B2+l*1+j));
 	                }
 	              }
 	            }
@@ -612,10 +612,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	        if( k >> 3 ){
 	          size_t k8 = ( k >> 3 );
 	          while( k8-- ){
-	            for( size_t j=0; j<1; j++ ){
-	              for( size_t i=0; i<1; i++ ){
-	                for( size_t l=0; l<8; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*8))*(*(B2+l+j*8));
+	            for( size_t l=0; l<8; l++ ){
+	              for( size_t j=0; j<1; j++ ){
+	                for( size_t i=0; i<1; i++ ){
+	                  c[i+1*j] += (*(A2+l*1+i))*(*(B2+l*1+j));
 	                }
 	              }
 	            }
@@ -624,10 +624,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	          }
 	        }
 	        if( k & 4 ){
-	            for( size_t j=0; j<1; j++ ){
-	              for( size_t i=0; i<1; i++ ){
-	                for( size_t l=0; l<4; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*4))*(*(B2+l+j*4));
+	            for( size_t l=0; l<4; l++ ){
+	              for( size_t j=0; j<1; j++ ){
+	                for( size_t i=0; i<1; i++ ){
+	                  c[i+1*j] += (*(A2+l*1+i))*(*(B2+l*1+j));
 	                }
 	              }
 	            }
@@ -635,10 +635,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=4;
 	        }
 	        if( k & 2 ){
-	            for( size_t j=0; j<1; j++ ){
-	              for( size_t i=0; i<1; i++ ){
-	                for( size_t l=0; l<2; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*2))*(*(B2+l+j*2));
+	            for( size_t l=0; l<2; l++ ){
+	              for( size_t j=0; j<1; j++ ){
+	                for( size_t i=0; i<1; i++ ){
+	                  c[i+1*j] += (*(A2+l*1+i))*(*(B2+l*1+j));
 	                }
 	              }
 	            }
@@ -646,10 +646,10 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	            B2+=2;
 	        }
 	        if( k & 1 ){
-	            for( size_t j=0; j<1; j++ ){
-	              for( size_t i=0; i<1; i++ ){
-	                for( size_t l=0; l<1; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*1))*(*(B2+l+j*1));
+	            for( size_t l=0; l<1; l++ ){
+	              for( size_t j=0; j<1; j++ ){
+	                for( size_t i=0; i<1; i++ ){
+	                  c[i+1*j] += (*(A2+l*1+i))*(*(B2+l*1+j));
 	                }
 	              }
 	            }
