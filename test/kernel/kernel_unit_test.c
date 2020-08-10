@@ -38,7 +38,7 @@ int main( int argc, char** argv ){
 	size_t N=MAX_SIZE;
 	size_t K=MAX_SIZE;
 
-	double alpha=1e0;
+	double alpha=1.382934e0;
 
 	char*  argend;
 
