@@ -18,7 +18,12 @@ void myblas_dgemm_kernel(double alpha, const double *A2, const double *B2,
 	size_t KQ = K2/tile_K;
 	size_t KR = K2%tile_K;
 
-	block3d_info_t tile = { 0, 0, 0, 0, 0, 0 };
+
+	double *Abuf = NULL;
+	if( info->use_buffer ){
+	    myblas_dgemm_copy_2( A2, info );
+	    Abuf = info->buf;
+	}
 
 	if( MR >  0 ){ MQ++; }
 	if( MR == 0 ){ MR = tile_M; }
@@ -40,23 +45,27 @@ void myblas_dgemm_kernel(double alpha, const double *A2, const double *B2,
 	    while( m1-- ){
 	      size_t M1 = tile_M; if( m1==0 ){ M1=MR; }
 
-	      myblas_dgemm_kernel_detail( M1, N1, K1, alpha, A2, B2, C, ldc );
+	      myblas_dgemm_kernel_detail( M1, N1, K1, alpha, A2, B2, C, ldc, Abuf );
 	
               A2 = A2 + M1*K1;
 	      C  = C  + M1;
+              if( Abuf != NULL ) Abuf = Abuf + M1*K1*2;
 
 	    } // end of m2-loop
 	    A2 = A2 - M2*K1;
 	    B2 = B2 + K1*N1;
 	    C  = C - M2 + ldc*N1;
+	    if( Abuf != NULL ) Abuf = Abuf - M2*K1*2;
 
 	  } // end of n2-loop
 	  A2 = A2 + M2*K1;
 	  C  = C - ldc*N2;
+	  if( Abuf != NULL ) Abuf = Abuf + M2*K1*2;
 
 	} // end of k2-loop
 	A2 = A2 - M2*K2;
 	B2 = B2 - K2*N2;
+	if( Abuf != NULL ) Abuf = Abuf - M2*K2*2;
 
 }
 
@@ -64,7 +73,12 @@ void myblas_dgemm_kernel(double alpha, const double *A2, const double *B2,
 void myblas_dgemm_kernel_core(double alpha, const double *A2, const double *B2, 
                               double *C, size_t ldc, const block3d_info_t* info ){
 
-	myblas_dgemm_kernel_detail( info->M2, info->N2, info->K2, alpha, A2, B2, C, ldc );
+	double *Abuf = NULL;
+	if( info->use_buffer ){
+		myblas_dgemm_copy_2_core( A2, info );
+		Abuf = info->buf;
+	}
+	myblas_dgemm_kernel_detail( info->M2, info->N2, info->K2, alpha, A2, B2, C, ldc, Abuf );
 
 }
 

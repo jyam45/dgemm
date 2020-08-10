@@ -30,7 +30,7 @@ static int kernel_check_error( const kernel_test_t *test1, const kernel_test_t *
 
 int main( int argc, char** argv ){
 
-	block3d_info_t sizes={MAX_SIZE,MAX_SIZE,MAX_SIZE,TILE_M,TILE_N,TILE_K};
+	block3d_info_t sizes={MAX_SIZE,MAX_SIZE,MAX_SIZE,TILE_M,TILE_N,TILE_K,NULL,0};
 	kernel_test_t test1 ={NULL,0e0,NULL,NULL,NULL,MAX_SIZE,&sizes};
 	kernel_test_t test2 ={NULL,0e0,NULL,NULL,NULL,MAX_SIZE,&sizes};
 
@@ -70,11 +70,15 @@ int main( int argc, char** argv ){
 	double* B = calloc( K*N, sizeof(double));
 	double* C = calloc( M*N, sizeof(double));
 	double* D = calloc( M*N, sizeof(double));
+	double* Abuf = calloc( M*K*2, sizeof(double));
 
 	rand_matrix( M, K, A, 1, M, SEED ); // ColMajor
 	rand_matrix( K, N, B, 1, K, SEED ); // ColMajor
 	init_matrix( M, N, C, 1, M, 0e0  ); // ColMajor
 	init_matrix( M, N, D, 1, M, 0e0  ); // ColMajor
+
+	sizes.buf = Abuf;
+	sizes.use_buffer = 1;
 
 	test1.A    = A;
 	test1.B    = B;

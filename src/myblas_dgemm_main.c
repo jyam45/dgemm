@@ -51,6 +51,9 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	double*   A2 = aligned_alloc( ALIGNMENT_B, MYBLAS_BLOCK_M*MYBLAS_BLOCK_K*sizeof(double) ); // C11 standard
 	double*   B2 = aligned_alloc( ALIGNMENT_B, MYBLAS_BLOCK_K*MYBLAS_BLOCK_N*sizeof(double) ); // C11 standard
 
+	double*   Abuf = aligned_alloc( ALIGNMENT_B, MYBLAS_BLOCK_M*MYBLAS_BLOCK_K*2*sizeof(double) );
+	size_t    use_buffer = 1;
+
 	// L3 cache
 	for( size_t j3=0 ; j3<N; j3+=MIN(N-j3,MYBLAS_PANEL_N) ){
 	for( size_t i3=0 ; i3<M; i3+=MIN(M-i3,MYBLAS_PANEL_M) ){
@@ -101,7 +104,7 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	        myblas_dgemm_copy_B(B,ldb,B2,&infoB);
 
 	        // L1 cache
-	        block3d_info_t info3d = {M2,N2,K2,MYBLAS_TILE_M,MYBLAS_TILE_N,MYBLAS_TILE_K};
+	        block3d_info_t info3d = {M2,N2,K2,MYBLAS_TILE_M,MYBLAS_TILE_N,MYBLAS_TILE_K,Abuf,use_buffer};
 	        myblas_dgemm_kernel(alpha,A2,B2,C+ldc*j2+i2,ldc,&info3d);
 
 	        m2n2--;
@@ -121,7 +124,7 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	          myblas_dgemm_copy_B(B,ldb,B2,&infoB);
 
 	          // L1 cache
-	          block3d_info_t info3d = {M2,N2,K2,MYBLAS_TILE_M,MYBLAS_TILE_N,MYBLAS_TILE_K};
+	          block3d_info_t info3d = {M2,N2,K2,MYBLAS_TILE_M,MYBLAS_TILE_N,MYBLAS_TILE_K,Abuf,use_buffer};
 	          myblas_dgemm_kernel(alpha,A2,B2,C+ldc*j2+i2,ldc,&info3d);
 
 	        }else{ 
@@ -136,7 +139,7 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	          myblas_dgemm_copy_A(A,lda,A2,&infoA);
 
 	          // L1 cache
-	          block3d_info_t info3d = {M2,N2,K2,MYBLAS_TILE_M,MYBLAS_TILE_N,MYBLAS_TILE_K};
+	          block3d_info_t info3d = {M2,N2,K2,MYBLAS_TILE_M,MYBLAS_TILE_N,MYBLAS_TILE_K,Abuf,use_buffer};
 	          myblas_dgemm_kernel(alpha,A2,B2,C+ldc*j2+i2,ldc,&info3d);
 
 	          n2 = N3B-1; 
@@ -150,4 +153,5 @@ void myblas_dgemm_main( gemm_args_t* args ){
 
 	free(A2);
 	free(B2);
+	free(Abuf);
 }

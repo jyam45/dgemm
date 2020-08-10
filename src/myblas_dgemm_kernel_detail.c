@@ -5,7 +5,7 @@
 void myblas_dgemm_kernel_detail(
          size_t M, size_t N, size_t K,
          double alpha, const double *A, const double *B, 
-         double *C, size_t ldc )
+         double *C, size_t ldc, const double* buf )
 {
 	//double a00,a01,a02,a03;
 	//double a10,a11,a12,a13;
@@ -31,8 +31,17 @@ void myblas_dgemm_kernel_detail(
 	//double *cc = (double*)calloc(32,sizeof(double));
 	//printf("%x\n",(uint64_t)cc);
 
+
+
 	// ---- Kernel
 	if( N >> 2 ){
+
+	  //size_t MK4 = M*K + ( 4-((M*K)&0x3) );
+	  //double* buf = aligned_alloc(32,MK4*sizeof(double));
+	  //double* buf = calloc(MK4,sizeof(double));
+	  const double* A2 = buf;
+	  //myblas_dgemm_copy_2_detail( M, K, A, A2 );
+
 	  size_t n4 = ( N >> 2 );
 	  while( n4-- ){
 	    if( M >> 2 ){
@@ -148,10 +157,14 @@ void myblas_dgemm_kernel_detail(
 
 	            __asm__ __volatile__ (
 	                "\n\t"
-	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
-	                "vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
-	                "vbroadcastf128  4*8(%[a]), %%ymm2 \n\t"
-	                "vbroadcastf128  6*8(%[a]), %%ymm3 \n\t"
+	                //"vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
+	                //"vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
+	                //"vbroadcastf128  4*8(%[a]), %%ymm2 \n\t"
+	                //"vbroadcastf128  6*8(%[a]), %%ymm3 \n\t"
+	                "vmovapd         0*8(%[a2]),%%ymm0 \n\t"
+	                "vmovapd         4*8(%[a2]),%%ymm1 \n\t"
+	                "vmovapd         8*8(%[a2]),%%ymm2 \n\t"
+	                "vmovapd        12*8(%[a2]),%%ymm3 \n\t"
 	                "vmovapd         0*8(%[b]), %%ymm4 \n\t"
 	                "vmovapd         4*8(%[b]), %%ymm5 \n\t"
 	                "\n\t"
@@ -168,10 +181,14 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd %%ymm2 , %%ymm11, %%ymm14\n\t"
 	                "vfmadd231pd %%ymm3 , %%ymm11, %%ymm15\n\t"
 	                "\n\t"
-	                "vbroadcastf128  8*8(%[a]), %%ymm0 \n\t"
-	                "vbroadcastf128 10*8(%[a]), %%ymm1 \n\t"
-	                "vbroadcastf128 12*8(%[a]), %%ymm2 \n\t"
-	                "vbroadcastf128 14*8(%[a]), %%ymm3 \n\t"
+	                //"vbroadcastf128  8*8(%[a]), %%ymm0 \n\t"
+	                //"vbroadcastf128 10*8(%[a]), %%ymm1 \n\t"
+	                //"vbroadcastf128 12*8(%[a]), %%ymm2 \n\t"
+	                //"vbroadcastf128 14*8(%[a]), %%ymm3 \n\t"
+	                "vmovapd        16*8(%[a2]),%%ymm0 \n\t"
+	                "vmovapd        20*8(%[a2]),%%ymm1 \n\t"
+	                "vmovapd        24*8(%[a2]),%%ymm2 \n\t"
+	                "vmovapd        28*8(%[a2]),%%ymm3 \n\t"
 	                "vmovapd         8*8(%[b]), %%ymm6 \n\t"
 	                "vmovapd        12*8(%[b]), %%ymm7 \n\t"
 	                "\n\t"
@@ -188,10 +205,14 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd %%ymm2 , %%ymm11, %%ymm14\n\t"
 	                "vfmadd231pd %%ymm3 , %%ymm11, %%ymm15\n\t"
 	                "\n\t"
-	                "vbroadcastf128 16*8(%[a]), %%ymm0 \n\t"
-	                "vbroadcastf128 18*8(%[a]), %%ymm1 \n\t"
-	                "vbroadcastf128 20*8(%[a]), %%ymm2 \n\t"
-	                "vbroadcastf128 22*8(%[a]), %%ymm3 \n\t"
+	                //"vbroadcastf128 16*8(%[a]), %%ymm0 \n\t"
+	                //"vbroadcastf128 18*8(%[a]), %%ymm1 \n\t"
+	                //"vbroadcastf128 20*8(%[a]), %%ymm2 \n\t"
+	                //"vbroadcastf128 22*8(%[a]), %%ymm3 \n\t"
+	                "vmovapd        32*8(%[a2]),%%ymm0 \n\t"
+	                "vmovapd        36*8(%[a2]),%%ymm1 \n\t"
+	                "vmovapd        40*8(%[a2]),%%ymm2 \n\t"
+	                "vmovapd        44*8(%[a2]),%%ymm3 \n\t"
 	                "vmovapd        16*8(%[b]), %%ymm4 \n\t"
 	                "vmovapd        20*8(%[b]), %%ymm5 \n\t"
 	                "\n\t"
@@ -208,10 +229,14 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd %%ymm2 , %%ymm11, %%ymm14\n\t"
 	                "vfmadd231pd %%ymm3 , %%ymm11, %%ymm15\n\t"
 	                "\n\t"
-	                "vbroadcastf128 24*8(%[a]), %%ymm0 \n\t"
-	                "vbroadcastf128 26*8(%[a]), %%ymm1 \n\t"
-	                "vbroadcastf128 28*8(%[a]), %%ymm2 \n\t"
-	                "vbroadcastf128 30*8(%[a]), %%ymm3 \n\t"
+	                //"vbroadcastf128 24*8(%[a]), %%ymm0 \n\t"
+	                //"vbroadcastf128 26*8(%[a]), %%ymm1 \n\t"
+	                //"vbroadcastf128 28*8(%[a]), %%ymm2 \n\t"
+	                //"vbroadcastf128 30*8(%[a]), %%ymm3 \n\t"
+	                "vmovapd        48*8(%[a2]),%%ymm0 \n\t"
+	                "vmovapd        52*8(%[a2]),%%ymm1 \n\t"
+	                "vmovapd        56*8(%[a2]),%%ymm2 \n\t"
+	                "vmovapd        60*8(%[a2]),%%ymm3 \n\t"
 	                "vmovapd        24*8(%[b]), %%ymm6 \n\t"
 	                "vmovapd        28*8(%[b]), %%ymm7 \n\t"
 	                "\n\t"
@@ -229,9 +254,10 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd %%ymm3 , %%ymm11, %%ymm15\n\t"
 	                "\n\t"
 	                "addq  $32*8, %[a]\n\t"
+	                "addq  $64*8, %[a2]\n\t"
 	                "addq  $32*8, %[b]\n\t"
 	                "\n\t"
-	                :[a]"+r"(A),[b]"+r"(B)
+	                :[a]"+r"(A),[a2]"+r"(A2),[b]"+r"(B)
 	            :);
 
 	            //printf("%x\n",(uint64_t)cc);
@@ -293,10 +319,14 @@ void myblas_dgemm_kernel_detail(
 */
 	            __asm__ __volatile__ (
 	                "\n\t"
-	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
-	                "vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
-	                "vbroadcastf128  4*8(%[a]), %%ymm2 \n\t"
-	                "vbroadcastf128  6*8(%[a]), %%ymm3 \n\t"
+	                //"vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
+	                //"vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
+	                //"vbroadcastf128  4*8(%[a]), %%ymm2 \n\t"
+	                //"vbroadcastf128  6*8(%[a]), %%ymm3 \n\t"
+	                "vmovapd         0*8(%[a2]),%%ymm0 \n\t"
+	                "vmovapd         4*8(%[a2]),%%ymm1 \n\t"
+	                "vmovapd         8*8(%[a2]),%%ymm2 \n\t"
+	                "vmovapd        12*8(%[a2]),%%ymm3 \n\t"
 	                "vmovapd         0*8(%[b]), %%ymm4 \n\t"
 	                "vmovapd         4*8(%[b]), %%ymm5 \n\t"
 	                "\n\t"
@@ -313,10 +343,14 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd %%ymm2 , %%ymm11, %%ymm14\n\t"
 	                "vfmadd231pd %%ymm3 , %%ymm11, %%ymm15\n\t"
 	                "\n\t"
-	                "vbroadcastf128  8*8(%[a]), %%ymm0 \n\t"
-	                "vbroadcastf128 10*8(%[a]), %%ymm1 \n\t"
-	                "vbroadcastf128 12*8(%[a]), %%ymm2 \n\t"
-	                "vbroadcastf128 14*8(%[a]), %%ymm3 \n\t"
+	                //"vbroadcastf128  8*8(%[a]), %%ymm0 \n\t"
+	                //"vbroadcastf128 10*8(%[a]), %%ymm1 \n\t"
+	                //"vbroadcastf128 12*8(%[a]), %%ymm2 \n\t"
+	                //"vbroadcastf128 14*8(%[a]), %%ymm3 \n\t"
+	                "vmovapd        16*8(%[a2]),%%ymm0 \n\t"
+	                "vmovapd        20*8(%[a2]),%%ymm1 \n\t"
+	                "vmovapd        24*8(%[a2]),%%ymm2 \n\t"
+	                "vmovapd        28*8(%[a2]),%%ymm3 \n\t"
 	                "vmovapd         8*8(%[b]), %%ymm6 \n\t"
 	                "vmovapd        12*8(%[b]), %%ymm7 \n\t"
 	                "\n\t"
@@ -334,9 +368,10 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd %%ymm3 , %%ymm11, %%ymm15\n\t"
 	                "\n\t"
 	                "addq  $16*8, %[a]\n\t"
+	                "addq  $32*8, %[a2]\n\t"
 	                "addq  $16*8, %[b]\n\t"
 	                "\n\t"
-	                :[a]"+r"(A),[b]"+r"(B)
+	                :[a]"+r"(A),[a2]"+r"(A2),[b]"+r"(B)
 	            :);
 	           
 	        }
@@ -371,10 +406,14 @@ void myblas_dgemm_kernel_detail(
 */
 	            __asm__ __volatile__ (
 	                "\n\t"
-	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
-	                "vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
-	                "vbroadcastf128  4*8(%[a]), %%ymm2 \n\t"
-	                "vbroadcastf128  6*8(%[a]), %%ymm3 \n\t"
+	                //"vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
+	                //"vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
+	                //"vbroadcastf128  4*8(%[a]), %%ymm2 \n\t"
+	                //"vbroadcastf128  6*8(%[a]), %%ymm3 \n\t"
+	                "vmovapd         0*8(%[a2]),%%ymm0 \n\t"
+	                "vmovapd         4*8(%[a2]),%%ymm1 \n\t"
+	                "vmovapd         8*8(%[a2]),%%ymm2 \n\t"
+	                "vmovapd        12*8(%[a2]),%%ymm3 \n\t"
 	                "vmovapd         0*8(%[b]), %%ymm4 \n\t"
 	                "vmovapd         4*8(%[b]), %%ymm5 \n\t"
 	                "\n\t"
@@ -392,9 +431,10 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd %%ymm3 , %%ymm11, %%ymm15\n\t"
 	                "\n\t"
 	                "addq  $8*8, %[a]\n\t"
+	                "addq  $16*8,%[a2]\n\t"
 	                "addq  $8*8, %[b]\n\t"
 	                "\n\t"
-	                :[a]"+r"(A),[b]"+r"(B)
+	                :[a]"+r"(A),[a2]"+r"(A2),[b]"+r"(B)
 	            :);
 
 	        }
@@ -430,8 +470,10 @@ void myblas_dgemm_kernel_detail(
 
 	            __asm__ __volatile__ (
 	                "\n\t"
-	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
-	                "vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
+	                //"vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
+	                //"vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
+	                "vmovapd         0*8(%[a2]),%%ymm0 \n\t"
+	                "vmovapd         4*8(%[a2]),%%ymm1 \n\t"
 	                "vmovapd         0*8(%[b]), %%ymm4 \n\t"
 	                "\n\t"
 	                "vshufpd    $0x00, %%ymm4, %%ymm4, %%ymm8 \n\t"
@@ -442,9 +484,10 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd %%ymm1 , %%ymm9 , %%ymm15\n\t"
 	                "\n\t"
 	                "addq  $4*8, %[a]\n\t"
+	                "addq  $8*8, %[a2]\n\t"
 	                "addq  $4*8, %[b]\n\t"
 	                "\n\t"
-	                :[a]"+r"(A),[b]"+r"(B)
+	                :[a]"+r"(A),[a2]"+r"(A2),[b]"+r"(B)
 	            :);
 
 
@@ -595,8 +638,10 @@ void myblas_dgemm_kernel_detail(
 
 	            __asm__ __volatile__ (
 	                "\n\t"
-	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
-	                "vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
+	                //"vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
+	                //"vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
+	                "vmovapd         0*8(%[a2]),%%ymm0 \n\t"
+	                "vmovapd         4*8(%[a2]),%%ymm1 \n\t"
 	                "vmovapd         0*8(%[b]), %%ymm4 \n\t"
 	                "vmovapd         4*8(%[b]), %%ymm5 \n\t"
 	                "\n\t"
@@ -609,8 +654,10 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd %%ymm1 , %%ymm5 , %%ymm14\n\t"
 	                "vfmadd231pd %%ymm1 , %%ymm11, %%ymm15\n\t"
 	                "\n\t"
-	                "vbroadcastf128  4*8(%[a]), %%ymm2 \n\t"
-	                "vbroadcastf128  6*8(%[a]), %%ymm3 \n\t"
+	                //"vbroadcastf128  4*8(%[a]), %%ymm2 \n\t"
+	                //"vbroadcastf128  6*8(%[a]), %%ymm3 \n\t"
+	                "vmovapd         8*8(%[a2]),%%ymm2 \n\t"
+	                "vmovapd        12*8(%[a2]),%%ymm3 \n\t"
 	                "vmovapd         8*8(%[b]), %%ymm6 \n\t"
 	                "vmovapd        12*8(%[b]), %%ymm7 \n\t"
 	                "\n\t"
@@ -623,8 +670,10 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd %%ymm3 , %%ymm7 , %%ymm14\n\t"
 	                "vfmadd231pd %%ymm3 , %%ymm13, %%ymm15\n\t"
 	                "\n\t"
-	                "vbroadcastf128  8*8(%[a]), %%ymm0 \n\t"
-	                "vbroadcastf128 10*8(%[a]), %%ymm1 \n\t"
+	                //"vbroadcastf128  8*8(%[a]), %%ymm0 \n\t"
+	                //"vbroadcastf128 10*8(%[a]), %%ymm1 \n\t"
+	                "vmovapd        16*8(%[a2]),%%ymm0 \n\t"
+	                "vmovapd        20*8(%[a2]),%%ymm1 \n\t"
 	                "vmovapd        16*8(%[b]), %%ymm4 \n\t"
 	                "vmovapd        20*8(%[b]), %%ymm5 \n\t"
 	                "\n\t"
@@ -637,8 +686,10 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd %%ymm1 , %%ymm5 , %%ymm14\n\t"
 	                "vfmadd231pd %%ymm1 , %%ymm11, %%ymm15\n\t"
 	                "\n\t"
-	                "vbroadcastf128 12*8(%[a]), %%ymm2 \n\t"
-	                "vbroadcastf128 14*8(%[a]), %%ymm3 \n\t"
+	                //"vbroadcastf128 12*8(%[a]), %%ymm2 \n\t"
+	                //"vbroadcastf128 14*8(%[a]), %%ymm3 \n\t"
+	                "vmovapd        24*8(%[a2]),%%ymm2 \n\t"
+	                "vmovapd        28*8(%[a2]),%%ymm3 \n\t"
 	                "vmovapd        24*8(%[b]), %%ymm6 \n\t"
 	                "vmovapd        28*8(%[b]), %%ymm7 \n\t"
 	                "\n\t"
@@ -652,9 +703,10 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd %%ymm3 , %%ymm13, %%ymm15\n\t"
 	                "\n\t"
 	                "addq  $16*8, %[a]\n\t"
+	                "addq  $32*8, %[a2]\n\t"
 	                "addq  $32*8, %[b]\n\t"
 	                "\n\t"
-	                :[a]"+r"(A),[b]"+r"(B)
+	                :[a]"+r"(A),[a2]"+r"(A2),[b]"+r"(B)
 	            :);
 
 
@@ -680,8 +732,10 @@ void myblas_dgemm_kernel_detail(
 
 	            __asm__ __volatile__ (
 	                "\n\t"
-	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
-	                "vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
+	                //"vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
+	                //"vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
+	                "vmovapd         0*8(%[a2]),%%ymm0 \n\t"
+	                "vmovapd         4*8(%[a2]),%%ymm1 \n\t"
 	                "vmovapd         0*8(%[b]), %%ymm4 \n\t"
 	                "vmovapd         4*8(%[b]), %%ymm5 \n\t"
 	                "\n\t"
@@ -694,8 +748,10 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd %%ymm1 , %%ymm5 , %%ymm14\n\t"
 	                "vfmadd231pd %%ymm1 , %%ymm11, %%ymm15\n\t"
 	                "\n\t"
-	                "vbroadcastf128  4*8(%[a]), %%ymm2 \n\t"
-	                "vbroadcastf128  6*8(%[a]), %%ymm3 \n\t"
+	                //"vbroadcastf128  4*8(%[a]), %%ymm2 \n\t"
+	                //"vbroadcastf128  6*8(%[a]), %%ymm3 \n\t"
+	                "vmovapd         8*8(%[a2]),%%ymm2 \n\t"
+	                "vmovapd        12*8(%[a2]),%%ymm3 \n\t"
 	                "vmovapd         8*8(%[b]), %%ymm6 \n\t"
 	                "vmovapd        12*8(%[b]), %%ymm7 \n\t"
 	                "\n\t"
@@ -709,9 +765,10 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd %%ymm3 , %%ymm13, %%ymm15\n\t"
 	                "\n\t"
 	                "addq  $8*8 , %[a]\n\t"
+	                "addq  $16*8, %[a2]\n\t"
 	                "addq  $16*8, %[b]\n\t"
 	                "\n\t"
-	                :[a]"+r"(A),[b]"+r"(B)
+	                :[a]"+r"(A),[a2]"+r"(A2),[b]"+r"(B)
 	            :);
 
 
@@ -736,8 +793,10 @@ void myblas_dgemm_kernel_detail(
 
 	            __asm__ __volatile__ (
 	                "\n\t"
-	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
-	                "vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
+	                //"vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
+	                //"vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
+	                "vmovapd         0*8(%[a2]),%%ymm0 \n\t"
+	                "vmovapd         4*8(%[a2]),%%ymm1 \n\t"
 	                "vmovapd         0*8(%[b]), %%ymm4 \n\t"
 	                "vmovapd         4*8(%[b]), %%ymm5 \n\t"
 	                "\n\t"
@@ -751,9 +810,10 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd %%ymm1 , %%ymm11, %%ymm15\n\t"
 	                "\n\t"
 	                "addq  $4*8, %[a]\n\t"
+	                "addq  $8*8, %[a2]\n\t"
 	                "addq  $8*8, %[b]\n\t"
 	                "\n\t"
-	                :[a]"+r"(A),[b]"+r"(B)
+	                :[a]"+r"(A),[a2]"+r"(A2),[b]"+r"(B)
 	            :);
 
 
@@ -778,7 +838,8 @@ void myblas_dgemm_kernel_detail(
 
 	            __asm__ __volatile__ (
 	                "\n\t"
-	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
+	                //"vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
+	                "vmovapd         0*8(%[a2]),%%ymm0 \n\t"
 	                "vmovapd         0*8(%[b]), %%ymm4 \n\t"
 	                "\n\t"
 	                "vshufpd    $0x0f, %%ymm4, %%ymm4, %%ymm10\n\t"
@@ -787,9 +848,10 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd %%ymm0 , %%ymm10, %%ymm15\n\t"
 	                "\n\t"
 	                "addq  $2*8, %[a]\n\t"
+	                "addq  $4*8, %[a2]\n\t"
 	                "addq  $4*8, %[b]\n\t"
 	                "\n\t"
-	                :[a]"+r"(A),[b]"+r"(B)
+	                :[a]"+r"(A),[a2]"+r"(A2),[b]"+r"(B)
 	            :);
 
 	        }
@@ -1030,17 +1092,22 @@ void myblas_dgemm_kernel_detail(
 	        );
 
 	        B = B - 4*K;//N*K
+	        A2 = A2 + K*2;
 	        //C+=1;
 	        //c0+=1;
 	        //c1+=1;
 
 	    }
 	    A = A - M*K;
+	    A2= A2- M*K*2;
 	    B = B + 4*K;
 	    //C  = C - M + 4*ldc;
 	    c0 = c0 - M + 4*ldc;
 	    c1 = c1 - M + 4*ldc;
 	  }
+	  //if( (uint64_t)A2 != (uint64_t)buf ){ printf("[ERROR] Addrss incorrect : A2=0x%x , buf=0x%x \n",(uint64_t)A2,(uint64_t)buf); }
+	  //{ printf("[ERROR] Addrss incorrect : A2=0x%x , buf=0x%x \n",(uint64_t)A2,(uint64_t)buf); }
+	  //free(A2);
 	}
 	if( N & 2 ){
 

@@ -35,6 +35,8 @@ typedef struct _block3d_info_t {
 	size_t tile_M;
 	size_t tile_N;
 	size_t tile_K;
+	double* buf;
+	size_t  use_buffer;
 } block3d_info_t;
 
 typedef struct _block2d_info_t {
@@ -57,18 +59,22 @@ void myblas_dgemm_copy_t(const double* A, size_t lda, double* A2, const block2d_
 void myblas_dgemm_copy_n(const double* B, size_t ldb, double* B2, const block2d_info_t* info );
 void myblas_dgemm_kernel(double alpha, const double *A2, const double *B2, 
                          double *C, size_t ldc, const block3d_info_t* info );
+void myblas_dgemm_copy_2(const double *A2, const block3d_info_t* info );
 
 
 void myblas_dgemm_copy_n_core(const double* B, size_t ldb, double* B2, const block2d_info_t* info );
 void myblas_dgemm_copy_t_core(const double* A, size_t lda, double* A2, const block2d_info_t* info );
 void myblas_dgemm_kernel_core(double alpha, const double *A2, const double *B2, 
                               double *C, size_t ldc, const block3d_info_t* info );
+void myblas_dgemm_copy_2_core(const double *A2, const block3d_info_t* info );
 
 
 void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, size_t ldc );
 void myblas_dgemm_copy_n_detail(size_t K1, size_t N1, const double* B, size_t k, size_t j, size_t ldb, double* B2 );
 void myblas_dgemm_copy_t_detail(size_t K1, size_t M1, const double* A, size_t k, size_t i, size_t lda, double* A2 );
 void myblas_dgemm_kernel_detail(size_t M, size_t N, size_t K,
-                                double alpha, const double *A2, const double *B2, double *C, size_t ldc );
+                                double alpha, const double *A2, const double *B2, 
+                                double *C, size_t ldc, const double* buf );
+void myblas_dgemm_copy_2_detail( size_t M, size_t K, const double* A, double *A2 );
 
 #endif//MYBLAS_INTERNAL_H

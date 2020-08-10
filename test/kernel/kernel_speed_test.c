@@ -50,9 +50,13 @@ int main( int argc, char** argv ){
 	double* A  = aligned_alloc(ALIGNMENT_B,MAX_SIZE*MAX_SIZE*sizeof(double));
 	double* B  = aligned_alloc(ALIGNMENT_B,MAX_SIZE*MAX_SIZE*sizeof(double));
 	double* C  = aligned_alloc(ALIGNMENT_B,MAX_SIZE*MAX_SIZE*sizeof(double));
+	double* buf= aligned_alloc(ALIGNMENT_B,MAX_SIZE*MAX_SIZE*2*sizeof(double));
 
 	rand_matrix( MAX_SIZE, MAX_SIZE, A, 1, MAX_SIZE, SEED ); // ColMajor
 	rand_matrix( MAX_SIZE, MAX_SIZE, B, 1, MAX_SIZE, SEED ); // ColMajor
+
+	sizes.buf = buf;
+	sizes.use_buffer = 1;
 
 	test.A    = A;
 	test.B    = B;
@@ -89,6 +93,7 @@ int main( int argc, char** argv ){
 	free(A);
 	free(B);
 	free(C);
+	free(buf);
 
 	return error;
 }
