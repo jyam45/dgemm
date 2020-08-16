@@ -47,6 +47,17 @@ void myblas_dgemm_kernel_detail(
 
 	        __asm__ __volatile__ (
 	            "\n\t"
+	            //"prefetcht1   32*8(%[a])\n\t"
+	            //"prefetcht0   64*8(%[b])\n\t"
+	            "prefetchw     0*8(%[c0]        )\n\t"
+	            "prefetchw     0*8(%[c1]        )\n\t"
+	            "prefetchw     0*8(%[c0],%[ldc2])\n\t"
+	            "prefetchw     0*8(%[c1],%[ldc2])\n\t"
+	        ::[a]"r"(A),[b]"r"(B),[c0]"r"(c0),[c1]"r"(c1),[ldc2]"r"(ldc2)
+	        );
+
+	        __asm__ __volatile__ (
+	            "\n\t"
 	            "vpxor  %%ymm12, %%ymm12, %%ymm12\n\t"
 	            "vpxor  %%ymm13, %%ymm13, %%ymm13\n\t"
 	            "vpxor  %%ymm14, %%ymm14, %%ymm14\n\t"
@@ -147,6 +158,9 @@ void myblas_dgemm_kernel_detail(
 
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0  64*8(%[a])\n\t"
+	                //"prefetcht0  64*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
 	                "vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
@@ -293,6 +307,8 @@ void myblas_dgemm_kernel_detail(
 */
 	            __asm__ __volatile__ (
 	                "\n\t"
+	                "prefetcht0  64*8(%[a])\n\t"
+	                "\n\t"
 	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
 	                "vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
 	                "vbroadcastf128  4*8(%[a]), %%ymm2 \n\t"
@@ -371,6 +387,8 @@ void myblas_dgemm_kernel_detail(
 */
 	            __asm__ __volatile__ (
 	                "\n\t"
+	                //"prefetcht0  64*8(%[a])\n\t"
+	                "\n\t"
 	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
 	                "vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
 	                "vbroadcastf128  4*8(%[a]), %%ymm2 \n\t"
@@ -429,6 +447,8 @@ void myblas_dgemm_kernel_detail(
 */
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                //"prefetcht0  64*8(%[a])\n\t"
 	                "\n\t"
 	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
 	                "vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
@@ -544,6 +564,18 @@ void myblas_dgemm_kernel_detail(
 
 	        __asm__ __volatile__ (
 	            "\n\t"
+	            //"prefetcht1   32*8(%[a])\n\t"
+	            //"prefetcht0   64*8(%[b])\n\t"
+	            "prefetchw     0*8(%[c0]        )\n\t"
+	            "prefetchw     0*8(%[c1]        )\n\t"
+	            "prefetchw     0*8(%[c0],%[ldc2])\n\t"
+	            "prefetchw     0*8(%[c1],%[ldc2])\n\t"
+	        ::[a]"r"(A),[b]"r"(B),[c0]"r"(c0),[c1]"r"(c1),[ldc2]"r"(ldc2)
+	        );
+
+
+	        __asm__ __volatile__ (
+	            "\n\t"
 	            "vpxor  %%ymm14, %%ymm14, %%ymm14\n\t"
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
@@ -594,6 +626,8 @@ void myblas_dgemm_kernel_detail(
 	            //c13 += a10 * b30; c13 += a11 * b31; c13 += a12 * b32; c13 += a13 * b33; 
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0  64*8(%[a])\n\t"
 	                "\n\t"
 	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
 	                "vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
@@ -680,6 +714,8 @@ void myblas_dgemm_kernel_detail(
 
 	            __asm__ __volatile__ (
 	                "\n\t"
+	                //"prefetcht0  64*8(%[a])\n\t"
+	                "\n\t"
 	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
 	                "vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
 	                "vmovapd         0*8(%[b]), %%ymm4 \n\t"
@@ -736,6 +772,8 @@ void myblas_dgemm_kernel_detail(
 
 	            __asm__ __volatile__ (
 	                "\n\t"
+	                //"prefetcht0  64*8(%[a])\n\t"
+	                "\n\t"
 	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
 	                "vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
 	                "vmovapd         0*8(%[b]), %%ymm4 \n\t"
@@ -777,6 +815,8 @@ void myblas_dgemm_kernel_detail(
 	            //B+=4;
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                //"prefetcht0  64*8(%[a])\n\t"
 	                "\n\t"
 	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
 	                "vmovapd         0*8(%[b]), %%ymm4 \n\t"
@@ -839,6 +879,19 @@ void myblas_dgemm_kernel_detail(
 	        //c10=0e0;c11=0e0;c12=0e0;c13=0e0;
 	        //c20=0e0;c21=0e0;c22=0e0;c23=0e0;
 	        //c30=0e0;c31=0e0;c32=0e0;c33=0e0;
+/*
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            //"prefetcht1   32*8(%[a])\n\t"
+	            //"prefetcht0   64*8(%[b])\n\t"
+	            "prefetchw     4*8(%[c0]        )\n\t"
+	            "prefetchw     4*8(%[c1]        )\n\t"
+	            "prefetchw     4*8(%[c0],%[ldc2])\n\t"
+	            "prefetchw     4*8(%[c1],%[ldc2])\n\t"
+	        ::[a]"r"(A),[b]"r"(B),[c0]"r"(c0),[c1]"r"(c1),[ldc2]"r"(ldc2)
+	        );
+*/
+
 	        __asm__ __volatile__ (
 	            "\n\t"
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
@@ -868,6 +921,8 @@ void myblas_dgemm_kernel_detail(
 	            //B+=32;
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                //"prefetcht0  64*8(%[a])\n\t"
 	                "\n\t"
 	                "vbroadcastsd  0*8(%[a]), %%ymm0 \n\t"
 	                "vbroadcastsd  1*8(%[a]), %%ymm1 \n\t"
@@ -918,6 +973,8 @@ void myblas_dgemm_kernel_detail(
 	            //B+=16;
 	            __asm__ __volatile__ (
 	                "\n\t"
+	                //"prefetcht0  64*8(%[a])\n\t"
+	                "\n\t"
 	                "vbroadcastsd  0*8(%[a]), %%ymm0 \n\t"
 	                "vbroadcastsd  1*8(%[a]), %%ymm1 \n\t"
 	                "vbroadcastsd  2*8(%[a]), %%ymm2 \n\t"
@@ -953,6 +1010,8 @@ void myblas_dgemm_kernel_detail(
 
 	            __asm__ __volatile__ (
 	                "\n\t"
+	                //"prefetcht0  64*8(%[a])\n\t"
+	                "\n\t"
 	                "vbroadcastsd  0*8(%[a]), %%ymm0 \n\t"
 	                "vbroadcastsd  1*8(%[a]), %%ymm1 \n\t"
 	                "vmovapd       0*8(%[b]), %%ymm4 \n\t"
@@ -981,6 +1040,8 @@ void myblas_dgemm_kernel_detail(
 	            //B+=4;
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                //"prefetcht0  64*8(%[a])\n\t"
 	                "\n\t"
 	                "vbroadcastsd  0*8(%[a]), %%ymm0 \n\t"
 	                "vmovapd       0*8(%[b]), %%ymm4 \n\t"
