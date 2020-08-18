@@ -31,6 +31,14 @@ void myblas_dgemm_kernel_detail(
 	//double *cc = (double*)calloc(32,sizeof(double));
 	//printf("%x\n",(uint64_t)cc);
 
+        __asm__ __volatile__ (
+	    "\n\t"
+	    "prefetcht0   0*8(%[a])\n\t"
+	    "prefetcht0   0*8(%[b])\n\t"
+	::[a]"r"(A),[b]"r"(B)
+	);
+
+
 	// ---- Kernel
 	if( N >> 2 ){
 	  size_t n4 = ( N >> 2 );
@@ -49,10 +57,10 @@ void myblas_dgemm_kernel_detail(
 	            "\n\t"
 	            //"prefetcht1   32*8(%[a])\n\t"
 	            //"prefetcht0   64*8(%[b])\n\t"
-	            "prefetchw     0*8(%[c0]        )\n\t"
-	            "prefetchw     0*8(%[c1]        )\n\t"
-	            "prefetchw     0*8(%[c0],%[ldc2])\n\t"
-	            "prefetchw     0*8(%[c1],%[ldc2])\n\t"
+	            //"prefetcht0     0*8(%[c0]        )\n\t"
+	            "prefetcht0     0*8(%[c1]        )\n\t"
+	            "prefetcht0     0*8(%[c0],%[ldc2])\n\t"
+	            "prefetcht0     0*8(%[c1],%[ldc2])\n\t"
 	        ::[a]"r"(A),[b]"r"(B),[c0]"r"(c0),[c1]"r"(c1),[ldc2]"r"(ldc2)
 	        );
 
@@ -159,7 +167,7 @@ void myblas_dgemm_kernel_detail(
 
 	            __asm__ __volatile__ (
 	                "\n\t"
-	                "prefetcht0  64*8(%[a])\n\t"
+	                //"prefetcht0  64*8(%[a])\n\t"
 	                //"prefetcht0  64*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
@@ -307,7 +315,7 @@ void myblas_dgemm_kernel_detail(
 */
 	            __asm__ __volatile__ (
 	                "\n\t"
-	                "prefetcht0  64*8(%[a])\n\t"
+	                //"prefetcht0  64*8(%[a])\n\t"
 	                "\n\t"
 	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
 	                "vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
@@ -566,10 +574,10 @@ void myblas_dgemm_kernel_detail(
 	            "\n\t"
 	            //"prefetcht1   32*8(%[a])\n\t"
 	            //"prefetcht0   64*8(%[b])\n\t"
-	            "prefetchw     0*8(%[c0]        )\n\t"
-	            "prefetchw     0*8(%[c1]        )\n\t"
-	            "prefetchw     0*8(%[c0],%[ldc2])\n\t"
-	            "prefetchw     0*8(%[c1],%[ldc2])\n\t"
+	            "prefetcht0     0*8(%[c0]        )\n\t"
+	            "prefetcht0     0*8(%[c1]        )\n\t"
+	            "prefetcht0     0*8(%[c0],%[ldc2])\n\t"
+	            "prefetcht0     0*8(%[c1],%[ldc2])\n\t"
 	        ::[a]"r"(A),[b]"r"(B),[c0]"r"(c0),[c1]"r"(c1),[ldc2]"r"(ldc2)
 	        );
 
@@ -627,7 +635,7 @@ void myblas_dgemm_kernel_detail(
 
 	            __asm__ __volatile__ (
 	                "\n\t"
-	                "prefetcht0  64*8(%[a])\n\t"
+	                //"prefetcht0  64*8(%[a])\n\t"
 	                "\n\t"
 	                "vbroadcastf128  0*8(%[a]), %%ymm0 \n\t"
 	                "vbroadcastf128  2*8(%[a]), %%ymm1 \n\t"
