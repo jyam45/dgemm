@@ -33,6 +33,14 @@ void myblas_dgemm_kernel_detail(
 	A += 32;
 	B += 32;
 
+	__asm__ __volatile__ (
+	    "\n\t"
+	    "prefetcht0 -32*8(%[a])\n\t"
+	    "prefetcht0 -32*8(%[b])\n\t"
+	::[a]"r"(A),[b]"r"(B)
+	);
+
+
 	// ---- Kernel
 	if( N >> 2 ){
 	  size_t n4 = ( N >> 2 );
@@ -46,6 +54,17 @@ void myblas_dgemm_kernel_detail(
 	        //c10=0e0;c11=0e0;c12=0e0;c13=0e0;
 	        //c20=0e0;c21=0e0;c22=0e0;c23=0e0;
 	        //c30=0e0;c31=0e0;c32=0e0;c33=0e0;
+
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            //"prefetcht1   32*8(%[a])\n\t"
+	            //"prefetcht0  -32*8(%[b])\n\t"
+	            "prefetcht0     0*8(%[c0]        )\n\t"
+	            "prefetcht0     0*8(%[c1]        )\n\t"
+	            "prefetcht0     0*8(%[c0],%[ldc2])\n\t"
+	            "prefetcht0     0*8(%[c1],%[ldc2])\n\t"
+	        ::[a]"r"(A),[b]"r"(B),[c0]"r"(c0),[c1]"r"(c1),[ldc2]"r"(ldc2)
+	        );
 
 	        __asm__ __volatile__ (
 	            "\n\t"
@@ -548,6 +567,18 @@ void myblas_dgemm_kernel_detail(
 
 	        __asm__ __volatile__ (
 	            "\n\t"
+	            //"prefetcht1   32*8(%[a])\n\t"
+	            //"prefetcht0   64*8(%[b])\n\t"
+	            "prefetcht0     0*8(%[c0]        )\n\t"
+	            "prefetcht0     0*8(%[c1]        )\n\t"
+	            "prefetcht0     0*8(%[c0],%[ldc2])\n\t"
+	            "prefetcht0     0*8(%[c1],%[ldc2])\n\t"
+	        ::[a]"r"(A),[b]"r"(B),[c0]"r"(c0),[c1]"r"(c1),[ldc2]"r"(ldc2)
+	        );
+
+
+	        __asm__ __volatile__ (
+	            "\n\t"
 	            "vpxor  %%ymm14, %%ymm14, %%ymm14\n\t"
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
@@ -844,6 +875,19 @@ void myblas_dgemm_kernel_detail(
 	        //c10=0e0;c11=0e0;c12=0e0;c13=0e0;
 	        //c20=0e0;c21=0e0;c22=0e0;c23=0e0;
 	        //c30=0e0;c31=0e0;c32=0e0;c33=0e0;
+/*
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            //"prefetcht1   32*8(%[a])\n\t"
+	            //"prefetcht0   64*8(%[b])\n\t"
+	            "prefetchw     4*8(%[c0]        )\n\t"
+	            "prefetchw     4*8(%[c1]        )\n\t"
+	            "prefetchw     4*8(%[c0],%[ldc2])\n\t"
+	            "prefetchw     4*8(%[c1],%[ldc2])\n\t"
+	        ::[a]"r"(A),[b]"r"(B),[c0]"r"(c0),[c1]"r"(c1),[ldc2]"r"(ldc2)
+	        );
+*/
+
 	        __asm__ __volatile__ (
 	            "\n\t"
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
@@ -1061,6 +1105,16 @@ void myblas_dgemm_kernel_detail(
 	        //c10=0e0;c11=0e0;c12=0e0;c13=0e0;
 	        //c20=0e0;c21=0e0;c22=0e0;c23=0e0;
 	        //c30=0e0;c31=0e0;c32=0e0;c33=0e0;
+
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            //"prefetcht1   32*8(%[a])\n\t"
+	            //"prefetcht0   64*8(%[b])\n\t"
+	            "prefetcht0     0*8(%[c0]        )\n\t"
+	            "prefetcht0     0*8(%[c1]        )\n\t"
+	        ::[a]"r"(A),[b]"r"(B),[c0]"r"(c0),[c1]"r"(c1)
+	        );
+
 
 	        __asm__ __volatile__ (
 	            "\n\t"
@@ -1339,6 +1393,17 @@ void myblas_dgemm_kernel_detail(
 	        //c10=0e0;c11=0e0;c12=0e0;c13=0e0;
 	        //c20=0e0;c21=0e0;c22=0e0;c23=0e0;
 	        //c30=0e0;c31=0e0;c32=0e0;c33=0e0;
+
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            //"prefetcht1   32*8(%[a])\n\t"
+	            //"prefetcht0   64*8(%[b])\n\t"
+	            "prefetcht0     0*8(%[c0]        )\n\t"
+	            "prefetcht0     0*8(%[c1]        )\n\t"
+	        ::[a]"r"(A),[b]"r"(B),[c0]"r"(c0),[c1]"r"(c1)
+	        );
+
+
 	        __asm__ __volatile__ (
 	            "\n\t"
 	            "vpxor  %%ymm12, %%ymm12, %%ymm12\n\t"
