@@ -81,7 +81,12 @@ int main( int argc, char** argv ){
 		do_kernel( &test );
 		double t2 = get_realtime();
 		double dt = t2 - t1;
-		double nflop = ((double)test.info->M2) * ((double)test.info->K2) * ((double)test.info->N2) * 2 + ((double)test.info->M2) * ((double)test.info->N2) * 2 ; // A*B+C, alpha*AB, beta*C
+		//double nflop = ((double)test.info->M2) * ((double)test.info->K2) * ((double)test.info->N2) * 2 + ((double)test.info->M2) * ((double)test.info->N2) * 2 ; // A*B+C, alpha*AB, beta*C
+		//  C(i,j) = sum_K{alpha*A(i,k)*B(k,j)} + beta*C(i,j) -> *=2*K*M*N +=(K-1)*M*N +=M*N *=M*N -> 2*K*M*N + K*M*N - M*N + 2*M*N -> 3*K*M*N + M*N -> (3*K+1)*M*N
+		//double nflop = (3*((double)myblas.K)-1)*((double)myblas.M) * ((double)myblas.N) ; // A*B+C, alpha*AB, beta*C
+		double nflop = (3*((double)test.info->K2-1))*((double)test.info->M2) * ((double)test.info->N2) ; // A*B+C, alpha*AB, beta*C
+		//  C(i,j) = alpha*sum_K{A(i,k)*B(k,j)} + beta*C(i,j) -> *=M*N, *=K*M*N, +=(K-1)*M*N, +=M*N, *=M*N -> (2*K-1)*M*N + 3*M*N -> (2*K+2)*M*N -> 2*(K+1)*M*N
+		//double nflop = 2*(((double)test.info->K2+1))*((double)test.info->M2) * ((double)test.info->N2) ; // A*B+C, alpha*AB, beta*C
 		double mflops = nflop / dt / 1000 / 1000;
 		printf("%6u, %15G, %15G, %15G, %15G \n",n,dt,mflops,mflops/bpeak*100,mflops/mpeak*100);
 	}
