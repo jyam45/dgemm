@@ -14,6 +14,7 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	const double* a2 = A + lda*2;
 	const double* a3 = A + lda*3;
 	size_t        lda1 = lda * sizeof(double);
+	size_t        lda2 = lda * sizeof(double) * 2;
 
 	if( M >> 2 ){
 	  size_t m4 = ( M >> 2 );
@@ -21,6 +22,17 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 
 	    if( K >> 3 ){
 	      size_t k8 = ( K >> 3 );
+
+	      __asm__ __volatile__ (
+	        "\n\t"
+	        "prefetcht0  0(%[a0],%[lda1],8)\n\t"
+	        "prefetcht0  0(%[a1],%[lda1],8)\n\t"
+	        "prefetcht0  0(%[a2],%[lda1],8)\n\t"
+	        "prefetcht0  0(%[a3],%[lda1],8)\n\t"
+	        "\n\t"
+	      :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(a2),[a3]"+r"(a3),[aa]"+r"(A2)
+	      :[lda1]"r"(lda1),[lda2]"r"(lda2) );
+
 	      while( k8-- ){
 
 	        //x00 = *(A + 0 + 0*lda); x01 = *(A + 0 + 1*lda); x02 = *(A + 0 + 2*lda); x03 = *(A + 0 + 3*lda);
@@ -43,6 +55,11 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	        //A2+= 32;;
 
 	        __asm__ __volatile__ (
+	          "\n\t"
+	          //"prefetcht0  0(%[a0],%[lda1],8)\n\t"
+	          //"prefetcht0  0(%[a1],%[lda1],8)\n\t"
+	          //"prefetcht0  0(%[a2],%[lda1],8)\n\t"
+	          //"prefetcht0  0(%[a3],%[lda1],8)\n\t"
 	          "\n\t"
 	          "vmovupd   0*8(%[a0]        ), %%ymm0 \n\t" // [x00,x10,x20,x30]
 	          "vmovupd   0*8(%[a1]        ), %%ymm1 \n\t" // [x01,x11,x21,x31]
@@ -71,7 +88,7 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	          "addq    $32*8,  %[aa]\n\t"
 	          "\n\t"
 	        :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(a2),[a3]"+r"(a3),[aa]"+r"(A2)
-	        :[lda1]"r"(lda1) );
+	        :[lda1]"r"(lda1),[lda2]"r"(lda2) );
 
 	        A += 8*lda ;
 	      }
