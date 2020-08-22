@@ -52,10 +52,10 @@ void myblas_dgemm_copy_n_detail(size_t K, size_t N, const double* B, size_t k, s
 
 	          __asm__ __volatile__ (
 	            "\n\t"
-	            "prefetcht0 16*8(%[b0]        )\n\t"
-	            "prefetcht0 16*8(%[b1]        )\n\t"
-	            "prefetcht0 16*8(%[b0],%[ldb2])\n\t"
-	            "prefetcht0 16*8(%[b1],%[ldb2])\n\t"
+	            //"prefetcht0 16*8(%[b0]        )\n\t"
+	            //"prefetcht0 16*8(%[b1]        )\n\t"
+	            //"prefetcht0 16*8(%[b0],%[ldb2])\n\t"
+	            //"prefetcht0 16*8(%[b1],%[ldb2])\n\t"
 	            "\n\t"
 	            "vmovupd  0*8(%[b0]        ), %%ymm0 \n\t" // [x00,x10,x20,x30]
 	            "vmovupd  0*8(%[b1]        ), %%ymm1 \n\t" // [x01,x11,x21,x31]
