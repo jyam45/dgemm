@@ -80,7 +80,6 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	}
 	if( M & 2 ){
 
-	    size_t K = K;
 	    if( K >> 3 ){
 	      size_t k8 = ( K >> 3 );
 	      while( k8-- ){
@@ -127,7 +126,6 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	}
 	if( M & 1 ){
 
-	    size_t K = K;
 	    if( K >> 3 ){
 	      size_t k8 = ( K >> 3 );
 	      while( k8-- ){
