@@ -111,7 +111,6 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	        :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(a2),[a3]"+r"(a3),[aa]"+r"(A2)
 	        :[lda1]"r"(lda1),[lda2]"r"(lda2) );
 
-	        A += 8*lda ;
 	      }
 
 	     __asm__ __volatile__ (
@@ -170,8 +169,6 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	        :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(a2),[a3]"+r"(a3),[aa]"+r"(A2)
 	        :[lda1]"r"(lda1) );
 
-	        A += 4*lda ;
-
 	    }
 	    if( K & 2 ){
 	        //x00 = *(A + 0 + 0*lda); x01 = *(A + 0 + 1*lda);
@@ -200,8 +197,6 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	        :[a0]"+r"(a0),[a1]"+r"(a1),[aa]"+r"(A2)
 	        :[lda1]"r"(lda1) );
 
-	        A += 2*lda ;
-
 	    }
 	    if( K & 1 ){
 	        //x00 = *(A + 0 + 0*lda);
@@ -227,10 +222,7 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	        :[a0]"+r"(a0),[aa]"+r"(A2)
 	        :[lda1]"r"(lda1) );
 
-	        A += 1*lda ;
-
 	    }
-	    A  = A  - lda *K + 4;
 	    a0 = a0 - lda *K + 4;
 	    a1 = a0 + lda;
 	    a2 = a1 + lda;
@@ -305,8 +297,6 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	        :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(a2),[a3]"+r"(a3),[aa]"+r"(A2)
 	        :[lda1]"r"(lda1) );
 
-	        A += 8*lda ;
-
 	      }
 
 	      __asm__ __volatile__ (
@@ -361,8 +351,6 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	        :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(a2),[a3]"+r"(a3),[aa]"+r"(A2)
 	        :[lda1]"r"(lda1) );
 
-	        A += 4*lda ;
-
 	    }
 	    if( K & 2 ){
 	        //x00 = *(A + 0 + 0*lda); x01 = *(A + 0 + 1*lda);
@@ -387,9 +375,6 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	        :[a0]"+r"(a0),[a1]"+r"(a1),[aa]"+r"(A2)
 	        :[lda1]"r"(lda1) );
 
-	        A += 2*lda ;
-
-
 	    }
 	    if( K & 1 ){
 	        //x00 = *(A + 0 + 0*lda);
@@ -411,9 +396,7 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	        :[a0]"+r"(a0),[aa]"+r"(A2)
 	        :[lda1]"r"(lda1) );
 
-	        A += 1*lda ;
 	    }
-	    A  = A  - lda *K + 2;
 	    a0 = a0 - lda *K + 2;
 	    a1 = a0 + lda;
 	    a2 = a1 + lda;
@@ -464,9 +447,6 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	        :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(a2),[a3]"+r"(a3),[aa]"+r"(A2)
 	        :[lda1]"r"(lda1) );
 
-	        A += 8*lda ;
-
-
 	      }
 	    }
 	    if( K & 4 ){
@@ -496,9 +476,6 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	        :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(a2),[a3]"+r"(a3),[aa]"+r"(A2)
 	        :[lda1]"r"(lda1) );
 
-	        A += 4*lda ;
-
-
 	    }
 	    if( K & 2 ){
 	        //x00 = *(A + 0 + 0*lda); x01 = *(A + 0 + 1*lda);
@@ -521,8 +498,6 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	        :[a0]"+r"(a0),[a1]"+r"(a1),[aa]"+r"(A2)
 	        :[lda1]"r"(lda1) );
 
-	        A += 2*lda ;
-
 	    }
 	    if( K & 1 ){
 	        //x00 = *(A + 0 + 0*lda);
@@ -542,11 +517,7 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	        :[a0]"+r"(a0),[aa]"+r"(A2)
 	        :[lda1]"r"(lda1) );
 
-	        A += 1*lda ;
-
-
 	    }
-	    A  = A  - lda *K + 1;
 	    a0 = a0 - lda *K + 2;
 	    a1 = a0 + lda;
 	    a2 = a1 + lda;
