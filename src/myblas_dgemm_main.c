@@ -14,6 +14,8 @@
 #define MYBLAS_TILE_N    32
 #define MYBLAS_TILE_K    32
 
+#define ALIGNMENT_B      32  // for AVX
+
 #define MIN(x,y)  (((x)<(y))?(x):(y))
 
 static copy_func_t copy_funcs_A[] = {myblas_dgemm_copy_t,myblas_dgemm_copy_n};
@@ -44,31 +46,32 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	block2d_info_t infoC = {M,N,1,1};
 	myblas_dgemm_scale2d(beta,C,ldc,&infoC);
 
-	double*   A2 = calloc( MYBLAS_BLOCK_M*MYBLAS_BLOCK_K, sizeof(double) );
-	double*   B2 = calloc( MYBLAS_BLOCK_K*MYBLAS_BLOCK_N, sizeof(double) );
+	//double*   A2 = calloc( MYBLAS_BLOCK_M*MYBLAS_BLOCK_K, sizeof(double) );
+	//double*   B2 = calloc( MYBLAS_BLOCK_K*MYBLAS_BLOCK_N, sizeof(double) );
+	double*   A2 = aligned_alloc( ALIGNMENT_B, MYBLAS_BLOCK_M*MYBLAS_BLOCK_K*sizeof(double) ); // C11 standard
+	double*   B2 = aligned_alloc( ALIGNMENT_B, MYBLAS_BLOCK_K*MYBLAS_BLOCK_N*sizeof(double) ); // C11 standard
 
 	// L3 cache
-	for( size_t j3=0 ; j3<N; j3+=MIN(N-j3,MYBLAS_PANEL_N) ){
-	for( size_t i3=0 ; i3<M; i3+=MIN(M-i3,MYBLAS_PANEL_M) ){
 	for( size_t k3=0 ; k3<K; k3+=MIN(K-k3,MYBLAS_PANEL_K) ){
-	    size_t M3 = MIN(MYBLAS_PANEL_M ,M-i3);
-	    size_t N3 = MIN(MYBLAS_PANEL_N ,N-j3);
 	    size_t K3 = MIN(MYBLAS_PANEL_K ,K-k3);
-
-	    size_t M3B = M3/MYBLAS_BLOCK_M; // number of full blocks
-	    size_t M3R = M3%MYBLAS_BLOCK_M; // size of the final block
-	    size_t N3B = N3/MYBLAS_BLOCK_N; // number of full blocks
-	    size_t N3R = N3%MYBLAS_BLOCK_N; // size of the final block
 	    size_t K3B = K3/MYBLAS_BLOCK_K; // number of full blocks
 	    size_t K3R = K3%MYBLAS_BLOCK_K; // size of the final block
-
-	    M3B = M3B + (M3R>0?1:0); // number of blocks
-	    N3B = N3B + (N3R>0?1:0); // number of blocks
 	    K3B = K3B + (K3R>0?1:0); // number of blocks
-
-	    if( M3R==0 ) M3R = MYBLAS_BLOCK_M;
-	    if( N3R==0 ) N3R = MYBLAS_BLOCK_N;
 	    if( K3R==0 ) K3R = MYBLAS_BLOCK_K;
+
+	for( size_t j3=0 ; j3<N; j3+=MIN(N-j3,MYBLAS_PANEL_N) ){
+	    size_t N3 = MIN(MYBLAS_PANEL_N ,N-j3);
+	    size_t N3B = N3/MYBLAS_BLOCK_N; // number of full blocks
+	    size_t N3R = N3%MYBLAS_BLOCK_N; // size of the final block
+	    N3B = N3B + (N3R>0?1:0); // number of blocks
+	    if( N3R==0 ) N3R = MYBLAS_BLOCK_N;
+
+	for( size_t i3=0 ; i3<M; i3+=MIN(M-i3,MYBLAS_PANEL_M) ){
+	    size_t M3 = MIN(MYBLAS_PANEL_M ,M-i3);
+	    size_t M3B = M3/MYBLAS_BLOCK_M; // number of full blocks
+	    size_t M3R = M3%MYBLAS_BLOCK_M; // size of the final block
+	    M3B = M3B + (M3R>0?1:0); // number of blocks
+	    if( M3R==0 ) M3R = MYBLAS_BLOCK_M;
 
 	    // L2 cache
 	    size_t l2 = K3B; // block index

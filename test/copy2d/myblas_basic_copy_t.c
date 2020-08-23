@@ -1,4 +1,5 @@
 #include "copy2d_test.h"
+#include <stdlib.h>
 
 // On L2-Cache Copy for A
 void myblas_basic_copy_t(const double* A, size_t lda, double* A2, const block2d_info_t* info ){
@@ -49,15 +50,155 @@ void myblas_basic_copy_t_core(const double* A, size_t lda, double* A2, const blo
 	size_t K1     = info->M2    ;
 	size_t M1     = info->N2    ;
 
+	//size_t m = M1;
+	//while( m-- ){
+	//  size_t k = K1;
+	//  while( k-- ){
+	//    (*A2) = (*A);
+	//    A += lda ;
+	//    A2++;
+	//  }
+	//  A  = A  - lda *K1 + 1;
+	//}
+
 	size_t m = M1;
-	while( m-- ){
-	  size_t k = K1;
-	  while( k-- ){
-	    (*A2) = (*A);
-	    A += lda ;
-	    A2++;
+	if( m >> 2 ){
+	  size_t m4 = ( m >> 2 );
+	  while( m4-- ){
+
+	    size_t k = K1;
+	    if( k >> 3 ){
+	      size_t k8 = ( k >> 3 );
+	      while( k8-- ){
+	        for( size_t l=0; l<8; l++ ){
+	          for( size_t i=0; i<4; i++ ){
+	            (*A2) = *(A+i+l*lda);
+	            A2++;
+	          }
+	        }
+	        A += 8*lda ;
+	      }
+	    }
+	    if( k & 4 ){
+	        for( size_t l=0; l<4; l++ ){
+	          for( size_t i=0; i<4; i++ ){
+	            (*A2) = *(A+i+l*lda);
+	            A2++;
+	          }
+	        }
+	        A += 4*lda ;
+	    }
+	    if( k & 2 ){
+	        for( size_t l=0; l<2; l++ ){
+	          for( size_t i=0; i<4; i++ ){
+	            (*A2) = *(A+i+l*lda);
+	            A2++;
+	          }
+	        }
+	        A += 2*lda ;
+	    }
+	    if( k & 1 ){
+	        for( size_t l=0; l<1; l++ ){
+	          for( size_t i=0; i<4; i++ ){
+	            (*A2) = *(A+i+l*lda);
+	            A2++;
+	          }
+	        }
+	        A += 1*lda ;
+	    }
+	    A  = A  - lda *K1 + 4;
+
 	  }
-	  A  = A  - lda *K1 + 1;
+	}
+	if( m & 2 ){
+
+	    size_t k = K1;
+	    if( k >> 3 ){
+	      size_t k8 = ( k >> 3 );
+	      while( k8-- ){
+	        for( size_t l=0; l<8; l++ ){
+	          for( size_t i=0; i<2; i++ ){
+	            (*A2) = *(A+i+l*lda);
+	            A2++;
+	          }
+	        }
+	        A += 8*lda ;
+	      }
+	    }
+	    if( k & 4 ){
+	        for( size_t l=0; l<4; l++ ){
+	          for( size_t i=0; i<2; i++ ){
+	            (*A2) = *(A+i+l*lda);
+	            A2++;
+	          }
+	        }
+	        A += 4*lda ;
+	    }
+	    if( k & 2 ){
+	        for( size_t l=0; l<2; l++ ){
+	          for( size_t i=0; i<2; i++ ){
+	            (*A2) = *(A+i+l*lda);
+	            A2++;
+	          }
+	        }
+	        A += 2*lda ;
+	    }
+	    if( k & 1 ){
+	        for( size_t l=0; l<1; l++ ){
+	          for( size_t i=0; i<2; i++ ){
+	            (*A2) = *(A+i+l*lda);
+	            A2++;
+	          }
+	        }
+	        A += 1*lda ;
+	    }
+	    A  = A  - lda *K1 + 2;
+
+	}
+	if( m & 1 ){
+
+	    size_t k = K1;
+	    if( k >> 3 ){
+	      size_t k8 = ( k >> 3 );
+	      while( k8-- ){
+	        for( size_t l=0; l<8; l++ ){
+	          for( size_t i=0; i<1; i++ ){
+	            (*A2) = *(A+i+l*lda);
+	            A2++;
+	          }
+	        }
+	        A += 8*lda ;
+	      }
+	    }
+	    if( k & 4 ){
+	        for( size_t l=0; l<4; l++ ){
+	          for( size_t i=0; i<1; i++ ){
+	            (*A2) = *(A+i+l*lda);
+	            A2++;
+	          }
+	        }
+	        A += 4*lda ;
+	    }
+	    if( k & 2 ){
+	        for( size_t l=0; l<2; l++ ){
+	          for( size_t i=0; i<1; i++ ){
+	            (*A2) = *(A+i+l*lda);
+	            A2++;
+	          }
+	        }
+	        A += 2*lda ;
+	    }
+	    if( k & 1 ){
+	        for( size_t l=0; l<1; l++ ){
+	          for( size_t i=0; i<1; i++ ){
+	            (*A2) = *(A+i+l*lda);
+	            A2++;
+	          }
+	        }
+	        A += 1*lda ;
+	    }
+	    A  = A  - lda *K1 + 1;
+
 	}
 
 }

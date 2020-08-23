@@ -15,7 +15,7 @@ int check_matrix( const int m, const int n, const int k,
 			double cmax = ( c1>c2 ? c1 : c2 );
 			double cdiff = fabs(c1-c2);
 			double sqrtk = sqrt((double)k);
-			double eps = DBL_EPSILON * sqrtk * cmax;
+			double eps = DBL_EPSILON * sqrtk * cmax * 2;
 
 			if( cdiff > eps  ){
 				fprintf(stderr,"[ERROR] An element C(%d,%d) is invalid : t1=%G, t2=%G, diff=%G, eps=%G\n",i,j,*C1,*C2,cdiff,eps);

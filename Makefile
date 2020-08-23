@@ -1,22 +1,24 @@
 CC=gcc
 FCC=gfortran
 
-CFLAGS=-O3 --std=c11 -I./include/ -I./src/ -I./test/
+CFLAGS=-O3 -mavx2 --std=c11 -I./include/ -I./src/ -I./test/
 LDFLAGS=-L./lib/
 LIBS=-lcpuid -ltimer
 CBLASLIBS= -lcblas -lblas
 
-MYBLAS_OBJS= src/myblas_dgemm.o src/myblas_dgemm_main.o src/myblas_xerbla.o \
-             src/myblas_dgemm_scale2d.o src/myblas_dgemm_copy_n.o src/myblas_dgemm_copy_t.o src/myblas_dgemm_kernel.o
 
-MYBLAS_COPY_OBJS=src/myblas_dgemm_copy_n.o src/myblas_dgemm_copy_t.o
-MYBLAS_SCAL_OBJS=src/myblas_dgemm_scale2d.o
+MYBLAS_COPY_OBJS=src/myblas_dgemm_copy_n.o src/myblas_dgemm_copy_t.o src/myblas_dgemm_copy_n_detail.o src/myblas_dgemm_copy_t_detail.o
+MYBLAS_SCAL_OBJS=src/myblas_dgemm_scale2d.o src/myblas_dgemm_scale2d_detail.o
+MYBLAS_KRNL_OBJS=src/myblas_dgemm_kernel.o src/myblas_dgemm_kernel_detail.o
+
+MYBLAS_OBJS= src/myblas_dgemm.o src/myblas_dgemm_main.o src/myblas_xerbla.o $(MYBLAS_COPY_OBJS) $(MYBLAS_SCAL_OBJS) $(MYBLAS_KRNL_OBJS)
+
 
 all: libs test
 
 libs: ./lib ./include lib/libblas.a lib/libcblas.a lib/libcpuid.a lib/libtimer.a
 
-test: unit_test speed_test total_test copy2d_unit_test copy2d_speed_test scale2d_unit_test scale2d_speed_test
+test: unit_test speed_test total_test copy2d_unit_test copy2d_speed_test scale2d_unit_test scale2d_speed_test kernel_unit_test kernel_speed_test
 
 unit_test: test/unit_test.o test/check_error.o test/check_matrix.o test/check_speed.o test/init_matrix.o $(MYBLAS_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS) $(CBLASLIBS)
@@ -46,6 +48,11 @@ src/myblas_dgemm_copy_n.o  : src/myblas_dgemm_copy_n.c src/myblas_internal.h
 src/myblas_dgemm_copy_t.o  : src/myblas_dgemm_copy_t.c src/myblas_internal.h
 src/myblas_dgemm_kernel.o  : src/myblas_dgemm_kernel.c src/myblas_internal.h
 
+src/myblas_dgemm_scale2d_detail.o : src/myblas_dgemm_scale2d_detail.c src/myblas_internal.h
+src/myblas_dgemm_kernel_detail.o  : src/myblas_dgemm_kernel_detail.c src/myblas_internal.h
+src/myblas_dgemm_copy_n_detail.o  : src/myblas_dgemm_copy_n_detail.c src/myblas_internal.h
+src/myblas_dgemm_copy_t_detail.o  : src/myblas_dgemm_copy_t_detail.c src/myblas_internal.h
+
 copy2d_unit_test: test/copy2d/copy2d_unit_test.o test/copy2d/myblas_basic_copy_n.o test/copy2d/myblas_basic_copy_t.o test/check_array.o test/init_matrix.o $(MYBLAS_COPY_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS) $(CBLASLIBS)
 
@@ -67,8 +74,19 @@ test/scale2d/scale2d_speed_test.o   : test/scale2d/scale2d_speed_test.c test/sca
 test/scale2d/scale2d_unit_test.o    : test/scale2d/scale2d_unit_test.c test/scale2d/scale2d_test.h
 test/scale2d/myblas_basic_scale2d.o : test/scale2d/myblas_basic_scale2d.c test/scale2d/scale2d_test.h
 
+kernel_unit_test: test/kernel/kernel_unit_test.o test/kernel/myblas_basic_kernel.o test/check_matrix.o test/init_matrix.o $(MYBLAS_KRNL_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS) $(CBLASLIBS)
+
+kernel_speed_test: test/kernel/kernel_speed_test.o test/kernel/myblas_basic_kernel.o test/init_matrix.o test/peak_flops.o $(MYBLAS_KRNL_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS) $(CBLASLIBS)
+
+test/kernel/kernel_speed_test.o   : test/kernel/kernel_speed_test.c test/kernel/kernel_test.h include/Timer.h 
+test/kernel/kernel_unit_test.o    : test/kernel/kernel_unit_test.c test/kernel/kernel_test.h  
+test/kernel/myblas_basic_kernel.o : test/kernel/myblas_basic_kernel.c test/kernel/kernel_test.h
+
 test/copy2d/copy2d_test.h    : test/dgemm_test.h src/myblas_internal.h
 test/scale2d/scale2d_test.h  : test/dgemm_test.h src/myblas_internal.h
+test/kernel/kernel_test.h    : test/dgemm_test.h src/myblas_internal.h
 
 ./lib:
 	mkdir -p lib
@@ -97,7 +115,7 @@ clean:
 	cd timer/ ; make clean
 
 distclean: clean
-	rm -f unit_test speed_test total_test copy2d_unit_test copy2d_speed_test scale2d_unit_test scale2d_speed_test
+	rm -f unit_test speed_test total_test copy2d_unit_test copy2d_speed_test scale2d_unit_test scale2d_speed_test kernel_unit_test kernel_speed_test
 	cd blas/ ; make distclean 
 	cd cpuid/ ; make distclean
 	cd timer/ ; make distclean
