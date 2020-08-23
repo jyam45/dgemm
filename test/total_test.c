@@ -33,7 +33,8 @@ int main(int argc, char** arv){
 	printf("Base Peak MFlops per Core: %G MFlops \n",bpeak);
 
 	printf("size  , elapsed time[s],          MFlops,   base ratio[%%],    max ratio[%%] \n");
-	for( size_t n=32; n<=MAX_SIZE; n=n+32 ){
+	//for( size_t n=32; n<=MAX_SIZE; n=n+32 ){
+	for( size_t n=16; n<=MAX_SIZE; n=n+16 ){
 
 		myblas.M   = n;
 		myblas.N   = n;
@@ -44,7 +45,7 @@ int main(int argc, char** arv){
 
 		//double nflop = ((double)myblas.M) * ((double)myblas.K) * ((double)myblas.N) * 2 + ((double)myblas.M) * ((double)myblas.N) * 2 ; // A*B+C, alpha*AB, beta*C
 		//  C(i,j) = sum_K{alpha*A(i,k)*B(k,j)} + beta*C(i,j) -> *=2*K*M*N +=(K-1)*M*N +=M*N *=M*N -> 2*K*M*N + K*M*N - M*N + 2*M*N -> 3*K*M*N + M*N -> (3*K+1)*M*N
-		double nflop = (3*((double)myblas.K)-1)*((double)myblas.M) * ((double)myblas.N) ; // A*B+C, alpha*AB, beta*C
+		double nflop = (3*((double)myblas.K)+1)*((double)myblas.M) * ((double)myblas.N) ; // A*B+C, alpha*AB, beta*C
 		//  C(i,j) = alpha*sum_K{A(i,k)*B(k,j)} + beta*C(i,j) -> *=M*N, *=K*M*N, +=(K-1)*M*N, +=M*N, *=M*N -> (2*K-1)*M*N + 3*M*N -> (2*K+2)*M*N -> 2*(K+1)*M*N
 		//double nflop = 2*(((double)myblas.K)+1)*((double)myblas.M) * ((double)myblas.N) ; // A*B+C, alpha*AB, beta*C
 		double dt = check_speed( &myblas );
