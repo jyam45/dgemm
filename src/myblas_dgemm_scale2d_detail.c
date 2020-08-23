@@ -6,6 +6,7 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	double* c0 = C;
 	double* c1 = C + ldc;
 	size_t  ldc2 = 2*ldc*sizeof(double); // *** byte unit ***
+	size_t  ldc3 = 3*ldc*sizeof(double); // *** byte unit ***
 
 	//printf("M=%d, N=%d, ldc=%d\n",M,N,ldc);
 
@@ -20,12 +21,24 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	    size_t n4 = ( n >> 2 ); // unrolling with 4 elements
 	    while( n4-- )
 	    {
+	        __asm__ __volatile__ (
+	          "prefetcht1   0*8(%[c0],%[ldc2],2)\n\t"
+	          "prefetcht1   0*8(%[c1],%[ldc2],2)\n\t"
+	          "prefetcht1   0*8(%[c0],%[ldc3],2)\n\t"
+	          "prefetcht1   0*8(%[c1],%[ldc3],2)\n\t"
+	          :[c0]"+r"(c0),[c1]"+r"(c1)
+	          :[ldc2]"r"(ldc2),[ldc3]"r"(ldc3)
+	        );
 	        size_t m = M;
 	        if( m >> 4 ){
 	            size_t m16 = ( m >> 4 );
 	            while( m16-- ){
 
 	                __asm__ __volatile__ (
+	                    "prefetcht0  16*8(%[c0]        )\n\t"
+	                    "prefetcht0  16*8(%[c1]        )\n\t"
+	                    "prefetcht0  16*8(%[c0],%[ldc2])\n\t"
+	                    "prefetcht0  16*8(%[c1],%[ldc2])\n\t"
 	                    "vmovupd   0*8(%[c0]        ), %%ymm0\n\t"
 	                    "vmovupd   0*8(%[c1]        ), %%ymm1\n\t"
 	                    "vmovupd   0*8(%[c0],%[ldc2]), %%ymm2\n\t"
