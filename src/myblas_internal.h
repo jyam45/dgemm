@@ -6,6 +6,8 @@
 #define  MASK_TRANS  0x01
 #define  MASK_CONJ   0x02
 
+extern size_t g_flop;
+
 typedef struct _gemm_args_t {
 	size_t       TransA;
 	size_t       TransB;

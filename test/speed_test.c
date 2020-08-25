@@ -1,5 +1,6 @@
 #include "dgemm_test.h"
 #include "myblas.h"
+#include "myblas_internal.h"
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -95,9 +96,12 @@ int main(int argc, char** argv){
 	printf("Max  Peak MFlops per Core: %G MFlops \n",mpeak);
 	printf("Base Peak MFlops per Core: %G MFlops \n",bpeak);
 
-	printf("size  , elapsed time[s],          MFlops,   base ratio[%%],    max ratio[%%] \n");
+	//printf("size  , elapsed time[s],          MFlops,   base ratio[%%],    max ratio[%%] \n");
+	printf("  size,      FLOP count,      FLOP Comp0,       FLOP comp1,       FLOP comp2,       FLOP comp3 \n");
 	size_t n = init;
 	while ( n <= nmax ){
+
+		g_flop     = 0;
 
 		myblas.M   = n;
 		myblas.N   = n;
@@ -110,7 +114,14 @@ int main(int argc, char** argv){
 		double dt = check_speed( &myblas );
 		double mflops = nflop / dt / 1000 / 1000;
 
-		printf("%6u, %15G, %15G, %15G, %15G \n",n,dt,mflops,mflops/bpeak*100,mflops/mpeak*100);
+		double flop  = (double)g_flop;
+		double flop0 = flop_count_dgemm_simple   ( myblas.M, myblas.N, myblas.K );
+		double flop1 = flop_count_dgemm_minimum  ( myblas.M, myblas.N, myblas.K );
+		double flop2 = flop_count_dgemm_redundant( myblas.M, myblas.N, myblas.K );
+		double flop3 = flop_count_dgemm_implement( myblas.M, myblas.N, myblas.K );
+
+		//printf("%6u, %15G, %15G, %15G, %15G \n",n,dt,mflops,mflops/bpeak*100,mflops/mpeak*100);
+		printf("%6u, %15G, %15G, %15G, %15G, %15G \n",n,flop,flop0,flop1,flop2,flop3);
 
 		n = ( dist==0 ? n*2 : n+dist );
 

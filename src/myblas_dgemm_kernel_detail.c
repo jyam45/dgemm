@@ -277,6 +277,8 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 32*4*2;
+
 	            //printf("%x\n",(uint64_t)cc);
 	            //// Dump
 	            //__asm__ __volatile__ (
@@ -380,6 +382,7 @@ void myblas_dgemm_kernel_detail(
 	              :[a]"+r"(A),[b]"+r"(B)
 	          :);
 
+	          g_flop += 32*4*2;
 
 	        }
 	        if( K & 4 ){
@@ -458,6 +461,8 @@ void myblas_dgemm_kernel_detail(
 	                "\n\t"
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
+
+	          g_flop += 16*4*2;
 	           
 	        }
 	        if( K & 2 ){
@@ -517,6 +522,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	          g_flop += 8*4*2;
 	        }
 	        if( K & 1 ){
 /*
@@ -567,6 +573,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	          g_flop += 4*4*2;
 
 	        }
 /*
@@ -621,6 +628,7 @@ void myblas_dgemm_kernel_detail(
 	            :[c0]"+r"(c0),[c1]"+r"(c1)
 	            :[alpha]"m"(alpha4),[ldc2]"r"(ldc2)
 	        );
+	        g_flop += 4*4*2;
 
 	            ////printf("%x\n",(uint64_t)cc);
 	            ////// Dump
@@ -791,7 +799,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
-
+	            g_flop += 16*4*2;
 	          }
 	        }
 	        if( K & 4 ){
@@ -849,6 +857,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 8*4*2;
 
 	        }
 	        if( K & 2 ){
@@ -891,6 +900,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 4*4*2;
 
 	        }
 	        if( K & 1 ){
@@ -927,6 +937,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 2*4*2;
 	        }
 	        //*(C+0+0*ldc) += alpha*c00;
 	        //*(C+0+1*ldc) += alpha*c01;
@@ -961,6 +972,8 @@ void myblas_dgemm_kernel_detail(
 	            :[c0]"+r"(c0),[c1]"+r"(c1)
 	            :[alpha]"m"(alpha4),[ldc2]"r"(ldc2)
 	        );
+
+	        g_flop += 4*4*2;
 
 	        B = B - 4*K;//N*K
 	        //C+=2;
@@ -1049,6 +1062,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 8*4*2;
 
 	          }
 	        }
@@ -1085,6 +1099,8 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 4*4*2;
+
 	        }
 	        if( K & 2 ){
 	            //a00 = *(A + 0 + 0*1 ); a01 = *(A +  0 + 1*1 );
@@ -1114,6 +1130,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 2*4*2;
 	        }
 	        if( K & 1 ){
 	            //a00 = *(A + 0 + 0*1 );
@@ -1140,6 +1157,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 1*4*2;
 	        }
 	        //*(C+0+0*ldc) += alpha*c00;
 	        //*(C+0+1*ldc) += alpha*c01;
@@ -1178,6 +1196,8 @@ void myblas_dgemm_kernel_detail(
 	            :[c0]"+r"(c0),[c1]"+r"(c1)
 	            :[alpha]"m"(alpha4),[ldc2]"r"(ldc2)
 	        );
+
+	        g_flop += 4 + 4;
 
 	        B = B - 4*K;//N*K
 	        //C+=1;
@@ -1317,6 +1337,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 16*4*2;
 
 	          }
 	        }
@@ -1372,6 +1393,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 8*4*2;
 
 	        }
 	        if( K & 2 ){
@@ -1414,6 +1436,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 4*4*2;
 	        }
 	        if( K & 1 ){
 	            //a00 = *(A + 0 + 0*4 );
@@ -1447,6 +1470,7 @@ void myblas_dgemm_kernel_detail(
 	                "\n\t"
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
+	            g_flop += 2*4*2;
 
 	        }
 	        //*(C+0+0*ldc) += alpha*c00;
@@ -1478,6 +1502,7 @@ void myblas_dgemm_kernel_detail(
 	            :[c0]"+r"(c0),[c1]"+r"(c1)
 	            :[alpha]"m"(alpha4)
 	        );
+	        g_flop += 2*4*2;
 
 	        B = B - 2*K;//N*K
 	        //C+=4;
@@ -1592,6 +1617,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 16*2*2;
 
 	          }
 	        }
@@ -1641,6 +1667,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 8*2*2;
 
 	        }
 	        if( K & 2 ){
@@ -1677,6 +1704,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 4*2*2;
 
 	        }
 	        if( K & 1 ){
@@ -1707,6 +1735,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 2*2*2;
 	        }
 	        //*(C+0+0*ldc) += alpha*c00;
 	        //*(C+0+1*ldc) += alpha*c01;
@@ -1731,6 +1760,7 @@ void myblas_dgemm_kernel_detail(
 	            :[alpha]"m"(alpha4)
 	        );
 
+	        g_flop += 2*2*2;
 
 	        B = B - 2*K;//N*K
 	        //C+=2;
@@ -1807,6 +1837,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 8*2*2;
 
 	          }
 	        }
@@ -1843,6 +1874,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 4*2*2;
 	        }
 	        if( K & 2 ){
 	            //a00 = *(A + 0 + 0*1 ); a01 = *(A +  0 + 1*1 );
@@ -1870,6 +1902,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 2*2*2;
 
 	        }
 	        if( K & 1 ){
@@ -1895,6 +1928,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 1*2*2;
 
 	        }
 	        //*(C+0+0*ldc) += alpha*c00;
@@ -1918,6 +1952,8 @@ void myblas_dgemm_kernel_detail(
 	            :[c0]"+r"(c0),[c1]"+r"(c1)
 	            :[alpha]"m"(alpha4),[ldc2]"r"(ldc2)
 	        );
+
+	        g_flop += 2 + 2;
 
 	        B = B - 2*K;//N*K
 	        //C+=1;
@@ -2006,6 +2042,8 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 8*4*2;
+
 	          }
 	        }
 	        if( K & 4 ){
@@ -2043,6 +2081,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 4*4*2;
 
 	        }
 	        if( K & 2 ){
@@ -2074,6 +2113,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 2*4*2;
 
 	        }
 	        if( K & 1 ){
@@ -2102,6 +2142,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 1*4*2;
 
 	        }
 	        //*(C+0+0*ldc) += alpha*c00;
@@ -2121,6 +2162,7 @@ void myblas_dgemm_kernel_detail(
 	            :[c0]"+r"(c0),[c1]"+r"(c1)
 	            :[alpha]"m"(alpha4)
 	        );
+	        g_flop += 1*4*2;
 
 	        B = B - 1*K;//N*K
 	        //C+=4;
@@ -2195,6 +2237,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 8*2*2;
 
 	          }
 	        }
@@ -2231,6 +2274,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 4*2*2;
 	        }
 	        if( K & 2 ){
 	            //a00 = *(A + 0 + 0*2 ); a01 = *(A +  0 + 1*2 );
@@ -2258,6 +2302,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 2*2*2;
 
 	        }
 	        if( K & 1 ){
@@ -2283,6 +2328,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 1*2*2;
 
 	        }
 	        //*(C+0+0*ldc) += alpha*c00;
@@ -2300,6 +2346,7 @@ void myblas_dgemm_kernel_detail(
 	            :[alpha]"m"(alpha4)
 	        );
 
+	        g_flop += 1*2*2;
 
 	        B = B - 1*K;//N*K
 	        //C+=2;
@@ -2345,6 +2392,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 2*4*2;
 
 	          }
 	        }
@@ -2368,6 +2416,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 1*4*2;
 
 	        }
 	        if( K & 2 ){
@@ -2391,6 +2440,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 2*2;
 
 	        }
 	        if( K & 1 ){
@@ -2414,6 +2464,7 @@ void myblas_dgemm_kernel_detail(
 	                :[a]"+r"(A),[b]"+r"(B)
 	            :);
 
+	            g_flop += 2*1;
 
 	        }
 	        //*(C+0+0*ldc) += alpha*c00;
@@ -2435,6 +2486,7 @@ void myblas_dgemm_kernel_detail(
 	            :[alpha]"m"(alpha4)
 	        );
 
+	        g_flop += 4 + 4 + 3 + 1;
 
 	        B = B - 1*K;//N*K
 	        //C+=1;

@@ -122,6 +122,7 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	                    :[c0]"=r"(c0),[c1]"=r"(c1)
 	                    :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
 	                    );
+	                g_flop += 16*4;
 	            }
 
 	            __asm__ __volatile__ (
@@ -175,6 +176,7 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	                :[c0]"=r"(c0),[c1]"=r"(c1)
 	                :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
 	                );
+	              g_flop += 16*4;
 
 	        }
 
@@ -213,6 +215,7 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	                :[c0]"=r"(c0),[c1]"=r"(c1)
 	                :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
 	                );
+	              g_flop += 8*4;
 	        }
 	        if( m & 4 ){
 
@@ -237,6 +240,7 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	                :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
 	                );
 	
+	              g_flop += 4*4;
 		}
 	        if( m & 2 ){
 
@@ -261,6 +265,7 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	                :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
 	                );
 	
+	              g_flop += 4*2;
 	        }
 	        if( m & 1 ){
 
@@ -285,6 +290,7 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	                :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
 	                );
 
+	              g_flop += 4*1;
 		}
 	        c0= c0- M + 4*ldc;
 	        c1= c1- M + 4*ldc;
@@ -331,6 +337,7 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	                :[c0]"=r"(c0),[c1]"=r"(c1)
 	                :"0"(c0),"1"(c1)
 	                );
+	              g_flop += 8*4;
 
 	        }
 	    }
@@ -357,6 +364,7 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	            :[c0]"=r"(c0),[c1]"=r"(c1)
 	            :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
 	            );
+	         g_flop += 4*4;
 	    }
 	    if( m & 4 ){
 
@@ -375,6 +383,7 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	            :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
 	            );
 	
+	         g_flop += 2*4;
 	    }
 	    if( m & 2 ){
 
@@ -393,6 +402,7 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	            :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
 	            );
 	
+	         g_flop += 2*2;
 	    }
 	    if( m & 1 ){
 
@@ -411,6 +421,7 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	            :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
 	            );
 
+	         g_flop += 2*1;
 	    }
 	    c0= c0- M + 2*ldc;
 	    c1= c1- M + 2*ldc;
@@ -445,6 +456,7 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	                :"0"(c0)
 	                );
 
+	         g_flop += 4*4;
 	        }
 	    }
 	    if( m & 8 ){
@@ -464,6 +476,7 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	            :"0"(c0)
 	            );
 
+	         g_flop += 2*4;
 	    }
 	    if( m & 4 ){
 	   
@@ -478,6 +491,7 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	            :"0"(c0)
 	            );
 	
+	         g_flop += 1*4;
 	    }
 	    if( m & 2 ){
 
@@ -492,6 +506,7 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	            :"0"(c0)
 	            );
 	
+	         g_flop += 1*2;
 	    }
 	    if( m & 1 ){
 	    
@@ -506,6 +521,7 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	            :"0"(c0)
 	            );
 
+	         g_flop += 1*1;
 	    }
 	    c0= c0- M + ldc;
 
