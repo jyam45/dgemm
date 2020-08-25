@@ -23,10 +23,10 @@ test: unit_test speed_test total_test copy2d_unit_test copy2d_speed_test scale2d
 unit_test: test/unit_test.o test/check_error.o test/check_matrix.o test/check_speed.o test/init_matrix.o $(MYBLAS_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS) $(CBLASLIBS)
 
-speed_test: test/speed_test.o test/check_error.o  test/check_speed.o test/check_matrix.o test/init_matrix.o test/peak_flops.o $(MYBLAS_OBJS)
+speed_test: test/speed_test.o test/check_error.o  test/check_speed.o test/check_matrix.o test/init_matrix.o test/peak_flops.o test/flop_count.o $(MYBLAS_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS) $(CBLASLIBS)
 
-total_test: test/total_test.o test/check_error.o  test/check_speed.o test/check_matrix.o test/init_matrix.o test/peak_flops.o $(MYBLAS_OBJS)
+total_test: test/total_test.o test/check_error.o  test/check_speed.o test/check_matrix.o test/init_matrix.o test/peak_flops.o test/flop_count.o $(MYBLAS_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS) $(CBLASLIBS)
 
 test/check_error.o : test/check_error.c test/dgemm_test.h
@@ -35,6 +35,7 @@ test/check_matrix.o: test/check_matrix.c test/dgemm_test.h
 test/check_array.o : test/check_array.c test/dgemm_test.h
 test/init_matrix.o : test/init_matrix.c test/dgemm_test.h
 test/peak_flops.o  : test/peak_flops.c test/dgemm_test.h include/cpuid.h
+test/flop_count.o  : test/flop_count.c test/dgemm_test.h
 test/speed_test.o  : test/speed_test.c test/dgemm_test.h
 test/unit_test.o   : test/unit_test.c test/dgemm_test.h
 test/total_test.o  : test/total_test.c test/dgemm_test.h
@@ -77,7 +78,7 @@ test/scale2d/myblas_basic_scale2d.o : test/scale2d/myblas_basic_scale2d.c test/s
 kernel_unit_test: test/kernel/kernel_unit_test.o test/kernel/myblas_basic_kernel.o test/check_matrix.o test/init_matrix.o $(MYBLAS_KRNL_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS) $(CBLASLIBS)
 
-kernel_speed_test: test/kernel/kernel_speed_test.o test/kernel/myblas_basic_kernel.o test/init_matrix.o test/peak_flops.o $(MYBLAS_KRNL_OBJS)
+kernel_speed_test: test/kernel/kernel_speed_test.o test/kernel/myblas_basic_kernel.o test/init_matrix.o test/peak_flops.o test/flop_count.o $(MYBLAS_KRNL_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS) $(CBLASLIBS)
 
 test/kernel/kernel_speed_test.o   : test/kernel/kernel_speed_test.c test/kernel/kernel_test.h include/Timer.h 

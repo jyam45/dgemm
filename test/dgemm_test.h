@@ -61,4 +61,9 @@ int    check_matrix( const int m, const int n, const int k,
 
 int    check_array( const size_t n, const double *a, const double *b );
 
+double flop_count_dgemm_simple(size_t M, size_t N, size_t K);
+double flop_count_dgemm_minimum(size_t M, size_t N, size_t K);
+double flop_count_dgemm_redundant(size_t M, size_t N, size_t K);
+double flop_count_dgemm_implement(size_t M, size_t N, size_t K);
+	
 #endif//DTEMM_TEST_H
