@@ -35,18 +35,18 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	            m16--;
 
 	            __asm__ __volatile__ (
+	                "prefetcht0  16*8(%[c0]        )\n\t"
+	                "prefetcht0  16*8(%[c1]        )\n\t"
+	                "prefetcht0  16*8(%[c0],%[ldc2])\n\t"
+	                "prefetcht0  16*8(%[c1],%[ldc2])\n\t"
 	                "vmovupd   0*8(%[c0]        ), %%ymm0\n\t"
 	                "vmovupd   0*8(%[c1]        ), %%ymm1\n\t"
-	                "prefetcht0  16*8(%[c0]        )\n\t"
 	                "vmovupd   0*8(%[c0],%[ldc2]), %%ymm2\n\t"
 	                "vmovupd   0*8(%[c1],%[ldc2]), %%ymm3\n\t"
-	                "prefetcht0  16*8(%[c1]        )\n\t"
 	                "vmovupd   4*8(%[c0]        ), %%ymm8 \n\t"
 	                "vmovupd   4*8(%[c1]        ), %%ymm9 \n\t"
-	                "prefetcht0  16*8(%[c0],%[ldc2])\n\t"
 	                "vmovupd   4*8(%[c0],%[ldc2]), %%ymm10\n\t"
 	                "vmovupd   4*8(%[c1],%[ldc2]), %%ymm11\n\t"
-	                "prefetcht0  16*8(%[c1],%[ldc2])\n\t"
 	                "\n\t"
 	                :[c0]"=r"(c0),[c1]"=r"(c1)
 	                :"0"(c0),"1"(c1),[ldc2]"r"(ldc2)
@@ -55,6 +55,11 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	            while( m16-- ){
 
 	                __asm__ __volatile__ (
+	                    "\n\t"
+	                    "prefetcht0  24*8(%[c0]        )\n\t"
+	                    "prefetcht0  24*8(%[c1]        )\n\t"
+	                    "prefetcht0  24*8(%[c0],%[ldc2])\n\t"
+	                    "prefetcht0  24*8(%[c1],%[ldc2])\n\t"
 	                    "\n\t"
 	                    "vmulpd    %%ymm15,  %%ymm0 ,  %%ymm0\n\t"
 	                    "vmulpd    %%ymm15,  %%ymm1 ,  %%ymm1\n\t"
@@ -69,8 +74,6 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	                    "vmovupd   %%ymm2,   0*8(%[c0],%[ldc2])\n\t"
 	                    "vmovupd   %%ymm3,   0*8(%[c1],%[ldc2])\n\t"
 	                    "\n\t"
-	                    "prefetcht0  32*8(%[c0]        )\n\t"
-	                    "\n\t"
 	                    "vmulpd    %%ymm15,  %%ymm8 ,  %%ymm8 \n\t"
 	                    "vmulpd    %%ymm15,  %%ymm9 ,  %%ymm9 \n\t"
 	                    "vmovupd  12*8(%[c0]        ), %%ymm12\n\t"
@@ -83,8 +86,6 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	                    "vmovupd   %%ymm10,   4*8(%[c0],%[ldc2])\n\t"
 	                    "vmovupd   %%ymm11,   4*8(%[c1],%[ldc2])\n\t"
 	                    "vmovupd  12*8(%[c1],%[ldc2]), %%ymm11\n\t"
-	                    "\n\t"
-	                    "prefetcht0  32*8(%[c1]        )\n\t"
 	                    "\n\t"
 	                    "vmulpd    %%ymm15,  %%ymm4 ,  %%ymm4\n\t"
 	                    "vmulpd    %%ymm15,  %%ymm5 ,  %%ymm5\n\t"
@@ -99,8 +100,6 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	                    "vmovupd   %%ymm6,   8*8(%[c0],%[ldc2])\n\t"
 	                    "vmovupd   %%ymm7,   8*8(%[c1],%[ldc2])\n\t"
 	                    "\n\t"
-	                    "prefetcht0  32*8(%[c0],%[ldc2])\n\t"
-	                    "\n\t"
 	                    "vmulpd    %%ymm15,  %%ymm12,  %%ymm12\n\t"
 	                    "vmulpd    %%ymm15,  %%ymm13,  %%ymm13\n\t"
 	                    "vmovupd  20*8(%[c0]        ), %%ymm8 \n\t"
@@ -113,8 +112,6 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 	                    "vmovupd   %%ymm14,  12*8(%[c0],%[ldc2])\n\t"
 	                    "vmovupd   %%ymm11,  12*8(%[c1],%[ldc2])\n\t"
 	                    "vmovupd  20*8(%[c1],%[ldc2]), %%ymm11\n\t"
-	                    "\n\t"
-	                    "prefetcht0  32*8(%[c1],%[ldc2])\n\t"
 	                    "\n\t"
 	                    "addq   $16*8, %[c0]\n\t"
 	                    "addq   $16*8, %[c1]\n\t"
