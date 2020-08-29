@@ -45,7 +45,7 @@ static void usage(){
 	printf("\n");
 	printf("  flop count type:\n");
 	printf("     simple    = 2*M*N*K\n");
-	printf("     minimum   = M*N*(2*K+3)\n");
+	printf("     minimum   = M*N*(2*K+3)  (default)\n");
 	printf("     redandant = M*N*(3*K+1)\n");
 	printf("     implement = M*N*(2*K+K/32+1)\n");
 	printf("\n");
@@ -64,7 +64,7 @@ int main( int argc, char** argv ){
 	size_t nmax = MAX_SIZE;
 
 	// flop count configuration
-	size_t flop_type = FLOP_REDUNDANT;
+	size_t flop_type = FLOP_MINIMUM;
 
 	// processing command option
 	char*  argend;
