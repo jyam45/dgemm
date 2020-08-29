@@ -56,7 +56,8 @@ int main( int argc, char** argv ){
 	int error = 0;
 
 	printf("size  , elapsed time[s],   copy size[KB],            MB/s \n");
-	for( size_t n=16; n <= MAX_SIZE; n*=2 ){
+	//for( size_t n=16; n <= MAX_SIZE; n*=2 ){
+	for( size_t n=16; n <= MAX_SIZE; n+=16 ){
 		test.info->M2 = n;
 		test.info->N2 = n;
 

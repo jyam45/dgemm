@@ -18,15 +18,15 @@ void myblas_dgemm_copy_n_detail(size_t K, size_t N, const double* B, size_t k, s
 	  size_t n4 = ( N >> 2 );
 	  while( n4-- ){
 
-	    __asm__ __volatile__ (
-	      "\n\t"
-	      "prefetcht1  0*8(%[b0],%[ldb2],2)\n\t"
-	      "prefetcht1  0*8(%[b1],%[ldb2],2)\n\t"
-	      "prefetcht1  0*8(%[b0],%[ldb3],2)\n\t"
-	      "prefetcht1  0*8(%[b1],%[ldb3],2)\n\t"
-	      "\n\t"
-	    :[b0]"+r"(b0),[b1]"+r"(b1),[b2]"+r"(B2)
-	    :[ldb2]"r"(ldb2),[ldb3]"r"(ldb3));
+	    //__asm__ __volatile__ (
+	    //  "\n\t"
+	    //  "prefetcht1  0*8(%[b0],%[ldb2],2)\n\t"
+	    //  "prefetcht1  0*8(%[b1],%[ldb2],2)\n\t"
+	    //  "prefetcht1  0*8(%[b0],%[ldb3],2)\n\t"
+	    //  "prefetcht1  0*8(%[b1],%[ldb3],2)\n\t"
+	    //  "\n\t"
+	    //:[b0]"+r"(b0),[b1]"+r"(b1),[b2]"+r"(B2)
+	    //:[ldb2]"r"(ldb2),[ldb3]"r"(ldb3));
 
 	    if( K >> 3 ){
 	      size_t k8 = ( K >> 3 );
@@ -52,6 +52,10 @@ void myblas_dgemm_copy_n_detail(size_t K, size_t N, const double* B, size_t k, s
 
 	          __asm__ __volatile__ (
 	            "\n\t"
+	            "prefetcht0  0*8(%[b0],%[ldb2],2)\n\t"
+	            "prefetcht0  0*8(%[b1],%[ldb2],2)\n\t"
+	            "prefetcht0  0*8(%[b0],%[ldb3],2)\n\t"
+	            "prefetcht0  0*8(%[b1],%[ldb3],2)\n\t"
 	            //"prefetcht0 16*8(%[b0]        )\n\t"
 	            //"prefetcht0 16*8(%[b1]        )\n\t"
 	            //"prefetcht0 16*8(%[b0],%[ldb2])\n\t"
@@ -102,7 +106,7 @@ void myblas_dgemm_copy_n_detail(size_t K, size_t N, const double* B, size_t k, s
 	            "addq  $32*8, %[b2]\n\t"
 	            "\n\t"
 	          :[b0]"+r"(b0),[b1]"+r"(b1),[b2]"+r"(B2)
-	          :[ldb2]"r"(ldb2));
+	          :[ldb2]"r"(ldb2),[ldb3]"r"(ldb3));
 
 	      }
 	    }

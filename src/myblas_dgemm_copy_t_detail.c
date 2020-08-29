@@ -71,6 +71,11 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	          "vmovapd   %%ymm2 ,   8*8(%[aa])\n\t"
 	          "vmovapd   %%ymm3 ,  12*8(%[aa])\n\t"
 	          "\n\t"
+	          //"prefetcht0  0(%[a0],%[lda2],8)\n\t"
+	          //"prefetcht0  0(%[a1],%[lda2],8)\n\t"
+	          //"prefetcht0  0(%[a2],%[lda2],8)\n\t"
+	          //"prefetcht0  0(%[a3],%[lda2],8)\n\t"
+	          "\n\t"
 	          "vmovupd   0*8(%[a0],%[lda1],4), %%ymm4 \n\t" // [x00,x10,x20,x30]
 	          "vmovupd   0*8(%[a1],%[lda1],4), %%ymm5 \n\t" // [x01,x11,x21,x31]
 	          "vmovupd   0*8(%[a2],%[lda1],4), %%ymm6 \n\t" // [x02,x12,x22,x32]
