@@ -14,7 +14,7 @@ void do_dgemm( dgemm_test_t* test ){
 
 double check_speed( dgemm_test_t* test ){
 
-	if( test->Order == CblasRowMajor ){
+	if( test->Order == CblasColMajor ){
 		init_matrix( test->M, test->K, test->A, 1, test->lda, 1e0 );
 		init_matrix( test->K, test->N, test->B, 1, test->ldb, 1e0 );
 		init_matrix( test->M, test->N, test->C, 1, test->ldc, 0e0 );

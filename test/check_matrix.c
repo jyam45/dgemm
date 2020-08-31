@@ -31,4 +31,19 @@ int check_matrix( const int m, const int n, const int k,
 	return 0;
 }
 
+void print_matrix( size_t M, size_t N, const double *A, size_t lda ){
 
+	printf("      ");
+	for( size_t j=0; j<N; j++ ){
+	   printf(" %15d",j);
+	}
+	printf("\n");
+	for( size_t i=0; i<M; i++ ){
+	  printf("%6d",i);
+	  for( size_t j=0; j<N; j++ ){
+	    printf(" %15G",*(A+i+j*lda));
+	  }	
+	  printf("\n");
+	}
+
+}

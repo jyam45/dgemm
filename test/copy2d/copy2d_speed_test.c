@@ -60,7 +60,7 @@ int main( int argc, char** argv ){
 		test.info->M2 = n;
 		test.info->N2 = n;
 
-		init_matrix(test.info->M2, test.info->N2, A, test.lda, 1, 1e0 );
+		init_matrix(test.info->M2, test.info->N2, A, 1, test.lda, 1e0 );
 
 		double t1 = get_realtime();
 		do_copy2d( &test );

@@ -59,6 +59,8 @@ int    check_matrix( const int m, const int n, const int k,
                      const double *C1, const int di1, const int dj1,
                      const double *C2, const int di2, const int dj2 );
 
+void   print_matrix( size_t M, size_t N, const double *A, size_t lda );
+
 int    check_array( const size_t n, const double *a, const double *b );
 
 double flop_count_dgemm_simple(size_t M, size_t N, size_t K);

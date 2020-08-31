@@ -23,19 +23,19 @@ int check_error( const dgemm_test_t* t1, const dgemm_test_t* t2 ){
 	int error = 0;
 	if( t1->Order == CblasRowMajor && t2->Order == CblasRowMajor ){
 
-		error = check_matrix( m, n, k, C1, 1, ldc1, C2, 1, ldc2 );
+		error = check_matrix( m, n, k, C1, ldc1, 1, C2, ldc2, 1 );
 
 	}else if( t1->Order == CblasColMajor && t2->Order == CblasRowMajor ){
 
-		error = check_matrix( m, n, k, C1, ldc1, 1, C2, 1, ldc2 );
+		error = check_matrix( m, n, k, C1, 1, ldc1, C2, ldc2, 1 );
 
 	}else if( t1->Order == CblasRowMajor && t2->Order == CblasColMajor ){
 
-		error = check_matrix( m, n, k, C1, 1, ldc1, C2, ldc2, 1 );
+		error = check_matrix( m, n, k, C1, ldc1, 1, C2, 1, ldc2 );
 
 	}else if( t1->Order == CblasColMajor && t2->Order == CblasColMajor ){
 
-		error = check_matrix( m, n, k, C1, ldc1, 1, C2, ldc2, 1 );
+		error = check_matrix( m, n, k, C1, 1, ldc1, C2, 1, ldc2 );
 
 	}
 

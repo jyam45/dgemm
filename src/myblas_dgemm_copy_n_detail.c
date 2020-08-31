@@ -1,5 +1,6 @@
 #include "myblas_internal.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 void myblas_dgemm_copy_n_detail(size_t K, size_t N, const double* B, size_t k, size_t j,  size_t ldb, double* B2 ){
 
@@ -15,7 +16,7 @@ void myblas_dgemm_copy_n_detail(size_t K, size_t N, const double* B, size_t k, s
 	size_t        ldb2 = ldb * 2 * sizeof(double);
 	size_t        ldb3 = ldb * 3 * sizeof(double);
 
-	size_t aligned = ((((uint64_t)B)&0x1f)?0:1)&((ldb&0x02)?0:1);
+	size_t aligned = ((((uint64_t)B)&0x1f)?0:1)&&((ldb&0x03)?0:1);
 
 	if( aligned ){
 

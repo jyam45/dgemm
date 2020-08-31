@@ -17,7 +17,7 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	size_t        lda1 = lda * sizeof(double);
 	size_t        lda2 = lda * sizeof(double) * 2;
 
-	size_t aligned = ((((uint64_t)A)&0x1f)?0:1)&((lda & 0x02)?0:1);
+	size_t aligned = ((((uint64_t)A)&0x1f)?0:1)&((lda & 0x03)?0:1);
 
 	if( aligned ){
 

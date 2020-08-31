@@ -33,7 +33,7 @@ int main( int argc, char** argv ){
 		test.info->M2 = n;
 		test.info->N2 = n;
 
-		init_matrix(test.info->M2, test.info->N2, test.C, test.ldc, 1, 1e0 );
+		init_matrix(test.info->M2, test.info->N2, test.C, 1, test.ldc, 1e0 );
 
 		double t1 = get_realtime();
 		do_scale2d( &test );
