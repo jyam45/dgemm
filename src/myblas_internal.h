@@ -49,6 +49,7 @@ typedef struct _block2d_info_t {
 } block2d_info_t;
 
 typedef void (*copy_func_t)(const double*, size_t, double*, const block2d_info_t* ); 
+typedef void (*kernel_func_t)(double, const double*, const double*, double*, size_t, const block3d_info_t* ); 
 
 
 void myblas_dgemm_main( gemm_args_t* args );
