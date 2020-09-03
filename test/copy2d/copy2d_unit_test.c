@@ -28,6 +28,13 @@ static int copy2d_check_error( const copy2d_test_t *test1, const copy2d_test_t *
 
 }
 
+static void print_2buffers( size_t n, const double* A, const double* B ){
+
+	for( size_t i=0; i<n; i++ ){
+		printf("%15d %15G %15G\n",i,*(A+i),*(B+i));
+	}
+
+}
 
 static void usage(){
 	printf("Usage :\n");
@@ -103,7 +110,7 @@ int main( int argc, char** argv ){
 
 	int error = copy2d_check_error( &test1, &test2 );
 
-	if( error ){ printf("NG\n"); }else{ printf("OK\n"); }
+	if( error ){ printf("NG\n"); print_2buffers(M*N,A1,A2);  }else{ printf("OK\n"); }
 
 	free(A);
 	free(A1);
