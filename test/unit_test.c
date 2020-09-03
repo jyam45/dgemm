@@ -26,6 +26,13 @@ static void zero_matrix_t( size_t M, size_t N, double* A, size_t lda ){
 	//print_matrix( M, N, A, lda );
 }
 
+static void print_matrix_r( size_t M, size_t N, double* A, size_t lda ){
+	print_matrix( N, M, A, lda );
+}
+static void print_matrix_c( size_t M, size_t N, double* A, size_t lda ){
+	print_matrix( M, N, A, lda );
+}
+
 int main(int argc, char** argv){
 
 	enum CBLAS_ORDER     majors[2]={CblasRowMajor,CblasColMajor};
@@ -105,6 +112,7 @@ int main(int argc, char** argv){
 	init_matrix_t init_A[2][2];
 	init_matrix_t init_B[2][2];
 	init_matrix_t init_C[2];
+	init_matrix_t print_C[2];
 
 	init_A[0][0] = rand_matrix_t; //Row-major NoTrans  B*A
 	init_A[0][1] = rand_matrix_n; //Row-major Trans    B*T(A)
@@ -118,6 +126,9 @@ int main(int argc, char** argv){
 
 	init_C[0] = zero_matrix_t; // Row-major
 	init_C[1] = zero_matrix_n; // Col-major
+
+	print_C[0] = print_matrix_r; // Row-major
+	print_C[1] = print_matrix_c; // Col-major
 	
 	int error = 0;
 
@@ -159,6 +170,11 @@ int main(int argc, char** argv){
 	            if( error ){
 	                printf("NG\n");
 			//break ;
+	                if( M < 16 && N < 16 ){
+	                  init_matrix_t print_matrix_C = print_C[iorder];
+	                  print_matrix_C( M, N, cblas.C , ldc[iorder] );
+	                  print_matrix_C( M, N, myblas.C, ldc[iorder] );
+	                }
 	            }else{
 	                printf("OK\n"); 
 	            }
