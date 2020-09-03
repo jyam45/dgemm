@@ -24,6 +24,7 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	size_t  lda3 = 3*lda*sizeof(double);
 	size_t  KK = K*sizeof(double);
 
+	//double* A0 = A2;
 	double* A2_2 = A2   + K*( M & ~3 );
 	double* A2_1 = A2_2 + K*( M &  2 );;
 
@@ -40,6 +41,7 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	    size_t k8 = ( K >> 3 );
 	    while( k8-- ){
 	      if( M >> 2 ){
+	        //printf("K8M4:A2-A0=%d\n",A2-A0);
 	        size_t m4 = ( M >> 2 );
 	        m4--;
 
@@ -60,10 +62,6 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	            "vmovapd  0*8(%[a1],%[lda2],2), %%ymm5 \n\t"
 	            "vmovapd  0*8(%[a0],%[lda3],2), %%ymm6 \n\t"
 	            "vmovapd  0*8(%[a1],%[lda3],2), %%ymm7 \n\t"
-	            "\n\t"
-	            "addq  $4*8, %[a0]\n\t"
-	            "addq  $4*8, %[a1]\n\t"
-	            "leaq  0*8(%[a2],%[K],4), %[a2]\n\t"
 	            "\n\t"
 	          :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(A2)
 	          :[lda2]"r"(lda2),[lda3]"r"(lda3),[K]"r"(KK));
@@ -157,6 +155,7 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	      }
 	      if( M & 2 ){
 
+	          //printf("K8M2:A2_2-A0=%d\n",A2_2-A0);
 	          //for( size_t l=0; l<8; l++ ){
 	          //  for( size_t i=0; i<2; i++ ){
 	          //    (*A2_2) = *(A+i+l*lda);
@@ -204,6 +203,7 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	      }
 	      if( M & 1 ){
 
+	          //printf("K8M1:A2_1-A0=%d\n",A2_1-A0);
 	          //for( size_t l=0; l<8; l++ ){
 	          //  for( size_t i=0; i<1; i++ ){
 	          //    (*A2_1) = *(A+i+l*lda);
@@ -599,6 +599,7 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	    size_t k8 = ( K >> 3 );
 	    while( k8-- ){
 	      if( M >> 2 ){
+	        //printf("K8M4:A2-A0=%d\n",A2-A0);
 	        size_t m4 = ( M >> 2 );
 	        m4--;
 
@@ -619,10 +620,6 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	            "vmovupd  0*8(%[a1],%[lda2],2), %%ymm5 \n\t"
 	            "vmovupd  0*8(%[a0],%[lda3],2), %%ymm6 \n\t"
 	            "vmovupd  0*8(%[a1],%[lda3],2), %%ymm7 \n\t"
-	            "\n\t"
-	            "addq  $4*8, %[a0]\n\t"
-	            "addq  $4*8, %[a1]\n\t"
-	            "leaq  0*8(%[a2],%[K],4), %[a2]\n\t"
 	            "\n\t"
 	          :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(A2)
 	          :[lda2]"r"(lda2),[lda3]"r"(lda3),[K]"r"(KK));
@@ -716,6 +713,7 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	      }
 	      if( M & 2 ){
 
+	          //printf("K8M2:A2_2-A0=%d\n",A2_2-A0);
 	          //for( size_t l=0; l<8; l++ ){
 	          //  for( size_t i=0; i<2; i++ ){
 	          //    (*A2_2) = *(A+i+l*lda);
@@ -763,6 +761,7 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	      }
 	      if( M & 1 ){
 
+	          //printf("K8M1:A2_1-A0=%d\n",A2_1-A0);
 	          //for( size_t l=0; l<8; l++ ){
 	          //  for( size_t i=0; i<1; i++ ){
 	          //    (*A2_1) = *(A+i+l*lda);
