@@ -64,6 +64,10 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	        //A2 = A2 + 4*K;
 
 	        __asm__ __volatile__ (
+	          "prefetcht0  16*8(%[a0]          ) \n\t"
+	          "prefetcht0  16*8(%[a1]          ) \n\t"
+	          "prefetcht0  16*8(%[a0],%[lda2]  ) \n\t"
+	          "prefetcht0  16*8(%[a1],%[lda2]  ) \n\t"
 	          "vmovupd  0*8(%[a0]          ), %%ymm0 \n\t"
 	          "vmovupd  0*8(%[a1]          ), %%ymm1 \n\t"
 	          "vmovupd  0*8(%[a0],%[lda2]  ), %%ymm2 \n\t"
@@ -72,6 +76,10 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	          "vmovapd  %%ymm1 ,  4*8(%[a2]) \n\t"
 	          "vmovapd  %%ymm2 ,  8*8(%[a2]) \n\t"
 	          "vmovapd  %%ymm3 , 12*8(%[a2]) \n\t"
+	          "prefetcht0  16*8(%[a0],%[lda2],2) \n\t"
+	          "prefetcht0  16*8(%[a1],%[lda2],2) \n\t"
+	          "prefetcht0  16*8(%[a0],%[lda3],2) \n\t"
+	          "prefetcht0  16*8(%[a1],%[lda3],2) \n\t"
 	          "vmovupd  0*8(%[a0],%[lda2],2), %%ymm4 \n\t"
 	          "vmovupd  0*8(%[a1],%[lda2],2), %%ymm5 \n\t"
 	          "vmovupd  0*8(%[a0],%[lda3],2), %%ymm6 \n\t"
