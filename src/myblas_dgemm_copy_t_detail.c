@@ -34,6 +34,34 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	  while( k8-- ){
 	    if( M >> 2 ){
 	      size_t m4 = ( M >> 2 );
+	      m4--;
+
+	        __asm__ __volatile__ (
+	          "prefetcht0  16*8(%[a0]          ) \n\t"
+	          "prefetcht0  16*8(%[a1]          ) \n\t"
+	          "prefetcht0  16*8(%[a0],%[lda2]  ) \n\t"
+	          "prefetcht0  16*8(%[a1],%[lda2]  ) \n\t"
+	          "vmovupd  0*8(%[a0]          ), %%ymm0 \n\t"
+	          "vmovupd  0*8(%[a1]          ), %%ymm1 \n\t"
+	          "vmovupd  0*8(%[a0],%[lda2]  ), %%ymm2 \n\t"
+	          "vmovupd  0*8(%[a1],%[lda2]  ), %%ymm3 \n\t"
+	          "prefetcht0  16*8(%[a0],%[lda2],2) \n\t"
+	          "prefetcht0  16*8(%[a1],%[lda2],2) \n\t"
+	          "prefetcht0  16*8(%[a0],%[lda3],2) \n\t"
+	          "prefetcht0  16*8(%[a1],%[lda3],2) \n\t"
+	          "vmovupd  0*8(%[a0],%[lda2],2), %%ymm4 \n\t"
+	          "vmovupd  0*8(%[a1],%[lda2],2), %%ymm5 \n\t"
+	          "vmovupd  0*8(%[a0],%[lda3],2), %%ymm6 \n\t"
+	          "vmovupd  0*8(%[a1],%[lda3],2), %%ymm7 \n\t"
+	          "\n\t"
+	          "addq  $4*8, %[a0]\n\t"
+	          "addq  $4*8, %[a1]\n\t"
+	          "leaq  0*8(%[a2],%[K],4), %[a2]\n\t"
+	          "\n\t"
+	        :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(A2)
+	        :[lda2]"r"(lda2),[lda3]"r"(lda3),[K]"r"(KK));
+
+
 	      while( m4-- ){
 
 	        //for( size_t l=0; l<8; l++ ){
@@ -64,26 +92,47 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	        //A2 = A2 + 4*K;
 
 	        __asm__ __volatile__ (
-	          "prefetcht0  16*8(%[a0]          ) \n\t"
-	          "prefetcht0  16*8(%[a1]          ) \n\t"
-	          "prefetcht0  16*8(%[a0],%[lda2]  ) \n\t"
-	          "prefetcht0  16*8(%[a1],%[lda2]  ) \n\t"
-	          "vmovupd  0*8(%[a0]          ), %%ymm0 \n\t"
-	          "vmovupd  0*8(%[a1]          ), %%ymm1 \n\t"
-	          "vmovupd  0*8(%[a0],%[lda2]  ), %%ymm2 \n\t"
-	          "vmovupd  0*8(%[a1],%[lda2]  ), %%ymm3 \n\t"
+	          "prefetcht0  20*8(%[a0]          ) \n\t"
+	          "prefetcht0  20*8(%[a1]          ) \n\t"
+	          "prefetcht0  20*8(%[a0],%[lda2]  ) \n\t"
+	          "prefetcht0  20*8(%[a1],%[lda2]  ) \n\t"
+	          "vmovapd  %%ymm0 ,  0*8(%[a2]) \n\t"
+	          "vmovapd  %%ymm1 ,  4*8(%[a2]) \n\t"
+	          "vmovupd  4*8(%[a0]          ), %%ymm0 \n\t"
+	          "vmovupd  4*8(%[a1]          ), %%ymm1 \n\t"
+	          "vmovapd  %%ymm2 ,  8*8(%[a2]) \n\t"
+	          "vmovapd  %%ymm3 , 12*8(%[a2]) \n\t"
+	          "vmovupd  4*8(%[a0],%[lda2]  ), %%ymm2 \n\t"
+	          "vmovupd  4*8(%[a1],%[lda2]  ), %%ymm3 \n\t"
+	          "prefetcht0  20*8(%[a0],%[lda2],2) \n\t"
+	          "prefetcht0  20*8(%[a1],%[lda2],2) \n\t"
+	          "prefetcht0  20*8(%[a0],%[lda3],2) \n\t"
+	          "prefetcht0  20*8(%[a1],%[lda3],2) \n\t"
+	          "vmovapd  %%ymm4 , 16*8(%[a2]) \n\t"
+	          "vmovapd  %%ymm5 , 20*8(%[a2]) \n\t"
+	          "vmovupd  4*8(%[a0],%[lda2],2), %%ymm4 \n\t"
+	          "vmovupd  4*8(%[a1],%[lda2],2), %%ymm5 \n\t"
+	          "vmovapd  %%ymm6 , 24*8(%[a2]) \n\t"
+	          "vmovapd  %%ymm7 , 28*8(%[a2]) \n\t"
+	          "vmovupd  4*8(%[a0],%[lda3],2), %%ymm6 \n\t"
+	          "vmovupd  4*8(%[a1],%[lda3],2), %%ymm7 \n\t"
+	          "\n\t"
+	          "addq  $4*8, %[a0]\n\t"
+	          "addq  $4*8, %[a1]\n\t"
+	          "leaq  0*8(%[a2],%[K],4), %[a2]\n\t"
+	          "\n\t"
+	        :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(A2)
+	        :[lda2]"r"(lda2),[lda3]"r"(lda3),[K]"r"(KK));
+
+	        //A  = A  + 4;
+
+	      }
+
+	        __asm__ __volatile__ (
 	          "vmovapd  %%ymm0 ,  0*8(%[a2]) \n\t"
 	          "vmovapd  %%ymm1 ,  4*8(%[a2]) \n\t"
 	          "vmovapd  %%ymm2 ,  8*8(%[a2]) \n\t"
 	          "vmovapd  %%ymm3 , 12*8(%[a2]) \n\t"
-	          "prefetcht0  16*8(%[a0],%[lda2],2) \n\t"
-	          "prefetcht0  16*8(%[a1],%[lda2],2) \n\t"
-	          "prefetcht0  16*8(%[a0],%[lda3],2) \n\t"
-	          "prefetcht0  16*8(%[a1],%[lda3],2) \n\t"
-	          "vmovupd  0*8(%[a0],%[lda2],2), %%ymm4 \n\t"
-	          "vmovupd  0*8(%[a1],%[lda2],2), %%ymm5 \n\t"
-	          "vmovupd  0*8(%[a0],%[lda3],2), %%ymm6 \n\t"
-	          "vmovupd  0*8(%[a1],%[lda3],2), %%ymm7 \n\t"
 	          "vmovapd  %%ymm4 , 16*8(%[a2]) \n\t"
 	          "vmovapd  %%ymm5 , 20*8(%[a2]) \n\t"
 	          "vmovapd  %%ymm6 , 24*8(%[a2]) \n\t"
@@ -96,9 +145,7 @@ void myblas_dgemm_copy_t_detail(size_t K, size_t M, const double* A, size_t k, s
 	        :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(A2)
 	        :[lda2]"r"(lda2),[lda3]"r"(lda3),[K]"r"(KK));
 
-	        //A  = A  + 4;
 
-	      }
 	      A2 = A2 - (M&~3)*K + 4*8; // move to next row block
 	    }
 	    if( M & 2 ){
