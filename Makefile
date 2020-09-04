@@ -1,7 +1,7 @@
 CC=gcc
 FCC=gfortran
 
-CFLAGS=-O3 -mavx2 --std=c11 -I./include/ -I./src/ -I./test/
+CFLAGS=-O3 -mavx2 --std=c11 -fopenmp -I./include/ -I./src/ -I./test/
 LDFLAGS=-L./lib/
 LIBS=-lcpuid -ltimer
 CBLASLIBS= -lcblas -lblas
