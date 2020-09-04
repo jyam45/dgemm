@@ -51,9 +51,6 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	copy_func_t myblas_dgemm_copy_A = copy_funcs_A[TransA];
 	copy_func_t myblas_dgemm_copy_B = copy_funcs_B[TransB];
 
-	// scaling beta*C
-	block2d_info_t infoC = {M,N,1,1};
-	myblas_dgemm_scale2d(beta,C,ldc,&infoC);
 
 	#ifdef _OPENMP
 	//#pragma omp parallel reduction(+:C[0:ldc*N-1])
@@ -72,6 +69,10 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	    size_t Nth  = (N/num_threads)+(N%num_threads>thread_id?1:0); // K-size per a thread
 	    size_t j3th = thread_id * (N/num_threads) + (N%num_threads<thread_id?N%num_threads:thread_id); // K start point in a thread
 	    size_t Nend = j3th+Nth;
+
+	    // scaling beta*C
+	    block2d_info_t infoC = {M,Nth,1,1};
+	    myblas_dgemm_scale2d(beta,C+0+j3th*ldc,ldc,&infoC);
 
 	    //printf("num_threads=%d thread_id=%d N-size=%d J-begin=%d N-end=%d\n",num_threads,thread_id,Nth,j3th,Nend);
 
