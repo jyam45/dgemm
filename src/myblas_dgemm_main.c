@@ -18,10 +18,10 @@
 
 #define MIN(x,y)  (((x)<(y))?(x):(y))
 
-//static copy_func_t copy_funcs_A[] = {myblas_dgemm_copy_t,myblas_dgemm_copy_n};
-//static copy_func_t copy_funcs_B[] = {myblas_dgemm_copy_n,myblas_dgemm_copy_t};
-static copy_func_t copy_funcs_A[] = {myblas_dgemm_copy_t_core,myblas_dgemm_copy_n_core};
-static copy_func_t copy_funcs_B[] = {myblas_dgemm_copy_n_core,myblas_dgemm_copy_t_core};
+static copy_func_t copy_funcs_A[] = {myblas_dgemm_copy_t,myblas_dgemm_copy_n};
+static copy_func_t copy_funcs_B[] = {myblas_dgemm_copy_n,myblas_dgemm_copy_t};
+//static copy_func_t copy_funcs_A[] = {myblas_dgemm_copy_t_core,myblas_dgemm_copy_n_core};
+//static copy_func_t copy_funcs_B[] = {myblas_dgemm_copy_n_core,myblas_dgemm_copy_t_core};
 
 void myblas_dgemm_main( gemm_args_t* args ){
 
@@ -41,8 +41,8 @@ void myblas_dgemm_main( gemm_args_t* args ){
 
 	double       AB;
 
-	//kernel_func_t myblas_dgemm_kernel_AB = myblas_dgemm_kernel;
-	kernel_func_t myblas_dgemm_kernel_AB = myblas_dgemm_kernel_core;
+	kernel_func_t myblas_dgemm_kernel_AB = myblas_dgemm_kernel;
+	//kernel_func_t myblas_dgemm_kernel_AB = myblas_dgemm_kernel_core;
 
 	copy_func_t myblas_dgemm_copy_A = copy_funcs_A[TransA];
 	copy_func_t myblas_dgemm_copy_B = copy_funcs_B[TransB];
