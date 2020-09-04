@@ -22,21 +22,46 @@ static void do_copy2d( copy2d_test_t *test ){
 
 }
 
+static void usage(){
+	printf("usage :\n");
+	printf("  copy2d_speed_test [-n <max_size>] [-i <begin_size>] [-d <incliment_size>] [-t] [-c] [-h]\n\n");
+	printf("  loop controll:\n");
+	printf("     -n <max_size>       : max testing size of square matrix (default=2048)\n");
+	printf("     -i <begin_size>     : initial testing size of square matrix (default=16)\n");
+	printf("     -d <incliment_size> : inliment testing size of square matrix (default:x2)\n");
+	printf("\n");
+	printf("  algorithm selection:\n");
+	printf("     -t                  : Transforming algorithm\n");
+	printf("     -c                  : Core algorithm without L1-cache blocking\n");
+	printf("\n");
+}
+
 int main( int argc, char** argv ){
 
 	block2d_info_t sizes={0,0,MAX_SIZE,MAX_SIZE,TILE_M,TILE_N};
 	copy2d_test_t test ={NULL,NULL,MAX_SIZE,NULL,&sizes};
 
+	// loop configuration
+	size_t init = 16;
+	size_t dist =  0;
+	size_t nmax = MAX_SIZE;
+
+	// processing command option
+	char*  argend;
 	opterr = 0;
 	int flags = 0;
 	int c;
-	while((c=getopt(argc,argv,"tk")) != -1 ){
-		if( c == 't' ){
-			flags |= F_TRANS;
-		}else if( c == 'k' ){
-			flags |= F_CORE;
-		}else{
-			printf("Unknown option : %c\n",c);
+	while((c=getopt(argc,argv,"n:i:d:tch")) != -1 ){
+		switch(c){
+		case 'n' : nmax = strtol(optarg,&argend,10);if( *argend != '\0' ){ usage(); return -1; }; break;  
+		case 'i' : init = strtol(optarg,&argend,10);if( *argend != '\0' ){ usage(); return -1; }; break;  
+		case 'd' : dist = strtol(optarg,&argend,10);if( *argend != '\0' ){ usage(); return -1; }; break;  
+		case 't' : flags |= F_TRANS; break; 
+		case 'c' : flags |= F_CORE; break;
+		case 'h' : usage(); return 0; 
+		default  :
+			printf("Option Error : %c\n",c);
+			usage();
 			return -1;
 		}
 	}
@@ -44,19 +69,23 @@ int main( int argc, char** argv ){
 	test.func = myblas_funcs[flags];
 
 	double  beta = 1.3923842e0;
-	//double* A = calloc(MAX_SIZE*MAX_SIZE,sizeof(double));
-	//double* A2= calloc(MAX_SIZE*MAX_SIZE,sizeof(double));
-	double* A = aligned_alloc(ALIGNMENT_B,MAX_SIZE*MAX_SIZE*sizeof(double));
-	double* A2= aligned_alloc(ALIGNMENT_B,MAX_SIZE*MAX_SIZE*sizeof(double));
+	//double* A = calloc(nmax*nmax,sizeof(double));
+	//double* A2= calloc(nmax*nmax,sizeof(double));
+	double* A = aligned_alloc(ALIGNMENT_B,nmax*nmax*sizeof(double));
+	double* A2= aligned_alloc(ALIGNMENT_B,nmax*nmax*sizeof(double));
 
 	test.A    = A;
-	test.lda  = MAX_SIZE;
+	test.lda  = nmax;
 	test.buf  = A2;
 
 	int error = 0;
 
 	printf("size  , elapsed time[s],   copy size[KB],            MB/s \n");
-	for( size_t n=16; n <= MAX_SIZE; n*=2 ){
+	//for( size_t n=16; n <= MAX_SIZE; n*=2 ){
+	//for( size_t n=16; n <= MAX_SIZE; n+=16 ){
+	size_t n = init;
+	while ( n <= nmax ){
+
 		test.info->M2 = n;
 		test.info->N2 = n;
 
@@ -68,6 +97,8 @@ int main( int argc, char** argv ){
 		double dt = t2 - t1;
 		double bytes = test.info->M2 * test.info->N2 * sizeof(double);
 		printf("%6u, %15G, %15G, %15G \n",n,dt,bytes/1024,bytes/dt/(1024*1024));
+
+		n = ( dist==0 ? n*2 : n+dist );
 	}
 
 	free(A);

@@ -20,11 +20,12 @@ static flop_count_func_t flop_counters[]={flop_count_dgemm_simple,
                                           flop_count_dgemm_implement};
 
 static void usage(){
-	printf("usage : speed_test [-n <max_size>] [-i <begin_size>] [-d <incliment_size>] [-f {simple|minimum|redundant|implement}] [-h]\n\n");
+	printf("usage :\n");
+	printf("  speed_test [-n <max_size>] [-i <begin_size>] [-d <incliment_size>] [-f {simple|minimum|redundant|implement}] [-h]\n\n");
 	printf("  loop controll:\n");
-	printf("     <max_size>       = max testing size of square matrix (default=2048):\n");
-	printf("     <begin_size>     = initial testing size of square matrix (default=16):\n");
-	printf("     <incliment_size> = inliment testing size of square matrix (default:twice):\n");
+	printf("     -n <max_size>       : max testing size of square matrix (default=2048)\n");
+	printf("     -i <begin_size>     : initial testing size of square matrix (default=16)\n");
+	printf("     -d <incliment_size> : inliment testing size of square matrix (default:x2)\n");
 	printf("\n");
 	printf("  flop count type:\n");
 	printf("     simple    = 2*M*N*K\n");
@@ -76,12 +77,12 @@ int main(int argc, char** argv){
 		}
 	}
 
-	//A = calloc( MAX_SIZE*MAX_SIZE, sizeof(double) );
-	//B = calloc( MAX_SIZE*MAX_SIZE, sizeof(double) );
-	//C = calloc( MAX_SIZE*MAX_SIZE, sizeof(double) );
-	A = aligned_alloc( ALIGNMENT_B, MAX_SIZE*MAX_SIZE*sizeof(double) );
-	B = aligned_alloc( ALIGNMENT_B, MAX_SIZE*MAX_SIZE*sizeof(double) );
-	C = aligned_alloc( ALIGNMENT_B, MAX_SIZE*MAX_SIZE*sizeof(double) );
+	//A = calloc( nmax*nmax, sizeof(double) );
+	//B = calloc( nmax*nmax, sizeof(double) );
+	//C = calloc( nmax*nmax, sizeof(double) );
+	A = aligned_alloc( ALIGNMENT_B, nmax*nmax*sizeof(double) );
+	B = aligned_alloc( ALIGNMENT_B, nmax*nmax*sizeof(double) );
+	C = aligned_alloc( ALIGNMENT_B, nmax*nmax*sizeof(double) );
 
 	myblas.A = A;
 	myblas.B = B;
