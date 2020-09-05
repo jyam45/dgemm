@@ -11,7 +11,7 @@ MYBLAS_COPY_OBJS=src/myblas_dgemm_copy_n.o src/myblas_dgemm_copy_t.o src/myblas_
 MYBLAS_SCAL_OBJS=src/myblas_dgemm_scale2d.o src/myblas_dgemm_scale2d_detail.o
 MYBLAS_KRNL_OBJS=src/myblas_dgemm_kernel.o src/myblas_dgemm_kernel_detail.o
 
-MYBLAS_OBJS= src/myblas_dgemm.o src/myblas_dgemm_main.o src/myblas_xerbla.o $(MYBLAS_COPY_OBJS) $(MYBLAS_SCAL_OBJS) $(MYBLAS_KRNL_OBJS)
+MYBLAS_OBJS= src/myblas_dgemm.o src/myblas_dgemm_main.o src/myblas_xerbla.o src/myblas_parallel2d.o  $(MYBLAS_COPY_OBJS) $(MYBLAS_SCAL_OBJS) $(MYBLAS_KRNL_OBJS)
 
 
 all: libs test
@@ -42,6 +42,7 @@ test/total_test.o  : test/total_test.c test/dgemm_test.h
 test/dgemm_test.h  : include/cblas.h
 
 src/myblas_xerbla.o     : src/myblas_xerbla.c src/myblas_internal.h
+src/myblas_parallel2d.o : src/myblas_parallel2d.c src/myblas_internal.h
 src/myblas_dgemm.o      : src/myblas_dgemm.c src/myblas.h src/myblas_internal.h
 src/myblas_dgemm_main.o : src/myblas_dgemm_main.c src/myblas_internal.h
 src/myblas_dgemm_scale2d.o : src/myblas_dgemm_scale2d.c src/myblas_internal.h

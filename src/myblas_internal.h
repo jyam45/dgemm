@@ -72,4 +72,7 @@ void myblas_dgemm_copy_t_detail(size_t K1, size_t M1, const double* A, size_t k,
 void myblas_dgemm_kernel_detail(size_t M, size_t N, size_t K,
                                 double alpha, const double *A2, const double *B2, double *C, size_t ldc );
 
+size_t myblas_num_col_threads( size_t nthreads );
+size_t myblas_num_row_threads( size_t nthreads );
+
 #endif//MYBLAS_INTERNAL_H

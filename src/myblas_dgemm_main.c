@@ -66,13 +66,24 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	    size_t thread_id   = 0;
 	    #endif
 
-	    size_t Nth  = (N/num_threads)+(N%num_threads>thread_id?1:0); // K-size per a thread
-	    size_t j3th = thread_id * (N/num_threads) + (N%num_threads<thread_id?N%num_threads:thread_id); // K start point in a thread
+	    size_t N_threads = myblas_num_col_threads(num_threads);
+	    size_t M_threads = myblas_num_row_threads(num_threads);
+	    size_t N_thread_id = thread_id%N_threads;
+	    size_t M_thread_id = thread_id/N_threads;
+
+	    //printf("N_threads=%d, M_threads=%d, N_thread_id=%d, M_thread_id=%d\n",N_threads,M_threads,N_thread_id,M_thread_id);
+
+	    size_t Nth  = (N/N_threads)+(N%N_threads>thread_id?1:0); // K-size per a thread
+	    size_t j3th = N_thread_id * (N/N_threads) + (N%N_threads<N_thread_id?N%N_threads:N_thread_id); // K start point in a thread
 	    size_t Nend = j3th+Nth;
 
+	    size_t Mth  = (M/M_threads)+(M%M_threads>thread_id?1:0); // K-size per a thread
+	    size_t i3th = M_thread_id * (M/M_threads) + (M%M_threads<M_thread_id?M%M_threads:M_thread_id); // K start point in a thread
+	    size_t Mend = i3th+Mth;
+
 	    // scaling beta*C
-	    block2d_info_t infoC = {M,Nth,1,1};
-	    myblas_dgemm_scale2d(beta,C+0+j3th*ldc,ldc,&infoC);
+	    block2d_info_t infoC = {Mth,Nth,1,1};
+	    myblas_dgemm_scale2d(beta,C+i3th+j3th*ldc,ldc,&infoC);
 
 	    //printf("num_threads=%d thread_id=%d N-size=%d J-begin=%d N-end=%d\n",num_threads,thread_id,Nth,j3th,Nend);
 
@@ -96,8 +107,8 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	        N3B = N3B + (N3R>0?1:0); // number of blocks
 	        if( N3R==0 ) N3R = MYBLAS_BLOCK_N;
 
-	    for( size_t i3=0 ; i3<M; i3+=MIN(M-i3,MYBLAS_PANEL_M) ){
-	        size_t M3 = MIN(MYBLAS_PANEL_M ,M-i3);
+	    for( size_t i3=i3th ; i3<Mend; i3+=MIN(Mend-i3,MYBLAS_PANEL_M) ){
+	        size_t M3 = MIN(MYBLAS_PANEL_M ,Mend-i3);
 	        size_t M3B = M3/MYBLAS_BLOCK_M; // number of full blocks
 	        size_t M3R = M3%MYBLAS_BLOCK_M; // size of the final block
 	        M3B = M3B + (M3R>0?1:0); // number of blocks
