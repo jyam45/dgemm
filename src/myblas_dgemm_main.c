@@ -73,11 +73,11 @@ void myblas_dgemm_main( gemm_args_t* args ){
 
 	    //printf("N_threads=%d, M_threads=%d, N_thread_id=%d, M_thread_id=%d\n",N_threads,M_threads,N_thread_id,M_thread_id);
 
-	    size_t Nth  = (N/N_threads)+(N%N_threads>thread_id?1:0); // K-size per a thread
+	    size_t Nth  = (N/N_threads)+(N%N_threads>N_thread_id?1:0); // K-size per a thread
 	    size_t j3th = N_thread_id * (N/N_threads) + (N%N_threads<N_thread_id?N%N_threads:N_thread_id); // K start point in a thread
 	    size_t Nend = j3th+Nth;
 
-	    size_t Mth  = (M/M_threads)+(M%M_threads>thread_id?1:0); // K-size per a thread
+	    size_t Mth  = (M/M_threads)+(M%M_threads>M_thread_id?1:0); // K-size per a thread
 	    size_t i3th = M_thread_id * (M/M_threads) + (M%M_threads<M_thread_id?M%M_threads:M_thread_id); // K start point in a thread
 	    size_t Mend = i3th+Mth;
 
@@ -85,7 +85,7 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	    block2d_info_t infoC = {Mth,Nth,1,1};
 	    myblas_dgemm_scale2d(beta,C+i3th+j3th*ldc,ldc,&infoC);
 
-	    //printf("num_threads=%d thread_id=%d N-size=%d J-begin=%d N-end=%d\n",num_threads,thread_id,Nth,j3th,Nend);
+	    //printf("Parallel=[%d,%d], thread_id=(%d,%d), sub-matrix size=[%d,%d], index=(%d:%d,%d:%d)\n",M_threads,N_threads,M_thread_id,N_thread_id,Mth,Nth,i3th,Mend,j3th,Nend);
 
 	    //double*   A2 = calloc( MYBLAS_BLOCK_M*MYBLAS_BLOCK_K, sizeof(double) );
 	    //double*   B2 = calloc( MYBLAS_BLOCK_K*MYBLAS_BLOCK_N, sizeof(double) );
