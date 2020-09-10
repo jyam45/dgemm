@@ -18,8 +18,6 @@ void myblas_dgemm_kernel(double alpha, const double *A2, const double *B2,
 	size_t KQ = K2/tile_K;
 	size_t KR = K2%tile_K;
 
-	block3d_info_t tile = { 0, 0, 0, 0, 0, 0 };
-
 	if( MR >  0 ){ MQ++; }
 	if( MR == 0 ){ MR = tile_M; }
 	if( NR >  0 ){ NQ++; }

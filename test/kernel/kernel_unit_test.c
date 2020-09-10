@@ -95,7 +95,18 @@ int main( int argc, char** argv ){
 
 	int error = kernel_check_error( &test1, &test2 );
 
-	if( error ){ printf("NG\n"); }else{ printf("OK\n"); }
+	//if( error ){ printf("NG\n"); }else{ printf("OK\n"); }
+	if( error ){
+	    printf("NG\n");
+	    //break ;
+	    if( M < 16 && N < 16 ){
+	      print_matrix( M, N, test1.C, test1.ldc );
+	      print_matrix( M, N, test2.C, test2.ldc );
+	    }
+	}else{
+	    printf("OK\n"); 
+	}
+
 
 	free(A);
 	free(B);
