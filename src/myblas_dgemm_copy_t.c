@@ -1,5 +1,7 @@
 #include "myblas_internal.h"
 
+static copy_detail_func_t copy_t_detail[]={ myblas_dgemm_copy_t_4x8, myblas_dgemm_copy_t_2x8 };
+
 // On L2-Cache Copy for A
 void myblas_dgemm_copy_t(const double* A, size_t lda, double* A2, const block2d_info_t* info ){
 
@@ -15,7 +17,7 @@ void myblas_dgemm_copy_t(const double* A, size_t lda, double* A2, const block2d_
 	size_t KQ = K2/tile_K;
 	size_t KR = K2%tile_K;
 
-	block2d_info_t tile = { 0,0,0,0,0,0 };
+	copy_detail_func_t myblas_dgemm_copy_t_detail = copy_t_detail[info->type];
 
 	A = A + lda*k2 + i2; // start point
 
@@ -32,7 +34,6 @@ void myblas_dgemm_copy_t(const double* A, size_t lda, double* A2, const block2d_
 	  while( m1-- ){
 	    size_t M1 = tile_M; if( m1==0 ){ M1=MR; }
 
-	    tile.M2 = K1; tile.N2 = M1;
 	    myblas_dgemm_copy_t_detail( K1, M1, A, 0, 0, lda, A2 );
 
 	    A  = A  + M1;
@@ -46,6 +47,8 @@ void myblas_dgemm_copy_t(const double* A, size_t lda, double* A2, const block2d_
 
 
 void myblas_dgemm_copy_t_core(const double* A, size_t lda, double* A2, const block2d_info_t* info ){
+
+	copy_detail_func_t myblas_dgemm_copy_t_detail = copy_t_detail[info->type];
 
 	myblas_dgemm_copy_t_detail( info->M2, info->N2, A, info->i2, info->j2, lda, A2 );
 

@@ -42,6 +42,7 @@ int main(int argc, char** argv){
 	flops_info_t cpu;
 
 	double *A, *B, *C;
+	//dgemm_test_t myblas = {cblas_dgemm, CblasColMajor, CblasNoTrans, CblasNoTrans, MAX_SIZE, MAX_SIZE, MAX_SIZE, 1e0, NULL, MAX_SIZE, NULL, MAX_SIZE, 1e0, NULL, MAX_SIZE };
 	dgemm_test_t myblas = {myblas_dgemm, CblasColMajor, CblasNoTrans, CblasNoTrans, MAX_SIZE, MAX_SIZE, MAX_SIZE, 1e0, NULL, MAX_SIZE, NULL, MAX_SIZE, 1e0, NULL, MAX_SIZE };
 
 	// loop configuration

@@ -13,6 +13,10 @@
 
 #define F_TRANS 0x0001
 #define F_CORE  0x0002
+#define F_AXIS  0x0004
+
+#define COPY_MK  0
+#define COPY_NK  1
 
 static copy2d_func_t myblas_funcs[] = { myblas_dgemm_copy_n, myblas_dgemm_copy_t, myblas_dgemm_copy_n_core, myblas_dgemm_copy_t_core };
 
@@ -33,12 +37,13 @@ static void usage(){
 	printf("  algorithm selection:\n");
 	printf("     -t                  : Transforming algorithm\n");
 	printf("     -c                  : Core algorithm without L1-cache blocking\n");
+	printf("     -u                  : turn on NK-axis switch (default=MK-axis)\n");
 	printf("\n");
 }
 
 int main( int argc, char** argv ){
 
-	block2d_info_t sizes={0,0,MAX_SIZE,MAX_SIZE,TILE_M,TILE_N};
+	block2d_info_t sizes={0,0,MAX_SIZE,MAX_SIZE,TILE_M,TILE_N,COPY_MK};
 	copy2d_test_t test ={NULL,NULL,MAX_SIZE,NULL,&sizes};
 
 	// loop configuration
@@ -51,13 +56,14 @@ int main( int argc, char** argv ){
 	opterr = 0;
 	int flags = 0;
 	int c;
-	while((c=getopt(argc,argv,"n:i:d:tch")) != -1 ){
+	while((c=getopt(argc,argv,"n:i:d:tcuh")) != -1 ){
 		switch(c){
 		case 'n' : nmax = strtol(optarg,&argend,10);if( *argend != '\0' ){ usage(); return -1; }; break;  
 		case 'i' : init = strtol(optarg,&argend,10);if( *argend != '\0' ){ usage(); return -1; }; break;  
 		case 'd' : dist = strtol(optarg,&argend,10);if( *argend != '\0' ){ usage(); return -1; }; break;  
 		case 't' : flags |= F_TRANS; break; 
 		case 'c' : flags |= F_CORE; break;
+		case 'u' : flags |= F_AXIS ; break;
 		case 'h' : usage(); return 0; 
 		default  :
 			printf("Option Error : %c\n",c);
@@ -66,7 +72,7 @@ int main( int argc, char** argv ){
 		}
 	}
 
-	test.func = myblas_funcs[flags];
+	test.func = myblas_funcs[flags&0x3];
 
 	double  beta = 1.3923842e0;
 	//double* A = calloc(nmax*nmax,sizeof(double));
@@ -74,6 +80,11 @@ int main( int argc, char** argv ){
 	double* A = aligned_alloc(ALIGNMENT_B,nmax*nmax*sizeof(double));
 	double* A2= aligned_alloc(ALIGNMENT_B,nmax*nmax*sizeof(double));
 
+	if( flags & F_AXIS ){
+	  sizes.type = COPY_NK;
+	}else{
+	  sizes.type = COPY_MK;
+	}
 	test.A    = A;
 	test.lda  = nmax;
 	test.buf  = A2;

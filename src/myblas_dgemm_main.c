@@ -133,11 +133,11 @@ void myblas_dgemm_main( gemm_args_t* args ){
 
 	            //printf("m2=%d n2=%d  A(%d,%d)[%d,%d] x B(%d,%d)[%d,%d] = C(%d,%d)[%d,%d]\n",m2,n2,i2,k2,M2,K2,k2,j2,K2,N2,i2,j2,M2,N2); 
 	            // On L2-Cache Copy for A
-	            block2d_info_t infoA = {k2,i2,K2,M2,MYBLAS_TILE_K,MYBLAS_TILE_M};
+	            block2d_info_t infoA = {k2,i2,K2,M2,MYBLAS_TILE_K,MYBLAS_TILE_M,COPY_MK};
 	            myblas_dgemm_copy_A(A,lda,A2,&infoA);
 
 	            // On L2-Cache Copy for B
-	            block2d_info_t infoB = {k2,j2,K2,N2,MYBLAS_TILE_K,MYBLAS_TILE_N};
+	            block2d_info_t infoB = {k2,j2,K2,N2,MYBLAS_TILE_K,MYBLAS_TILE_N,COPY_NK};
 	            myblas_dgemm_copy_B(B,ldb,B2,&infoB);
 
 	            // L1 cache
@@ -172,7 +172,7 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	              //printf("m2=%d n2=%d  A(%d,%d)[%d,%d] x B(%d,%d)[%d,%d] = C(%d,%d)[%d,%d]\n",m2,n2,i2,k2,M2,K2,k2,j2,K2,N2,i2,j2,M2,N2); 
 
 	              // On L2-Cache Copy for B
-	              block2d_info_t infoB = {k2,j2,K2,N2,MYBLAS_TILE_K,MYBLAS_TILE_N};
+	              block2d_info_t infoB = {k2,j2,K2,N2,MYBLAS_TILE_K,MYBLAS_TILE_N,COPY_NK};
 	              myblas_dgemm_copy_B(B,ldb,B2,&infoB);
 
 	              // L1 cache
@@ -202,7 +202,7 @@ void myblas_dgemm_main( gemm_args_t* args ){
 	              //printf("m2=%d n2=%d  A(%d,%d)[%d,%d] x B(%d,%d)[%d,%d] = C(%d,%d)[%d,%d]\n",m2,n2,i2,k2,M2,K2,k2,j2,K2,N2,i2,j2,M2,N2); 
 
 	              // On L2-Cache Copy for A
-	              block2d_info_t infoA = {k2,i2,K2,M2,MYBLAS_TILE_K,MYBLAS_TILE_M};
+	              block2d_info_t infoA = {k2,i2,K2,M2,MYBLAS_TILE_K,MYBLAS_TILE_M,COPY_MK};
 	              myblas_dgemm_copy_A(A,lda,A2,&infoA);
 
 	              // L1 cache
