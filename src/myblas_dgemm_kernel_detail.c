@@ -26,6 +26,9 @@ void myblas_dgemm_kernel_detail(
 	size_t ldc2 = ldc * 2 * sizeof(double);
 	double alpha4[4] = {alpha,alpha,alpha,alpha};
 
+	//printf("A alignment = 0x%x\n",((size_t)A)&0x1f);
+	//printf("B alignment = 0x%x\n",((size_t)B)&0x1f);
+
 	            //printf("START:\n");
 	// Kernel ----
 	if( N >> 1 ){
@@ -55,90 +58,6 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
-	        //if( K >> 4 ){
-	        //  size_t k16 = ( K >> 4 ); // Unrolling K
-	        //  while( k16-- ){
-
-	        //    __asm__ __volatile__ (
-	        //        "\n\t"
-	        //        "vmovapd   0*8(%[a]), %%ymm0 \n\t" // [a00,a10,a20,a30]
-	        //        "vmovapd   4*8(%[a]), %%ymm1 \n\t" // [a01,a11,a21,a31]
-	        //        "vmovapd   8*8(%[a]), %%ymm2 \n\t" // [a02,a12,a22,a32]
-	        //        "vmovapd  12*8(%[a]), %%ymm3 \n\t" // [a03,a13,a23,a30]
-	        //        "\n\t"
-	        //        "vmovapd   0*8(%[b]), %%ymm4 \n\t" // [b00,b10,b20,b30]
-	        //        "vmovapd   4*8(%[b]), %%ymm5 \n\t" // [b01,b11,b21,b31]
-	        //        "\n\t"
-	        //        "vfmadd231pd  %%ymm0 , %%ymm4 , %%ymm8 \n\t"
-	        //        "vfmadd231pd  %%ymm1 , %%ymm4 , %%ymm9 \n\t"
-	        //        "vfmadd231pd  %%ymm2 , %%ymm4 , %%ymm10\n\t"
-	        //        "vfmadd231pd  %%ymm3 , %%ymm4 , %%ymm11\n\t"
-	        //        "vfmadd231pd  %%ymm0 , %%ymm5 , %%ymm12\n\t"
-	        //        "vfmadd231pd  %%ymm1 , %%ymm5 , %%ymm13\n\t"
-	        //        "vfmadd231pd  %%ymm2 , %%ymm5 , %%ymm14\n\t"
-	        //        "vfmadd231pd  %%ymm3 , %%ymm5 , %%ymm15\n\t"
-	        //        "\n\t"
-	        //        "vmovapd  16*8(%[a]), %%ymm0 \n\t" // [a00,a10,a20,a30]
-	        //        "vmovapd  20*8(%[a]), %%ymm1 \n\t" // [a01,a11,a21,a31]
-	        //        "vmovapd  24*8(%[a]), %%ymm2 \n\t" // [a02,a12,a22,a32]
-	        //        "vmovapd  28*8(%[a]), %%ymm3 \n\t" // [a03,a13,a23,a30]
-	        //        "\n\t"
-	        //        "vmovapd   8*8(%[b]), %%ymm4 \n\t" // [b00,b10,b20,b30]
-	        //        "vmovapd  12*8(%[b]), %%ymm5 \n\t" // [b01,b11,b21,b31]
-	        //        "\n\t"
-	        //        "vfmadd231pd  %%ymm0 , %%ymm4 , %%ymm8 \n\t"
-	        //        "vfmadd231pd  %%ymm1 , %%ymm4 , %%ymm9 \n\t"
-	        //        "vfmadd231pd  %%ymm2 , %%ymm4 , %%ymm10\n\t"
-	        //        "vfmadd231pd  %%ymm3 , %%ymm4 , %%ymm11\n\t"
-	        //        "vfmadd231pd  %%ymm0 , %%ymm5 , %%ymm12\n\t"
-	        //        "vfmadd231pd  %%ymm1 , %%ymm5 , %%ymm13\n\t"
-	        //        "vfmadd231pd  %%ymm2 , %%ymm5 , %%ymm14\n\t"
-	        //        "vfmadd231pd  %%ymm3 , %%ymm5 , %%ymm15\n\t"
-	        //        "\n\t"
-	        //        "vmovapd  32*8(%[a]), %%ymm0 \n\t" // [a00,a10,a20,a30]
-	        //        "vmovapd  36*8(%[a]), %%ymm1 \n\t" // [a01,a11,a21,a31]
-	        //        "vmovapd  40*8(%[a]), %%ymm2 \n\t" // [a02,a12,a22,a32]
-	        //        "vmovapd  44*8(%[a]), %%ymm3 \n\t" // [a03,a13,a23,a30]
-	        //        "\n\t"
-	        //        "vmovapd  16*8(%[b]), %%ymm4 \n\t" // [b00,b10,b20,b30]
-	        //        "vmovapd  20*8(%[b]), %%ymm5 \n\t" // [b01,b11,b21,b31]
-	        //        "\n\t"
-	        //        "vfmadd231pd  %%ymm0 , %%ymm4 , %%ymm8 \n\t"
-	        //        "vfmadd231pd  %%ymm1 , %%ymm4 , %%ymm9 \n\t"
-	        //        "vfmadd231pd  %%ymm2 , %%ymm4 , %%ymm10\n\t"
-	        //        "vfmadd231pd  %%ymm3 , %%ymm4 , %%ymm11\n\t"
-	        //        "vfmadd231pd  %%ymm0 , %%ymm5 , %%ymm12\n\t"
-	        //        "vfmadd231pd  %%ymm1 , %%ymm5 , %%ymm13\n\t"
-	        //        "vfmadd231pd  %%ymm2 , %%ymm5 , %%ymm14\n\t"
-	        //        "vfmadd231pd  %%ymm3 , %%ymm5 , %%ymm15\n\t"
-	        //        "\n\t"
-	        //        "vmovapd  48*8(%[a]), %%ymm0 \n\t" // [a00,a10,a20,a30]
-	        //        "vmovapd  52*8(%[a]), %%ymm1 \n\t" // [a01,a11,a21,a31]
-	        //        "vmovapd  56*8(%[a]), %%ymm2 \n\t" // [a02,a12,a22,a32]
-	        //        "vmovapd  60*8(%[a]), %%ymm3 \n\t" // [a03,a13,a23,a30]
-	        //        "\n\t"
-	        //        "vmovapd  24*8(%[b]), %%ymm4 \n\t" // [b00,b10,b20,b30]
-	        //        "vmovapd  28*8(%[b]), %%ymm5 \n\t" // [b01,b11,b21,b31]
-	        //        "\n\t"
-	        //        "vfmadd231pd  %%ymm0 , %%ymm4 , %%ymm8 \n\t"
-	        //        "vfmadd231pd  %%ymm1 , %%ymm4 , %%ymm9 \n\t"
-	        //        "vfmadd231pd  %%ymm2 , %%ymm4 , %%ymm10\n\t"
-	        //        "vfmadd231pd  %%ymm3 , %%ymm4 , %%ymm11\n\t"
-	        //        "vfmadd231pd  %%ymm0 , %%ymm5 , %%ymm12\n\t"
-	        //        "vfmadd231pd  %%ymm1 , %%ymm5 , %%ymm13\n\t"
-	        //        "vfmadd231pd  %%ymm2 , %%ymm5 , %%ymm14\n\t"
-	        //        "vfmadd231pd  %%ymm3 , %%ymm5 , %%ymm15\n\t"
-	        //        "\n\t"
-	        //        "addq  $64*8, %[a]\n\t"
-	        //        "addq  $32*8, %[b]\n\t"
-	        //        "\n\t"
-	        //        "\n\t"
-	        //        :[a]"+r"(A),[b]"+r"(B)
-	        //    :);
-
-	        //  }
-	        //}
-	        //if( K & 8 ){
 	        if( K >> 3 ){
 	          size_t k8 = ( K >> 3 ); // Unrolling K
 	          while( k8-- ){

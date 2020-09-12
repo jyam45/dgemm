@@ -66,10 +66,21 @@ int main( int argc, char** argv ){
 	sizes.N2 = N;
 	sizes.K2 = K;
 
-	double* A = calloc( M*K, sizeof(double));
-	double* B = calloc( K*N, sizeof(double));
-	double* C = calloc( M*N, sizeof(double));
-	double* D = calloc( M*N, sizeof(double));
+	// Adapt size of buffer to 32-byte alignment
+	size_t M32=M; if( M32 & 1 ) M32+=1;
+	size_t N32=N; if( N32 & 1 ) N32+=1;
+	size_t K32=K; if( K32 & 1 ) K32+=1;
+
+	//double* A = calloc( M*K, sizeof(double));
+	//double* B = calloc( K*N, sizeof(double));
+	//double* C = calloc( M*N, sizeof(double));
+	//double* D = calloc( M*N, sizeof(double));
+	double* A = aligned_alloc( 32, M32*K32*sizeof(double));
+	double* B = aligned_alloc( 32, K32*N32*sizeof(double));
+	double* C = aligned_alloc( 32, M32*N32*sizeof(double));
+	double* D = aligned_alloc( 32, M32*N32*sizeof(double));
+
+	//printf("B alignment = 0x%x\n",((size_t)B)&0x1f);
 
 	rand_matrix( M, K, A, 1, M, SEED ); // ColMajor
 	rand_matrix( K, N, B, 1, K, SEED ); // ColMajor
