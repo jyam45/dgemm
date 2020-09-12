@@ -37,6 +37,9 @@ void myblas_dgemm_kernel_detail(
 
 	            __asm__ __volatile__ (
 	                "\n\t"
+	                "prefetcht0  64*8(%[a])\n\t"
+	                "prefetcht0  32*8(%[b])\n\t"
+	                "\n\t"
 	                "vmovupd   0*8(%[b]), %%ymm4 \n\t" // [b00,b10,b20,b30]
 	                "vmovupd   4*8(%[b]), %%ymm5 \n\t" // [b40,b50,b60,b70]
 	                "vmovupd   8*8(%[b]), %%ymm6 \n\t" // [b01,b11,b21,b31]
@@ -242,6 +245,8 @@ void myblas_dgemm_kernel_detail(
 
 	            __asm__ __volatile__ (
 	                "\n\t"
+	                "prefetcht0  32*8(%[a])\n\t"
+	                "prefetcht0  32*8(%[b])\n\t"
 	                "vmovapd   0*8(%[a]), %%ymm0 \n\t" // [a00,a10,a20,a30]
 	                "vmovapd   4*8(%[a]), %%ymm1 \n\t" // [a40,a50,a60,a70]
 	                "vmovapd   8*8(%[a]), %%ymm2 \n\t" // [a01,a11,a21,a31]
@@ -392,6 +397,8 @@ void myblas_dgemm_kernel_detail(
 
 	            __asm__ __volatile__ (
 	                "\n\t"
+	                "prefetcht0  16*8(%[a])\n\t"
+	                "prefetcht0  32*8(%[b])\n\t"
 	                "vmovupd   0*8(%[a]), %%ymm0 \n\t" // [a00,a10,a20,a30]
 	                "vmovupd   4*8(%[a]), %%ymm1 \n\t" // [a40,a50,a60,a70]
 	                "\n\t"
@@ -540,6 +547,8 @@ void myblas_dgemm_kernel_detail(
 
 	            __asm__ __volatile__ (
 	                "\n\t"
+	                "prefetcht0  64*8(%[a])\n\t"
+	                "prefetcht0  16*8(%[b])\n\t"
 	                "vmovupd   0*8(%[b]), %%ymm4 \n\t" // [b00,b10,b20,b30]
 	                "vmovupd   4*8(%[b]), %%ymm5 \n\t" // [b40,b50,b60,b70]
 	                "\n\t"
@@ -698,6 +707,9 @@ void myblas_dgemm_kernel_detail(
 	          while( k8-- ){
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0  32*8(%[a])\n\t"
+	                "prefetcht0  16*8(%[b])\n\t"
 	                "\n\t"
 	                "vmovupd   0*8(%[b]), %%ymm4 \n\t" // [b00,b10,b20,b30]
 	                "vmovupd   4*8(%[b]), %%ymm5 \n\t" // [b40,b50,b60,b70]
