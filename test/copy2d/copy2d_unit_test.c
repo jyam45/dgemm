@@ -6,8 +6,8 @@
 #include <unistd.h>
 
 #define MAX_SIZE 1023
-#define TILE_M     32 
-#define TILE_N     32
+#define TILE_M     16 
+#define TILE_N    128
 #define SEED 13892393
 
 #define F_TRANS 0x0001

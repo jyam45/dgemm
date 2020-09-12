@@ -7,9 +7,9 @@
 #include <string.h>
 
 #define MAX_SIZE 2048
-#define TILE_M     32 
-#define TILE_N     32
-#define TILE_K     32
+#define TILE_M     16 
+#define TILE_N     16
+#define TILE_K    128
 #define SEED 13892393
 
 #define ALIGNMENT_B  32

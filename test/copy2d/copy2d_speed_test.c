@@ -6,8 +6,8 @@
 #include <unistd.h>
 
 #define MAX_SIZE 2048
-#define TILE_M     32 
-#define TILE_N     32
+#define TILE_M     16 
+#define TILE_N    128
 
 #define ALIGNMENT_B  32 // AVX2
 

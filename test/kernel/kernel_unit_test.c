@@ -6,9 +6,9 @@
 #include <unistd.h>
 
 #define MAX_SIZE 1023
-#define TILE_M     32 
-#define TILE_N     32
-#define TILE_K     32
+#define TILE_M     16 
+#define TILE_N     16
+#define TILE_K    128
 #define SEED 13892393
 
 #define F_CORE  0x0001
