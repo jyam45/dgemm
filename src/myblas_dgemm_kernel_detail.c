@@ -15,6 +15,14 @@ void myblas_dgemm_kernel_detail(
 	size_t NQ = N/6;
 	size_t NR = N%6;
 
+	__asm__ __volatile__ (
+	    "\n\t"
+	    "prefetcht0 0*8(%[a])\n\t"
+	    "prefetcht0 0*8(%[b])\n\t"
+	    "\n\t"
+	    :[a]"+r"(A),[b]"+r"(B)
+	:);
+
 	if( NQ ){
 	  size_t n4 = NQ; // unrolling N
 	  while( n4-- ){
@@ -22,6 +30,16 @@ void myblas_dgemm_kernel_detail(
 	      size_t m4 = ( M >> 2 ); // unrolling M
 	      while( m4-- ){
 
+	        __asm__ __volatile__ (
+	            "prefetcht0 0*8(%[c0]        )\n\t"
+	            "prefetcht0 0*8(%[c1]        )\n\t"
+	            "prefetcht0 0*8(%[c0],%[ldc2])\n\t"
+	            "prefetcht0 0*8(%[c1],%[ldc2])\n\t"
+	            "prefetcht0 0*8(%[c0],%[ldc4])\n\t"
+	            "prefetcht0 0*8(%[c1],%[ldc4])\n\t"
+	            :[c0]"+r"(c0),[c1]"+r"(c1)
+	            :[ldc2]"r"(ldc2),[ldc4]"r"(ldc4)
+	        );
 	        __asm__ __volatile__ (
 	            "\n\t"
 	            "vpxor  %%ymm4 , %%ymm4 , %%ymm4 \n\t"
@@ -44,6 +62,9 @@ void myblas_dgemm_kernel_detail(
 
 	            // 4x6x4x2  LD+PM/FMA = 10/24 = 0.42
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0 32*8(%[a])\n\t"
+	                "prefetcht0 48*8(%[b])\n\t"
 	                "\n\t"
 	                "vmovapd   0*8(%[a]), %%ymm0 \n\t" // [a00,a10,a01,a11]
 	                "vmovapd   4*8(%[a]), %%ymm1 \n\t" // [a02,a12,a03,a13]
