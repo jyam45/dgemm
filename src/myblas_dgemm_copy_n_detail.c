@@ -1,6 +1,52 @@
 #include "myblas_internal.h"
 
-void myblas_dgemm_copy_n_4x8(size_t K, size_t N, const double* B, size_t k, size_t j,  size_t ldb, double* B2 ){
+#define COPY_N(NU,KU,LU) \
+	        for( size_t k=0; k<KU; k++ ){\
+	          for( size_t j=0; j<NU; j++ ){\
+	            for( size_t l=0; l<LU; l++ ){\
+	              *B2=*(B+l+k*LU+j*ldb);\
+	              B2++;\
+	            }\
+	          }\
+	        }\
+	        B+=KU*LU;
+
+#define COPY_N_K4(NU) \
+	    if( K >> 2 ){\
+	      size_t k4 = ( K >> 2 );\
+	      while( k4-- ){\
+	        COPY_N(NU,2,2);\
+	      }\
+	    }\
+	    if( K & 2 ){\
+	        COPY_N(NU,1,2);\
+	    }\
+	    if( K & 1 ){\
+	        COPY_N(NU,1,1);\
+	    }\
+	    B  = B  - K + NU*ldb ;
+
+
+#define COPY_N_K8(NU) \
+	    if( K >> 3 ){\
+	      size_t k8 = ( K >> 3 );\
+	      while( k8-- ){\
+	        COPY_N(NU,4,2);\
+	      }\
+	    }\
+	    if( K & 4 ){\
+	        COPY_N(NU,2,2);\
+	    }\
+	    if( K & 2 ){\
+	        COPY_N(NU,1,2);\
+	    }\
+	    if( K & 1 ){\
+	        COPY_N(NU,1,1);\
+	    }\
+	    B  = B  - K + NU*ldb ;
+
+
+void myblas_dgemm_copy_n_MxK(size_t K, size_t N, const double* B, size_t k, size_t j,  size_t ldb, double* B2 ){
 
 	B = B + k + ldb*j; // start point
 
@@ -8,349 +54,51 @@ void myblas_dgemm_copy_n_4x8(size_t K, size_t N, const double* B, size_t k, size
 	  size_t n4 = ( N >> 2 );
 	  while( n4-- ){
 
-	    if( K >> 3 ){
-	      size_t k8 = ( K >> 3 );
-	      while( k8-- ){
-	          for( size_t j=0; j<4; j++ ){
-	        for( size_t l=0; l<8; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=8;
-	      }
-	    }
-	    if( K & 4 ){
-	          for( size_t j=0; j<4; j++ ){
-	        for( size_t l=0; l<4; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=4;
-	    }
-	    if( K & 2 ){
-	          for( size_t j=0; j<4; j++ ){
-	        for( size_t l=0; l<2; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=2;
-	    }
-	    if( K & 1 ){
-	          for( size_t j=0; j<4; j++ ){
-	        for( size_t l=0; l<1; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=1;
-	    }
-	    B  = B  - K + 4*ldb ;
+	    COPY_N_K8(4);
 
 	  }
 	}
 	if( N & 2 ){
 
-	    if( K >> 3 ){
-	      size_t k8 = ( K >> 3 );
-	      while( k8-- ){
-	          for( size_t j=0; j<2; j++ ){
-	        for( size_t l=0; l<8; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=8;
-	      }
-	    }
-	    if( K & 4 ){
-	          for( size_t j=0; j<2; j++ ){
-	        for( size_t l=0; l<4; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=4;
-	    }
-	    if( K & 2 ){
-	          for( size_t j=0; j<2; j++ ){
-	        for( size_t l=0; l<2; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=2;
-	    }
-	    if( K & 1 ){
-	          for( size_t j=0; j<2; j++ ){
-	        for( size_t l=0; l<1; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=1;
-	    }
-	    B  = B  - K + 2*ldb ;
+	    COPY_N_K8(2);
 
 	}
 	if( N & 1 ){
 
-	    if( K >> 3 ){
-	      size_t k8 = ( K >> 3 );
-	      while( k8-- ){
-	          for( size_t j=0; j<1; j++ ){
-	        for( size_t l=0; l<8; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=8;
-	      }
-	    }
-	    if( K & 4 ){
-	          for( size_t j=0; j<1; j++ ){
-	        for( size_t l=0; l<4; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=4;
-	    }
-	    if( K & 2 ){
-	          for( size_t j=0; j<1; j++ ){
-	        for( size_t l=0; l<2; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=2;
-	    }
-	    if( K & 1 ){
-	          for( size_t j=0; j<1; j++ ){
-	        for( size_t l=0; l<1; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=1;
-	    }
-	    B  = B  - K + ldb ;
+	    COPY_N_K8(1);
 
 	}
 
 }
 
-void myblas_dgemm_copy_n_2x8(size_t K, size_t N, const double* B, size_t k, size_t j,  size_t ldb, double* B2 ){
+void myblas_dgemm_copy_n_NxK(size_t K, size_t N, const double* B, size_t k, size_t j,  size_t ldb, double* B2 ){
 
 	B = B + k + ldb*j; // start point
 
-	if( N >> 1 ){
-	  size_t n2 = ( N >> 1 );
-	  while( n2-- ){
+	size_t NQ = N/6;
+	size_t NR = N%6;
 
-	    if( K >> 3 ){
-	      size_t k8 = ( K >> 3 );
-	      while( k8-- ){
-	          for( size_t j=0; j<2; j++ ){
-	        for( size_t l=0; l<8; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=8;
-	      }
-	    }
-	    if( K & 4 ){
-	          for( size_t j=0; j<2; j++ ){
-	        for( size_t l=0; l<4; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=4;
-	    }
-	    if( K & 2 ){
-	          for( size_t j=0; j<2; j++ ){
-	        for( size_t l=0; l<2; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=2;
-	    }
-	    if( K & 1 ){
-	          for( size_t j=0; j<2; j++ ){
-	        for( size_t l=0; l<1; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=1;
-	    }
-	    B  = B  - K + 2*ldb ;
-	  }
-	}
-	if( N & 1 ){
+	if( NQ ){
+	  size_t n6 = NQ;
+	  while( n6-- ){
 
-	    if( K >> 3 ){
-	      size_t k8 = ( K >> 3 );
-	      while( k8-- ){
-	          for( size_t j=0; j<1; j++ ){
-	        for( size_t l=0; l<8; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=8;
-	      }
-	    }
-	    if( K & 4 ){
-	          for( size_t j=0; j<1; j++ ){
-	        for( size_t l=0; l<4; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=4;
-	    }
-	    if( K & 2 ){
-	          for( size_t j=0; j<1; j++ ){
-	        for( size_t l=0; l<2; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=2;
-	    }
-	    if( K & 1 ){
-	          for( size_t j=0; j<1; j++ ){
-	        for( size_t l=0; l<1; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=1;
-	    }
-	    B  = B  - K + ldb ;
-
-	}
-
-
-}
-
-
-void myblas_dgemm_copy_n_4x4(size_t K, size_t N, const double* B, size_t k, size_t j,  size_t ldb, double* B2 ){
-
-	B = B + k + ldb*j; // start point
-
-	if( N >> 2 ){
-	  size_t n4 = ( N >> 2 );
-	  while( n4-- ){
-
-	    if( K >> 2 ){
-	      size_t k4 = ( K >> 2 );
-	      while( k4-- ){
-	          for( size_t j=0; j<4; j++ ){
-	        for( size_t l=0; l<4; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=4;
-	      }
-	    }
-	    if( K & 2 ){
-	          for( size_t j=0; j<4; j++ ){
-	        for( size_t l=0; l<2; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=2;
-	    }
-	    if( K & 1 ){
-	          for( size_t j=0; j<4; j++ ){
-	        for( size_t l=0; l<1; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=1;
-	    }
-	    B  = B  - K + 4*ldb ;
+	    COPY_N_K8(6);
 
 	  }
 	}
-	if( N & 2 ){
+	if( NR & 4 ){
 
-	    if( K >> 2 ){
-	      size_t k4 = ( K >> 2 );
-	      while( k4-- ){
-	          for( size_t j=0; j<2; j++ ){
-	        for( size_t l=0; l<4; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=4;
-	      }
-	    }
-	    if( K & 2 ){
-	          for( size_t j=0; j<2; j++ ){
-	        for( size_t l=0; l<2; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=2;
-	    }
-	    if( K & 1 ){
-	          for( size_t j=0; j<2; j++ ){
-	        for( size_t l=0; l<1; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=1;
-	    }
-	    B  = B  - K + 2*ldb ;
+	    COPY_N_K8(4);
 
 	}
-	if( N & 1 ){
+	if( NR & 2 ){
 
-	    if( K >> 2 ){
-	      size_t k4 = ( K >> 2 );
-	      while( k4-- ){
-	          for( size_t j=0; j<1; j++ ){
-	        for( size_t l=0; l<4; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=4;
-	      }
-	    }
-	    if( K & 2 ){
-	          for( size_t j=0; j<1; j++ ){
-	        for( size_t l=0; l<2; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=2;
-	    }
-	    if( K & 1 ){
-	          for( size_t j=0; j<1; j++ ){
-	        for( size_t l=0; l<1; l++ ){
-	            *B2=*(B+l+j*ldb);
-	            B2++;
-	          }
-	        }
-	        B+=1;
-	    }
-	    B  = B  - K + ldb ;
+	    COPY_N_K8(2);
+
+	}
+	if( NR & 1 ){
+
+	    COPY_N_K8(1);
 
 	}
 

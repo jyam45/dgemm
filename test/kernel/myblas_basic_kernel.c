@@ -2,6 +2,63 @@
 #include "kernel_test.h"
 #include <stdio.h>
 
+#define  KERNEL(MU,NU,KU,LU) \
+	            for( size_t k=0; k<KU; k++ ){\
+	              for( size_t j=0; j<NU; j++ ){\
+	                for( size_t i=0; i<MU; i++ ){\
+  	                   for( size_t l=0; l<LU; l++ ){\
+	                     c[i+MU*j] += (*(A2+l+i*LU+k*LU*MU))*(*(B2+l+j*LU+k*LU*NU));\
+	                   }\
+	                }\
+	              }\
+	            }\
+	            A2+=MU*KU*LU;\
+	            B2+=KU*LU*NU;
+
+#define  CSTORE(MU,NU) \
+	        for( size_t j=0; j<NU; j++ ){\
+	          for( size_t i=0; i<MU; i++ ){\
+	            *(C+i+j*ldc) += alpha*c[i+MU*j];\
+	          }\
+	        }\
+	        B2 = B2 - NU*K;\
+	        C+=MU;
+
+#define KERNEL_K4(MU,NU) \
+ 	        for( size_t ii=0; ii<MU*NU; ii++ ){ c[ii]=0e0; }\
+	        if( K >> 2 ){\
+	          size_t k4 = ( K >> 2 );\
+	          while( k4-- ){\
+	            KERNEL(MU,NU,2,2);\
+	          }\
+	        }\
+	        if( K & 2 ){\
+	            KERNEL(MU,NU,1,2);\
+	        }\
+	        if( K & 1 ){\
+	            KERNEL(MU,NU,1,1);\
+	        }\
+	        CSTORE(MU,NU);
+
+#define KERNEL_K8(MU,NU) \
+ 	        for( size_t ii=0; ii<MU*NU; ii++ ){ c[ii]=0e0; }\
+	        if( K >> 3 ){\
+	          size_t k8 = ( K >> 3 );\
+	          while( k8-- ){\
+	            KERNEL(MU,NU,4,2);\
+	          }\
+	        }\
+	        if( K & 4 ){\
+	            KERNEL(MU,NU,2,2);\
+	        }\
+	        if( K & 2 ){\
+	            KERNEL(MU,NU,1,2);\
+	        }\
+	        if( K & 1 ){\
+	            KERNEL(MU,NU,1,1);\
+	        }\
+	        CSTORE(MU,NU);
+
 void myblas_basic_kernel(double alpha, const double *A2, const double *B2, 
                          double *C, size_t ldc, const block3d_info_t* info ){
 
@@ -72,418 +129,122 @@ void myblas_basic_kernel_core(double alpha, const double *A2, const double *B2,
 	size_t N     = info->N2    ;
 	size_t K     = info->K2    ;
 
-	double c[16];
+	double c[4*6];
 
-	if( N >> 1 ){
-	  size_t n2 = ( N >> 1 );
-	  while( n2-- ){
+	size_t NQ = N/6;
+	size_t NR = N%6;
 
+	if( NQ ){
+	  size_t n6 = NQ;
+	  while( n6-- ){
 	    
 	    if( M >> 2 ){
 	      size_t m4 = ( M >> 2 );
 	      while( m4-- ){
 
-		for( size_t ii=0; ii<16; ii++ ){ c[ii]=0e0; }
-	        
-	        if( K >> 3 ){
-	          size_t k8 = ( K >> 3 );
-	          while( k8-- ){
-	              for( size_t j=0; j<2; j++ ){
-	                for( size_t i=0; i<4; i++ ){
-	            for( size_t l=0; l<8; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*8))*(*(B2+l+j*8));
-	                }
-	              }
-	            }
-	            A2+=32;
-	            B2+=16;
-	          }
-	        }
-	        if( K & 4 ){
-	              for( size_t j=0; j<2; j++ ){
-	                for( size_t i=0; i<4; i++ ){
-	            for( size_t l=0; l<4; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*4))*(*(B2+l+j*4));
-	                }
-	              }
-	            }
-	            A2+=16;
-	            B2+=8;
-	        }
-	        if( K & 2 ){
-	              for( size_t j=0; j<2; j++ ){
-	                for( size_t i=0; i<4; i++ ){
-	            for( size_t l=0; l<2; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*2))*(*(B2+l+j*2));
-	                }
-	              }
-	            }
-	            A2+=8;
-	            B2+=4;
-	        }
-	        if( K & 1 ){
-	              for( size_t j=0; j<2; j++ ){
-	                for( size_t i=0; i<4; i++ ){
-	            for( size_t l=0; l<1; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*1))*(*(B2+l+j*1));
-	                }
-	              }
-	            }
-	            A2+=4;
-	            B2+=2;
-	        }
-	        for( size_t j=0; j<2; j++ ){
-	          for( size_t i=0; i<4; i++ ){
-	            *(C+i+j*ldc) += alpha*c[i+4*j];
-	          }
-	        }
-	        //*C = (*C) + alpha*c00;
-	        B2 = B2 - 2*K;//N*K
-	        //C++;
-	        C+=4;
+	        KERNEL_K8(4,6);
+
 	      }
 
 	    }
 	    if( M & 2 ){
 
-		for( size_t ii=0; ii<16; ii++ ){ c[ii]=0e0; }
-	        
-	        if( K >> 3 ){
-	          size_t k8 = ( K >> 3 );
-	          while( k8-- ){
-	              for( size_t j=0; j<2; j++ ){
-	                for( size_t i=0; i<2; i++ ){
-	            for( size_t l=0; l<8; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*8))*(*(B2+l+j*8));
-	                }
-	              }
-	            }
-	            A2+=16;
-	            B2+=16;
-	          }
-	        }
-	        if( K & 4 ){
-	              for( size_t j=0; j<2; j++ ){
-	                for( size_t i=0; i<2; i++ ){
-	            for( size_t l=0; l<4; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*4))*(*(B2+l+j*4));
-	                }
-	              }
-	            }
-	            A2+=8;
-	            B2+=8;
-	        }
-	        if( K & 2 ){
-	              for( size_t j=0; j<2; j++ ){
-	                for( size_t i=0; i<2; i++ ){
-	            for( size_t l=0; l<2; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*2))*(*(B2+l+j*2));
-	                }
-	              }
-	            }
-	            A2+=4;
-	            B2+=4;
-	        }
-	        if( K & 1 ){
-	              for( size_t j=0; j<2; j++ ){
-	                for( size_t i=0; i<2; i++ ){
-	            for( size_t l=0; l<1; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*1))*(*(B2+l+j*1));
-	                }
-	              }
-	            }
-	            A2+=2;
-	            B2+=2;
-	        }
-	        for( size_t j=0; j<2; j++ ){
-	          for( size_t i=0; i<2; i++ ){
-	            *(C+i+j*ldc) += alpha*c[i+2*j];
-	          }
-	        }
-	        //*C = (*C) + alpha*c00;
-	        B2 = B2 - 2*K; // N*K
-	        //C++;
-	        C+=2;
-	      //}
+	        KERNEL_K8(2,6);
 
 	    }
 	    if( M & 1 ){
 
-		for( size_t ii=0; ii<16; ii++ ){ c[ii]=0e0; }
-	        
-	        if( K >> 3 ){
-	          size_t k8 = ( K >> 3 );
-	          while( k8-- ){
-	              for( size_t j=0; j<2; j++ ){
-	                for( size_t i=0; i<1; i++ ){
-	            for( size_t l=0; l<8; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*8))*(*(B2+l+j*8));
-	                }
-	              }
-	            }
-	            A2+=8;
-	            B2+=16;
-	          }
-	        }
-	        if( K & 4 ){
-	              for( size_t j=0; j<2; j++ ){
-	                for( size_t i=0; i<1; i++ ){
-	            for( size_t l=0; l<4; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*4))*(*(B2+l+j*4));
-	                }
-	              }
-	            }
-	            A2+=4;
-	            B2+=8;
-	        }
-	        if( K & 2 ){
-	              for( size_t j=0; j<2; j++ ){
-	                for( size_t i=0; i<1; i++ ){
-	            for( size_t l=0; l<2; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*2))*(*(B2+l+j*2));
-	                }
-	              }
-	            }
-	            A2+=2;
-	            B2+=4;
-	        }
-	        if( K & 1 ){
-	              for( size_t j=0; j<2; j++ ){
-	                for( size_t i=0; i<1; i++ ){
-	            for( size_t l=0; l<1; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*1))*(*(B2+l+j*1));
-	                }
-	              }
-	            }
-	            A2+=1;
-	            B2+=2;
-	        }
-	        for( size_t j=0; j<2; j++ ){
-	          for( size_t i=0; i<1; i++ ){
-	            *(C+i+j*ldc) += alpha*c[i+1*j];
-	          }
-	        }
-	        //*C = (*C) + alpha*c00;
-	        B2 = B2 - 2*K; // N*K
-	        //C++;
-	        C+=1;
-	      //}
+	        KERNEL_K8(1,6);
 
 	    }
+	    A2 = A2 - M*K;
+	    B2 = B2 + 6*K;
+	    C  = C - M + 6*ldc;
+	  }
+	
+	}
+	if( NR & 4 ){
+	    
+	    if( M >> 2 ){
+	      size_t m4 = ( M >> 2 );
+	      while( m4-- ){
+
+	        KERNEL_K8(4,4);
+
+	      }
+
+	    }
+	    if( M & 2 ){
+
+	        KERNEL_K8(2,4);
+
+	    }
+	    if( M & 1 ){
+
+	        KERNEL_K8(1,4);
+
+	    }
+	    A2 = A2 - M*K;
+	    B2 = B2 + 4*K;
+	    C  = C - M + 4*ldc;
+
+	}
+	if( NR & 2 ){
+
+	    if( M >> 2 ){
+	      size_t m4 = ( M >> 2 );
+	      while( m4-- ){
+
+	        KERNEL_K8(4,2);
+
+	      }
+
+	    }
+	    if( M & 2 ){
+
+	        KERNEL_K8(2,2);
+
+	    }
+	    if( M & 1 ){
+
+	        KERNEL_K8(1,2);
+
+	    }
+
 	    A2 = A2 - M*K;
 	    B2 = B2 + 2*K;
 	    C  = C - M + 2*ldc;
-	  }
-
 	}
-	if( N & 1 ){
-
-	    
+	if( NR & 1 ){
+	   
 	    if( M >> 2 ){
 	      size_t m4 = ( M >> 2 );
 	      while( m4-- ){
 
-		for( size_t ii=0; ii<16; ii++ ){ c[ii]=0e0; }
-	        
-	        if( K >> 3 ){
-	          size_t k8 = ( K >> 3 );
-	          while( k8-- ){
-	              for( size_t j=0; j<1; j++ ){
-	                for( size_t i=0; i<4; i++ ){
-	            for( size_t l=0; l<8; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*8))*(*(B2+l+j*8));
-	                }
-	              }
-	            }
-	            A2+=32;
-	            B2+=8;
-	          }
-	        }
-	        if( K & 4 ){
-	              for( size_t j=0; j<1; j++ ){
-	                for( size_t i=0; i<4; i++ ){
-	            for( size_t l=0; l<4; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*4))*(*(B2+l+j*4));
-	                }
-	              }
-	            }
-	            A2+=16;
-	            B2+=4;
-	        }
-	        if( K & 2 ){
-	              for( size_t j=0; j<1; j++ ){
-	                for( size_t i=0; i<4; i++ ){
-	            for( size_t l=0; l<2; l++ ){
-	                  c[i+4*j] += (*(A2+l+i*2))*(*(B2+l+j*2));
-	                }
-	              }
-	            }
-	            A2+=8;
-	            B2+=2;
-	        }
-	        if( K & 1 ){
-	            for( size_t l=0; l<1; l++ ){
-	              for( size_t j=0; j<1; j++ ){
-	                for( size_t i=0; i<4; i++ ){
-	                  c[i+4*j] += (*(A2+l+i*1))*(*(B2+l+j*1));
-	                }
-	              }
-	            }
-	            A2+=4;
-	            B2+=1;
-	        }
-	        for( size_t j=0; j<1; j++ ){
-	          for( size_t i=0; i<4; i++ ){
-	            *(C+i+j*ldc) += alpha*c[i+4*j];
-	          }
-	        }
-	        //*C = (*C) + alpha*c00;
-	        B2 = B2 - 1*K;//N*K
-	        //C++;
-	        C+=4;
+	        KERNEL_K8(4,1);
+
 	      }
 
 	    }
 	    if( M & 2 ){
 
-		for( size_t ii=0; ii<16; ii++ ){ c[ii]=0e0; }
-	        
-	        if( K >> 3 ){
-	          size_t k8 = ( K >> 3 );
-	          while( k8-- ){
-	              for( size_t j=0; j<1; j++ ){
-	                for( size_t i=0; i<2; i++ ){
-	            for( size_t l=0; l<8; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*8))*(*(B2+l+j*8));
-	                }
-	              }
-	            }
-	            A2+=16;
-	            B2+=8;
-	          }
-	        }
-	        if( K & 4 ){
-	            for( size_t l=0; l<4; l++ ){
-	              for( size_t j=0; j<1; j++ ){
-	                for( size_t i=0; i<2; i++ ){
-	                  c[i+2*j] += (*(A2+l+i*4))*(*(B2+l+j*4));
-	                }
-	              }
-	            }
-	            A2+=8;
-	            B2+=4;
-	        }
-	        if( K & 2 ){
-	              for( size_t j=0; j<1; j++ ){
-	                for( size_t i=0; i<2; i++ ){
-	            for( size_t l=0; l<2; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*2))*(*(B2+l+j*2));
-	                }
-	              }
-	            }
-	            A2+=4;
-	            B2+=2;
-	        }
-	        if( K & 1 ){
-	              for( size_t j=0; j<1; j++ ){
-	                for( size_t i=0; i<2; i++ ){
-	            for( size_t l=0; l<1; l++ ){
-	                  c[i+2*j] += (*(A2+l+i*1))*(*(B2+l+j*1));
-	                }
-	              }
-	            }
-	            A2+=2;
-	            B2+=1;
-	        }
-	        for( size_t j=0; j<1; j++ ){
-	          for( size_t i=0; i<2; i++ ){
-	            *(C+i+j*ldc) += alpha*c[i+2*j];
-	          }
-	        }
-	        //*C = (*C) + alpha*c00;
-	        B2 = B2 - 1*K; // N*K
-	        //C++;
-	        C+=2;
-	      //}
+	        KERNEL_K8(2,1);
 
 	    }
 	    if( M & 1 ){
 
-		for( size_t ii=0; ii<16; ii++ ){ c[ii]=0e0; }
-	        
-	        if( K >> 3 ){
-	          size_t k8 = ( K >> 3 );
-	          while( k8-- ){
-	              for( size_t j=0; j<1; j++ ){
-	                for( size_t i=0; i<1; i++ ){
-	            for( size_t l=0; l<8; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*8))*(*(B2+l+j*8));
-	                }
-	              }
-	            }
-	            A2+=8;
-	            B2+=8;
-	          }
-	        }
-	        if( K & 4 ){
-	            for( size_t l=0; l<4; l++ ){
-	              for( size_t j=0; j<1; j++ ){
-	                for( size_t i=0; i<1; i++ ){
-	                  c[i+1*j] += (*(A2+l+i*4))*(*(B2+l+j*4));
-	                }
-	              }
-	            }
-	            A2+=4;
-	            B2+=4;
-	        }
-	        if( K & 2 ){
-	              for( size_t j=0; j<1; j++ ){
-	                for( size_t i=0; i<1; i++ ){
-	            for( size_t l=0; l<2; l++ ){
-	                  c[i+1*j] += (*(A2+l+i*2))*(*(B2+l+j*2));
-	                }
-	              }
-	            }
-	            A2+=2;
-	            B2+=2;
-	        }
-	        if( K & 1 ){
-	            for( size_t l=0; l<1; l++ ){
-	              for( size_t j=0; j<1; j++ ){
-	                for( size_t i=0; i<1; i++ ){
-	                  c[i+1*j] += (*(A2+l+i*1))*(*(B2+l+j*1));
-	                }
-	              }
-	            }
-	            A2+=1;
-	            B2+=1;
-	        }
-	        for( size_t j=0; j<1; j++ ){
-	          for( size_t i=0; i<1; i++ ){
-	            *(C+i+j*ldc) += alpha*c[i+1*j];
-	          }
-	        }
-	        //*C = (*C) + alpha*c00;
-	        B2 = B2 - 1*K; // N*K
-	        //C++;
-	        C+=1;
-	      //}
+	        KERNEL_K8(1,1);
 
 	    }
+
 	    A2 = A2 - M*K;
 	    B2 = B2 + 1*K;
 	    C  = C - M + 1*ldc;
-	  //}
-
-
 	}
 
 	A2 = A2 + M*K;
 	B2 = B2 - K*N;
 	C  = C - ldc*N + M;
-	// ---- Kernel
 
-
-	// ---- Kernel
 }
 

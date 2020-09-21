@@ -78,10 +78,10 @@ void myblas_dgemm_scale2d_detail(size_t M, size_t N, double beta, double *C, siz
 void myblas_dgemm_kernel_detail(size_t M, size_t N, size_t K,
                                 double alpha, const double *A2, const double *B2, double *C, size_t ldc );
 
-void myblas_dgemm_copy_n_4x8(size_t K, size_t N, const double* B, size_t k, size_t j, size_t ldb, double* B2 );
-void myblas_dgemm_copy_n_2x8(size_t K, size_t N, const double* B, size_t k, size_t j, size_t ldb, double* B2 );
-void myblas_dgemm_copy_t_4x8(size_t K, size_t M, const double* A, size_t k, size_t i, size_t lda, double* A2 );
-void myblas_dgemm_copy_t_2x8(size_t K, size_t M, const double* A, size_t k, size_t i, size_t lda, double* A2 );
+void myblas_dgemm_copy_n_MxK(size_t K, size_t N, const double* B, size_t k, size_t j, size_t ldb, double* B2 );
+void myblas_dgemm_copy_n_NxK(size_t K, size_t N, const double* B, size_t k, size_t j, size_t ldb, double* B2 );
+void myblas_dgemm_copy_t_MxK(size_t K, size_t M, const double* A, size_t k, size_t i, size_t lda, double* A2 );
+void myblas_dgemm_copy_t_NxK(size_t K, size_t M, const double* A, size_t k, size_t i, size_t lda, double* A2 );
 
 size_t myblas_num_col_threads( size_t nthreads );
 size_t myblas_num_row_threads( size_t nthreads );

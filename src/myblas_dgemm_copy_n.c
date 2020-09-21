@@ -1,7 +1,7 @@
 #include "myblas_internal.h"
 //#include <stdio.h>
 
-static copy_detail_func_t copy_n_detail[]={ myblas_dgemm_copy_n_4x8, myblas_dgemm_copy_n_2x8 };
+static copy_detail_func_t copy_n_detail[]={ myblas_dgemm_copy_n_MxK, myblas_dgemm_copy_n_NxK };
 
 // On L2-Cache Copy for B
 void myblas_dgemm_copy_n(const double* B, size_t ldb, double* B2, const block2d_info_t* info ){
