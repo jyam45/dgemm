@@ -6,13 +6,13 @@
 #include <omp.h>
 #endif
 
-#define MYBLAS_PANEL_M  256
-#define MYBLAS_PANEL_N  256
-#define MYBLAS_PANEL_K  256
+#define MYBLAS_PANEL_M  2048
+#define MYBLAS_PANEL_N  2048
+#define MYBLAS_PANEL_K  2048
 
-#define MYBLAS_BLOCK_M  128
-#define MYBLAS_BLOCK_N   64
-#define MYBLAS_BLOCK_K  128
+#define MYBLAS_BLOCK_M  512
+#define MYBLAS_BLOCK_N  512
+#define MYBLAS_BLOCK_K  256
 
 #define MYBLAS_TILE_M    16
 #define MYBLAS_TILE_N    16
