@@ -76,7 +76,7 @@ void myblas_dgemm_copy_t_MxK(size_t K, size_t M, const double* A, size_t k1, siz
 
 	    if( M >> 2 ){
 	      size_t m4 = ( M >> 2 );
-	      while( m4-- ){
+	      m4--;
 
 	        __asm__ __volatile__ (
 	          "\n\t"
@@ -94,21 +94,124 @@ void myblas_dgemm_copy_t_MxK(size_t K, size_t M, const double* A, size_t k1, siz
 	          "vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm13\n\t" // [a20,a21,a30,a31]
 	          "vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm14\n\t" // [a02,a03,a12,a13]
 	          "vperm2f128 $0x31 , %%ymm7 , %%ymm6 , %%ymm15\n\t" // [a22,a23,a32,a33]
-	          "\n\t"
-	          "vmovapd  %%ymm12,  0*8(%[a2]) \n\t"
-	          "vmovapd  %%ymm13,  4*8(%[a2]) \n\t"
-	          "vmovapd  %%ymm14,  8*8(%[a2]) \n\t"
-	          "vmovapd  %%ymm15, 12*8(%[a2]) \n\t"
-	          "\n\t"
+	          //"\n\t"
+	          //"vmovapd  %%ymm12,  0*8(%[a2]) \n\t"
+	          //"vmovapd  %%ymm13,  4*8(%[a2]) \n\t"
+	          //"vmovapd  %%ymm14,  8*8(%[a2]) \n\t"
+	          //"vmovapd  %%ymm15, 12*8(%[a2]) \n\t"
+	          //"\n\t"
 	          "vmovupd  0*8(%[a0],%[lda2],2), %%ymm0 \n\t" // [a04,a14,a24,a34]
 	          "vmovupd  0*8(%[a1],%[lda2],2), %%ymm1 \n\t" // [a05,a15,a25,a35]
 	          "vmovupd  0*8(%[a0],%[lda3],2), %%ymm2 \n\t" // [a06,a16,a26,a36]
 	          "vmovupd  0*8(%[a1],%[lda3],2), %%ymm3 \n\t" // [a07,a17,a27,a37]
+	          //"\n\t"
+	          //"vshufpd    $0x00 , %%ymm1 , %%ymm0 , %%ymm4 \n\t" // [a04,a05,a24,a25]
+	          //"vshufpd    $0x0f , %%ymm1 , %%ymm0 , %%ymm5 \n\t" // [a14,a15,a34,a35]
+	          //"vshufpd    $0x00 , %%ymm3 , %%ymm2 , %%ymm6 \n\t" // [a06,a07,a26,a27]
+	          //"vshufpd    $0x0f , %%ymm3 , %%ymm2 , %%ymm7 \n\t" // [a16,a17,a36,a37]
+	          //"\n\t"
+	          //"vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm12\n\t" // [a04,a05,a14,a15]
+	          //"vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm13\n\t" // [a24,a25,a34,a35]
+	          //"vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm14\n\t" // [a06,a07,a16,a17]
+	          //"vperm2f128 $0x31 , %%ymm7 , %%ymm6 , %%ymm15\n\t" // [a26,a27,a36,a37]
+	          //"\n\t"
+	          //"vmovapd  %%ymm12, 16*8(%[a2]) \n\t"
+	          //"vmovapd  %%ymm13, 20*8(%[a2]) \n\t"
+	          //"vmovapd  %%ymm14, 24*8(%[a2]) \n\t"
+	          //"vmovapd  %%ymm15, 28*8(%[a2]) \n\t"
+	          //"\n\t"
+	          //"addq  $4*8, %[a0]\n\t"
+	          //"addq  $4*8, %[a1]\n\t"
+	          //"leaq  0*8(%[a2],%[K],4), %[a2]\n\t"
+	          "\n\t"
+	        :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(A2)
+	        :[lda2]"r"(lda2),[lda3]"r"(lda3),[K]"r"(KK));
+
+
+	      while( m4-- ){
+
+	        __asm__ __volatile__ (
+	          "\n\t"
+	          "vshufpd    $0x00 , %%ymm1 , %%ymm0 , %%ymm4 \n\t" // [a04,a05,a24,a25]
+	          "vshufpd    $0x0f , %%ymm1 , %%ymm0 , %%ymm5 \n\t" // [a14,a15,a34,a35]
+	          "vmovupd  4*8(%[a0]          ), %%ymm0 \n\t" // [a00,a10,a20,a30]
+	          "vmovupd  4*8(%[a1]          ), %%ymm1 \n\t" // [a01,a11,a21,a31]
+	          "\n\t"
+	          "vshufpd    $0x00 , %%ymm3 , %%ymm2 , %%ymm6 \n\t" // [a06,a07,a26,a27]
+	          "vshufpd    $0x0f , %%ymm3 , %%ymm2 , %%ymm7 \n\t" // [a16,a17,a36,a37]
+	          "vmovupd  4*8(%[a0],%[lda2]  ), %%ymm2 \n\t" // [a02,a12,a22,a32]
+	          "vmovupd  4*8(%[a1],%[lda2]  ), %%ymm3 \n\t" // [a03,a13,a23,a33]
+	          "\n\t"
+	          "vmovapd  %%ymm12,  0*8(%[a2]) \n\t"
+	          "vmovapd  %%ymm13,  4*8(%[a2]) \n\t"
+	          "vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm12\n\t" // [a04,a05,a14,a15]
+	          "vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm13\n\t" // [a24,a25,a34,a35]
+	          "\n\t"
+	          "vmovapd  %%ymm14,  8*8(%[a2]) \n\t"
+	          "vmovapd  %%ymm15, 12*8(%[a2]) \n\t"
+	          "vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm14\n\t" // [a06,a07,a16,a17]
+	          "vperm2f128 $0x31 , %%ymm7 , %%ymm6 , %%ymm15\n\t" // [a26,a27,a36,a37]
+	          "\n\t"
+	          "vshufpd    $0x00 , %%ymm1 , %%ymm0 , %%ymm4 \n\t" // [a00,a01,a20,a21]
+	          "vshufpd    $0x0f , %%ymm1 , %%ymm0 , %%ymm5 \n\t" // [a10,a11,a30,a31]
+	          "vmovupd  8*8(%[a0],%[lda2],2), %%ymm0 \n\t" // [a04,a14,a24,a34]
+	          "vmovupd  8*8(%[a1],%[lda2],2), %%ymm1 \n\t" // [a05,a15,a25,a35]
+	          "\n\t"
+	          "vshufpd    $0x00 , %%ymm3 , %%ymm2 , %%ymm6 \n\t" // [a02,a03,a22,a23]
+	          "vshufpd    $0x0f , %%ymm3 , %%ymm2 , %%ymm7 \n\t" // [a12,a13,a32,a33]
+	          "vmovupd  8*8(%[a0],%[lda3],2), %%ymm2 \n\t" // [a06,a16,a26,a36]
+	          "vmovupd  8*8(%[a1],%[lda3],2), %%ymm3 \n\t" // [a07,a17,a27,a37]
+	          "\n\t"
+	          "vmovapd  %%ymm12, 16*8(%[a2]) \n\t"
+	          "vmovapd  %%ymm13, 20*8(%[a2]) \n\t"
+	          "vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm12\n\t" // [a00,a01,a10,a11]
+	          "vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm13\n\t" // [a20,a21,a30,a31]
+	          "\n\t"
+	          "vmovapd  %%ymm14, 24*8(%[a2]) \n\t"
+	          "vmovapd  %%ymm15, 28*8(%[a2]) \n\t"
+	          "vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm14\n\t" // [a02,a03,a12,a13]
+	          "vperm2f128 $0x31 , %%ymm7 , %%ymm6 , %%ymm15\n\t" // [a22,a23,a32,a33]
+	          "\n\t"
+	          "addq  $4*8, %[a0]\n\t"
+	          "addq  $4*8, %[a1]\n\t"
+	          "leaq  0*8(%[a2],%[K],4), %[a2]\n\t"
+	          "\n\t"
+	        :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(A2)
+	        :[lda2]"r"(lda2),[lda3]"r"(lda3),[K]"r"(KK));
+
+	      }
+
+	        __asm__ __volatile__ (
+	          "\n\t"
+	          //"vmovupd  0*8(%[a0]          ), %%ymm0 \n\t" // [a00,a10,a20,a30]
+	          //"vmovupd  0*8(%[a1]          ), %%ymm1 \n\t" // [a01,a11,a21,a31]
+	          //"vmovupd  0*8(%[a0],%[lda2]  ), %%ymm2 \n\t" // [a02,a12,a22,a32]
+	          //"vmovupd  0*8(%[a1],%[lda2]  ), %%ymm3 \n\t" // [a03,a13,a23,a33]
+	          //"\n\t"
+	          //"vshufpd    $0x00 , %%ymm1 , %%ymm0 , %%ymm4 \n\t" // [a00,a01,a20,a21]
+	          //"vshufpd    $0x0f , %%ymm1 , %%ymm0 , %%ymm5 \n\t" // [a10,a11,a30,a31]
+	          //"vshufpd    $0x00 , %%ymm3 , %%ymm2 , %%ymm6 \n\t" // [a02,a03,a22,a23]
+	          //"vshufpd    $0x0f , %%ymm3 , %%ymm2 , %%ymm7 \n\t" // [a12,a13,a32,a33]
+	          //"\n\t"
+	          //"vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm12\n\t" // [a00,a01,a10,a11]
+	          //"vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm13\n\t" // [a20,a21,a30,a31]
+	          //"vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm14\n\t" // [a02,a03,a12,a13]
+	          //"vperm2f128 $0x31 , %%ymm7 , %%ymm6 , %%ymm15\n\t" // [a22,a23,a32,a33]
+	          "\n\t"
+	          //"vmovupd  0*8(%[a0],%[lda2],2), %%ymm0 \n\t" // [a04,a14,a24,a34]
+	          //"vmovupd  0*8(%[a1],%[lda2],2), %%ymm1 \n\t" // [a05,a15,a25,a35]
+	          //"vmovupd  0*8(%[a0],%[lda3],2), %%ymm2 \n\t" // [a06,a16,a26,a36]
+	          //"vmovupd  0*8(%[a1],%[lda3],2), %%ymm3 \n\t" // [a07,a17,a27,a37]
 	          "\n\t"
 	          "vshufpd    $0x00 , %%ymm1 , %%ymm0 , %%ymm4 \n\t" // [a04,a05,a24,a25]
 	          "vshufpd    $0x0f , %%ymm1 , %%ymm0 , %%ymm5 \n\t" // [a14,a15,a34,a35]
 	          "vshufpd    $0x00 , %%ymm3 , %%ymm2 , %%ymm6 \n\t" // [a06,a07,a26,a27]
 	          "vshufpd    $0x0f , %%ymm3 , %%ymm2 , %%ymm7 \n\t" // [a16,a17,a36,a37]
+	          "\n\t"
+	          "vmovapd  %%ymm12,  0*8(%[a2]) \n\t"
+	          "vmovapd  %%ymm13,  4*8(%[a2]) \n\t"
+	          "vmovapd  %%ymm14,  8*8(%[a2]) \n\t"
+	          "vmovapd  %%ymm15, 12*8(%[a2]) \n\t"
 	          "\n\t"
 	          "vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm12\n\t" // [a04,a05,a14,a15]
 	          "vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm13\n\t" // [a24,a25,a34,a35]
@@ -127,7 +230,7 @@ void myblas_dgemm_copy_t_MxK(size_t K, size_t M, const double* A, size_t k1, siz
 	        :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(A2)
 	        :[lda2]"r"(lda2),[lda3]"r"(lda3),[K]"r"(KK));
 
-	      }
+
 	      A2 = A2 - MM*K + 4*4*2; 
 	    }
 	    if( M & 2 ){
@@ -448,8 +551,7 @@ void myblas_dgemm_copy_t_NxK(size_t K, size_t M, const double* A, size_t k1, siz
 	    //COPY_T_M6(4,2);
 	    if( MQ ){
 	      size_t m6 = MQ;
-	      while( m6-- ){
-	        //COPY_T(6,4,2,A2);
+	      m6--;
 	        __asm__ __volatile__ (
 	          "vmovupd  0*8(%[a0]          ), %%ymm0 \n\t" // [a00,a10,a20,a30]
 	          "vmovupd  0*8(%[a1]          ), %%ymm1 \n\t" // [a01,a11,a21,a31]
@@ -465,55 +567,219 @@ void myblas_dgemm_copy_t_NxK(size_t K, size_t M, const double* A, size_t k1, siz
 	          "vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm11\n\t" // [a20,a21,a30,a31]
 	          "vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm12\n\t" // [a40,a41,a50,a51]
 	          "\n\t"
-	          "vmovupd  %%ymm10,  0*8(%[a2]) \n\t"
-	          "vmovupd  %%ymm11,  4*8(%[a2]) \n\t"
-	          "vmovupd  %%ymm12,  8*8(%[a2]) \n\t"
-	          "\n\t"
+	          //"vmovupd  %%ymm10,  0*8(%[a2]) \n\t"
+	          //"vmovupd  %%ymm11,  4*8(%[a2]) \n\t"
+	          //"vmovupd  %%ymm12,  8*8(%[a2]) \n\t"
+	          //"\n\t"
 	          "vmovupd  0*8(%[a0],%[lda2]  ), %%ymm0 \n\t" // [a02,a12,a22,a32]
 	          "vmovupd  0*8(%[a1],%[lda2]  ), %%ymm1 \n\t" // [a03,a13,a23,a33]
 	          "vmovupd  4*8(%[a0],%[lda2]  ), %%xmm2 \n\t" // [a42,a52,---,---]
 	          "vmovupd  4*8(%[a1],%[lda2]  ), %%xmm3 \n\t" // [a43,a53,---,---]
 	          "\n\t"
+	          //"vshufpd    $0x00 , %%ymm1 , %%ymm0 , %%ymm4 \n\t" // [a02,a03,a22,a23]
+	          //"vshufpd    $0x0f , %%ymm1 , %%ymm0 , %%ymm5 \n\t" // [a12,a13,a32,a33]
+	          //"vshufpd    $0x00 , %%ymm3 , %%ymm2 , %%ymm6 \n\t" // [a42,a43,---,---]
+	          //"vshufpd    $0x0f , %%ymm3 , %%ymm2 , %%ymm7 \n\t" // [a52,a53,---,---]
+	          //"\n\t"
+	          //"vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm13\n\t" // [a02,a03,a12,a13]
+	          //"vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm14\n\t" // [a22,a23,a32,a33]
+	          //"vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm15\n\t" // [a42,a43,a52,a53]
+	          //"\n\t"
+	          //"vmovupd  %%ymm13, 12*8(%[a2]) \n\t"
+	          //"vmovupd  %%ymm14, 16*8(%[a2]) \n\t"
+	          //"vmovupd  %%ymm15, 20*8(%[a2]) \n\t"
+	          //"\n\t"
+	          //"vmovupd  0*8(%[a0],%[lda2],2), %%ymm0 \n\t" // [a04,a14,a24,a34]
+	          //"vmovupd  0*8(%[a1],%[lda2],2), %%ymm1 \n\t" // [a05,a15,a25,a35]
+	          //"vmovupd  4*8(%[a0],%[lda2],2), %%xmm2 \n\t" // [a44,a54,---,---]
+	          //"vmovupd  4*8(%[a1],%[lda2],2), %%xmm3 \n\t" // [a45,a55,---,---]
+	          //"\n\t"
+	          //"vshufpd    $0x00 , %%ymm1 , %%ymm0 , %%ymm4 \n\t" // [a04,a05,a24,a25]
+	          //"vshufpd    $0x0f , %%ymm1 , %%ymm0 , %%ymm5 \n\t" // [a14,a15,a34,a35]
+	          //"vshufpd    $0x00 , %%ymm3 , %%ymm2 , %%ymm6 \n\t" // [a44,a45,---,---]
+	          //"vshufpd    $0x0f , %%ymm3 , %%ymm2 , %%ymm7 \n\t" // [a54,a55,---,---]
+	          //"\n\t"
+	          //"vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm10\n\t" // [a04,a05,a14,a15]
+	          //"vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm11\n\t" // [a24,a25,a34,a35]
+	          //"vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm12\n\t" // [a44,a45,a54,a55]
+	          //"\n\t"
+	          //"vmovupd  %%ymm10, 24*8(%[a2]) \n\t"
+	          //"vmovupd  %%ymm11, 28*8(%[a2]) \n\t"
+	          //"vmovupd  %%ymm12, 32*8(%[a2]) \n\t"
+	          //"\n\t"
+	          //"vmovupd  0*8(%[a0],%[lda3],2), %%ymm0 \n\t" // [a06,a16,a26,a36]
+	          //"vmovupd  0*8(%[a1],%[lda3],2), %%ymm1 \n\t" // [a07,a17,a27,a37]
+	          //"vmovupd  4*8(%[a0],%[lda3],2), %%xmm2 \n\t" // [a46,a56,---,---]
+	          //"vmovupd  4*8(%[a1],%[lda3],2), %%xmm3 \n\t" // [a47,a57,---,---]
+	          //"\n\t"
+	          //"vshufpd    $0x00 , %%ymm1 , %%ymm0 , %%ymm4 \n\t" // [a06,a07,a26,a27]
+	          //"vshufpd    $0x0f , %%ymm1 , %%ymm0 , %%ymm5 \n\t" // [a16,a17,a36,a37]
+	          //"vshufpd    $0x00 , %%ymm3 , %%ymm2 , %%ymm6 \n\t" // [a46,a47,---,---]
+	          //"vshufpd    $0x0f , %%ymm3 , %%ymm2 , %%ymm7 \n\t" // [a56,a57,---,---]
+	          //"\n\t"
+	          //"vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm13\n\t" // [a06,a07,a16,a17]
+	          //"vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm14\n\t" // [a26,a27,a36,a37]
+	          //"vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm15\n\t" // [a46,a47,a56,a57]
+	          //"\n\t"
+	          //"vmovupd  %%ymm13, 36*8(%[a2]) \n\t"
+	          //"vmovupd  %%ymm14, 40*8(%[a2]) \n\t"
+	          //"vmovupd  %%ymm15, 44*8(%[a2]) \n\t"
+	          //"\n\t"
+	          //"addq  $6*8, %[a0]\n\t"
+	          //"addq  $6*8, %[a1]\n\t"
+	          //"leaq  0*8(%[a2],%[K3],2), %[a2]\n\t"
+	          //"\n\t"
+	        :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(A2)
+	        :[lda2]"r"(lda2),[lda3]"r"(lda3),[K3]"r"(K3));
+
+
+	      while( m6-- ){
+	        //COPY_T(6,4,2,A2);
+	        __asm__ __volatile__ (
 	          "vshufpd    $0x00 , %%ymm1 , %%ymm0 , %%ymm4 \n\t" // [a02,a03,a22,a23]
 	          "vshufpd    $0x0f , %%ymm1 , %%ymm0 , %%ymm5 \n\t" // [a12,a13,a32,a33]
 	          "vshufpd    $0x00 , %%ymm3 , %%ymm2 , %%ymm6 \n\t" // [a42,a43,---,---]
 	          "vshufpd    $0x0f , %%ymm3 , %%ymm2 , %%ymm7 \n\t" // [a52,a53,---,---]
-	          "\n\t"
-	          "vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm13\n\t" // [a02,a03,a12,a13]
-	          "vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm14\n\t" // [a22,a23,a32,a33]
-	          "vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm15\n\t" // [a42,a43,a52,a53]
-	          "\n\t"
-	          "vmovupd  %%ymm13, 12*8(%[a2]) \n\t"
-	          "vmovupd  %%ymm14, 16*8(%[a2]) \n\t"
-	          "vmovupd  %%ymm15, 20*8(%[a2]) \n\t"
 	          "\n\t"
 	          "vmovupd  0*8(%[a0],%[lda2],2), %%ymm0 \n\t" // [a04,a14,a24,a34]
 	          "vmovupd  0*8(%[a1],%[lda2],2), %%ymm1 \n\t" // [a05,a15,a25,a35]
 	          "vmovupd  4*8(%[a0],%[lda2],2), %%xmm2 \n\t" // [a44,a54,---,---]
 	          "vmovupd  4*8(%[a1],%[lda2],2), %%xmm3 \n\t" // [a45,a55,---,---]
 	          "\n\t"
+	          "vmovupd  %%ymm10,  0*8(%[a2]) \n\t"
+	          "vmovupd  %%ymm11,  4*8(%[a2]) \n\t"
+	          "vmovupd  %%ymm12,  8*8(%[a2]) \n\t"
+	          "\n\t"
+	          "vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm13\n\t" // [a02,a03,a12,a13]
+	          "vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm14\n\t" // [a22,a23,a32,a33]
+	          "vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm15\n\t" // [a42,a43,a52,a53]
+	          "\n\t"
 	          "vshufpd    $0x00 , %%ymm1 , %%ymm0 , %%ymm4 \n\t" // [a04,a05,a24,a25]
 	          "vshufpd    $0x0f , %%ymm1 , %%ymm0 , %%ymm5 \n\t" // [a14,a15,a34,a35]
 	          "vshufpd    $0x00 , %%ymm3 , %%ymm2 , %%ymm6 \n\t" // [a44,a45,---,---]
 	          "vshufpd    $0x0f , %%ymm3 , %%ymm2 , %%ymm7 \n\t" // [a54,a55,---,---]
-	          "\n\t"
-	          "vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm10\n\t" // [a04,a05,a14,a15]
-	          "vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm11\n\t" // [a24,a25,a34,a35]
-	          "vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm12\n\t" // [a44,a45,a54,a55]
-	          "\n\t"
-	          "vmovupd  %%ymm10, 24*8(%[a2]) \n\t"
-	          "vmovupd  %%ymm11, 28*8(%[a2]) \n\t"
-	          "vmovupd  %%ymm12, 32*8(%[a2]) \n\t"
 	          "\n\t"
 	          "vmovupd  0*8(%[a0],%[lda3],2), %%ymm0 \n\t" // [a06,a16,a26,a36]
 	          "vmovupd  0*8(%[a1],%[lda3],2), %%ymm1 \n\t" // [a07,a17,a27,a37]
 	          "vmovupd  4*8(%[a0],%[lda3],2), %%xmm2 \n\t" // [a46,a56,---,---]
 	          "vmovupd  4*8(%[a1],%[lda3],2), %%xmm3 \n\t" // [a47,a57,---,---]
 	          "\n\t"
+	          "vmovupd  %%ymm13, 12*8(%[a2]) \n\t"
+	          "vmovupd  %%ymm14, 16*8(%[a2]) \n\t"
+	          "vmovupd  %%ymm15, 20*8(%[a2]) \n\t"
+	          "\n\t"
+	          "vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm10\n\t" // [a04,a05,a14,a15]
+	          "vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm11\n\t" // [a24,a25,a34,a35]
+	          "vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm12\n\t" // [a44,a45,a54,a55]
+	          "\n\t"
 	          "vshufpd    $0x00 , %%ymm1 , %%ymm0 , %%ymm4 \n\t" // [a06,a07,a26,a27]
 	          "vshufpd    $0x0f , %%ymm1 , %%ymm0 , %%ymm5 \n\t" // [a16,a17,a36,a37]
 	          "vshufpd    $0x00 , %%ymm3 , %%ymm2 , %%ymm6 \n\t" // [a46,a47,---,---]
 	          "vshufpd    $0x0f , %%ymm3 , %%ymm2 , %%ymm7 \n\t" // [a56,a57,---,---]
+	          "\n\t"
+	          "vmovupd  6*8(%[a0]          ), %%ymm0 \n\t" // [a00,a10,a20,a30]
+	          "vmovupd  6*8(%[a1]          ), %%ymm1 \n\t" // [a01,a11,a21,a31]
+	          "vmovupd 10*8(%[a0]          ), %%xmm2 \n\t" // [a40,a50,---,---]
+	          "vmovupd 10*8(%[a1]          ), %%xmm3 \n\t" // [a41,a51,---,---]
+	          "\n\t"
+	          "vmovupd  %%ymm10, 24*8(%[a2]) \n\t"
+	          "vmovupd  %%ymm11, 28*8(%[a2]) \n\t"
+	          "vmovupd  %%ymm12, 32*8(%[a2]) \n\t"
+	          "\n\t"
+	          "vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm13\n\t" // [a06,a07,a16,a17]
+	          "vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm14\n\t" // [a26,a27,a36,a37]
+	          "vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm15\n\t" // [a46,a47,a56,a57]
+	          "\n\t"
+	          "vshufpd    $0x00 , %%ymm1 , %%ymm0 , %%ymm4 \n\t" // [a00,a01,a20,a21]
+	          "vshufpd    $0x0f , %%ymm1 , %%ymm0 , %%ymm5 \n\t" // [a10,a11,a30,a31]
+	          "vshufpd    $0x00 , %%ymm3 , %%ymm2 , %%ymm6 \n\t" // [a40,a41,---,---]
+	          "vshufpd    $0x0f , %%ymm3 , %%ymm2 , %%ymm7 \n\t" // [a50,a51,---,---]
+	          "\n\t"
+	          "vmovupd  6*8(%[a0],%[lda2]  ), %%ymm0 \n\t" // [a02,a12,a22,a32]
+	          "vmovupd  6*8(%[a1],%[lda2]  ), %%ymm1 \n\t" // [a03,a13,a23,a33]
+	          "vmovupd 10*8(%[a0],%[lda2]  ), %%xmm2 \n\t" // [a42,a52,---,---]
+	          "vmovupd 10*8(%[a1],%[lda2]  ), %%xmm3 \n\t" // [a43,a53,---,---]
+	          "\n\t"
+	          "vmovupd  %%ymm13, 36*8(%[a2]) \n\t"
+	          "vmovupd  %%ymm14, 40*8(%[a2]) \n\t"
+	          "vmovupd  %%ymm15, 44*8(%[a2]) \n\t"
+	          "\n\t"
+	          "vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm10\n\t" // [a00,a01,a10,a11]
+	          "vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm11\n\t" // [a20,a21,a30,a31]
+	          "vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm12\n\t" // [a40,a41,a50,a51]
+	          "\n\t"
+	          "addq  $6*8, %[a0]\n\t"
+	          "addq  $6*8, %[a1]\n\t"
+	          "leaq  0*8(%[a2],%[K3],2), %[a2]\n\t"
+	          "\n\t"
+	        :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(A2)
+	        :[lda2]"r"(lda2),[lda3]"r"(lda3),[K3]"r"(K3));
+
+	      }
+	        __asm__ __volatile__ (
+	          //"vmovupd  0*8(%[a0]          ), %%ymm0 \n\t" // [a00,a10,a20,a30]
+	          //"vmovupd  0*8(%[a1]          ), %%ymm1 \n\t" // [a01,a11,a21,a31]
+	          //"vmovupd  4*8(%[a0]          ), %%xmm2 \n\t" // [a40,a50,---,---]
+	          //"vmovupd  4*8(%[a1]          ), %%xmm3 \n\t" // [a41,a51,---,---]
+	          //"\n\t"
+	          //"vshufpd    $0x00 , %%ymm1 , %%ymm0 , %%ymm4 \n\t" // [a00,a01,a20,a21]
+	          //"vshufpd    $0x0f , %%ymm1 , %%ymm0 , %%ymm5 \n\t" // [a10,a11,a30,a31]
+	          //"vshufpd    $0x00 , %%ymm3 , %%ymm2 , %%ymm6 \n\t" // [a40,a41,---,---]
+	          //"vshufpd    $0x0f , %%ymm3 , %%ymm2 , %%ymm7 \n\t" // [a50,a51,---,---]
+	          //"\n\t"
+	          //"vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm10\n\t" // [a00,a01,a10,a11]
+	          //"vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm11\n\t" // [a20,a21,a30,a31]
+	          //"vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm12\n\t" // [a40,a41,a50,a51]
+	          //"\n\t"
+	          //"vmovupd  0*8(%[a0],%[lda2]  ), %%ymm0 \n\t" // [a02,a12,a22,a32]
+	          //"vmovupd  0*8(%[a1],%[lda2]  ), %%ymm1 \n\t" // [a03,a13,a23,a33]
+	          //"vmovupd  4*8(%[a0],%[lda2]  ), %%xmm2 \n\t" // [a42,a52,---,---]
+	          //"vmovupd  4*8(%[a1],%[lda2]  ), %%xmm3 \n\t" // [a43,a53,---,---]
+	          //"\n\t"
+	          "vshufpd    $0x00 , %%ymm1 , %%ymm0 , %%ymm4 \n\t" // [a02,a03,a22,a23]
+	          "vshufpd    $0x0f , %%ymm1 , %%ymm0 , %%ymm5 \n\t" // [a12,a13,a32,a33]
+	          "vshufpd    $0x00 , %%ymm3 , %%ymm2 , %%ymm6 \n\t" // [a42,a43,---,---]
+	          "vshufpd    $0x0f , %%ymm3 , %%ymm2 , %%ymm7 \n\t" // [a52,a53,---,---]
+	          "\n\t"
+	          "vmovupd  0*8(%[a0],%[lda2],2), %%ymm0 \n\t" // [a04,a14,a24,a34]
+	          "vmovupd  0*8(%[a1],%[lda2],2), %%ymm1 \n\t" // [a05,a15,a25,a35]
+	          "vmovupd  4*8(%[a0],%[lda2],2), %%xmm2 \n\t" // [a44,a54,---,---]
+	          "vmovupd  4*8(%[a1],%[lda2],2), %%xmm3 \n\t" // [a45,a55,---,---]
+	          "\n\t"
+	          "vmovupd  %%ymm10,  0*8(%[a2]) \n\t"
+	          "vmovupd  %%ymm11,  4*8(%[a2]) \n\t"
+	          "vmovupd  %%ymm12,  8*8(%[a2]) \n\t"
+	          "\n\t"
+	          "vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm13\n\t" // [a02,a03,a12,a13]
+	          "vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm14\n\t" // [a22,a23,a32,a33]
+	          "vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm15\n\t" // [a42,a43,a52,a53]
+	          "\n\t"
+	          "vshufpd    $0x00 , %%ymm1 , %%ymm0 , %%ymm4 \n\t" // [a04,a05,a24,a25]
+	          "vshufpd    $0x0f , %%ymm1 , %%ymm0 , %%ymm5 \n\t" // [a14,a15,a34,a35]
+	          "vshufpd    $0x00 , %%ymm3 , %%ymm2 , %%ymm6 \n\t" // [a44,a45,---,---]
+	          "vshufpd    $0x0f , %%ymm3 , %%ymm2 , %%ymm7 \n\t" // [a54,a55,---,---]
+	          "\n\t"
+	          "vmovupd  0*8(%[a0],%[lda3],2), %%ymm0 \n\t" // [a06,a16,a26,a36]
+	          "vmovupd  0*8(%[a1],%[lda3],2), %%ymm1 \n\t" // [a07,a17,a27,a37]
+	          "vmovupd  4*8(%[a0],%[lda3],2), %%xmm2 \n\t" // [a46,a56,---,---]
+	          "vmovupd  4*8(%[a1],%[lda3],2), %%xmm3 \n\t" // [a47,a57,---,---]
+	          "\n\t"
+	          "vmovupd  %%ymm13, 12*8(%[a2]) \n\t"
+	          "vmovupd  %%ymm14, 16*8(%[a2]) \n\t"
+	          "vmovupd  %%ymm15, 20*8(%[a2]) \n\t"
+	          "\n\t"
+	          "vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm10\n\t" // [a04,a05,a14,a15]
+	          "vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm11\n\t" // [a24,a25,a34,a35]
+	          "vperm2f128 $0x20 , %%ymm7 , %%ymm6 , %%ymm12\n\t" // [a44,a45,a54,a55]
+	          "\n\t"
+	          "vshufpd    $0x00 , %%ymm1 , %%ymm0 , %%ymm4 \n\t" // [a06,a07,a26,a27]
+	          "vshufpd    $0x0f , %%ymm1 , %%ymm0 , %%ymm5 \n\t" // [a16,a17,a36,a37]
+	          "vshufpd    $0x00 , %%ymm3 , %%ymm2 , %%ymm6 \n\t" // [a46,a47,---,---]
+	          "vshufpd    $0x0f , %%ymm3 , %%ymm2 , %%ymm7 \n\t" // [a56,a57,---,---]
+	          "\n\t"
+	          "vmovupd  %%ymm10, 24*8(%[a2]) \n\t"
+	          "vmovupd  %%ymm11, 28*8(%[a2]) \n\t"
+	          "vmovupd  %%ymm12, 32*8(%[a2]) \n\t"
 	          "\n\t"
 	          "vperm2f128 $0x20 , %%ymm5 , %%ymm4 , %%ymm13\n\t" // [a06,a07,a16,a17]
 	          "vperm2f128 $0x31 , %%ymm5 , %%ymm4 , %%ymm14\n\t" // [a26,a27,a36,a37]
@@ -530,7 +796,7 @@ void myblas_dgemm_copy_t_NxK(size_t K, size_t M, const double* A, size_t k1, siz
 	        :[a0]"+r"(a0),[a1]"+r"(a1),[a2]"+r"(A2)
 	        :[lda2]"r"(lda2),[lda3]"r"(lda3),[K3]"r"(K3));
 
-	      }
+
 	      A2 = A2 - MM*K + 6*4*2; 
 	    }
 	    if( MR & 4 ){
