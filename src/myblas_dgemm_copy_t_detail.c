@@ -79,6 +79,7 @@ void myblas_dgemm_copy_t_MxK(size_t K, size_t M, const double* A, size_t k1, siz
 	      while( m4-- ){
 
 	        __asm__ __volatile__ (
+	          "\n\t"
 	          "vmovupd  0*8(%[a0]          ), %%ymm0 \n\t" // [a00,a10,a20,a30]
 	          "vmovupd  0*8(%[a1]          ), %%ymm1 \n\t" // [a01,a11,a21,a31]
 	          "vmovupd  0*8(%[a0],%[lda2]  ), %%ymm2 \n\t" // [a02,a12,a22,a32]

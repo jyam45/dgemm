@@ -59,6 +59,7 @@ void myblas_dgemm_copy_n_MxK(size_t K, size_t N, const double* B, size_t k, size
 	const double* b0 = B;
 	const double* b1 = B + ldb;
 	size_t        ldb2 = ldb * 2 * sizeof(double);
+	size_t        ldb3 = ldb * 3 * sizeof(double);
 
 	if( N >> 2 ){
 	  size_t n4 = ( N >> 2 );
@@ -69,6 +70,11 @@ void myblas_dgemm_copy_n_MxK(size_t K, size_t N, const double* B, size_t k, size
 	      while( k8-- ){
 
 	          __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[b0],%[ldb2],2) \n\t"
+	            "prefetcht0  0*8(%[b1],%[ldb2],2) \n\t"
+	            "prefetcht0  0*8(%[b0],%[ldb3],2) \n\t"
+	            "prefetcht0  0*8(%[b1],%[ldb3],2) \n\t"
 	            "\n\t"
 	            "vmovupd  0*8(%[b0]        ), %%ymm0 \n\t" // [x00,x10,x20,x30]
 	            "vmovupd  0*8(%[b1]        ), %%ymm1 \n\t" // [x01,x11,x21,x31]
@@ -102,13 +108,18 @@ void myblas_dgemm_copy_n_MxK(size_t K, size_t N, const double* B, size_t k, size
 	            "addq  $32*8, %[b2]\n\t"
 	            "\n\t"
 	          :[b0]"+r"(b0),[b1]"+r"(b1),[b2]"+r"(B2)
-	          :[ldb2]"r"(ldb2));
+	          :[ldb2]"r"(ldb2),[ldb3]"r"(ldb3));
 
 	      }
 	    }
 	    if( K & 4 ){
 
 	          __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[b0],%[ldb2],2) \n\t"
+	            "prefetcht0  0*8(%[b1],%[ldb2],2) \n\t"
+	            "prefetcht0  0*8(%[b0],%[ldb3],2) \n\t"
+	            "prefetcht0  0*8(%[b1],%[ldb3],2) \n\t"
 	            "\n\t"
 	            "vmovupd  0*8(%[b0]        ), %%ymm0 \n\t" // [x00,x10,x20,x30]
 	            "vmovupd  0*8(%[b1]        ), %%ymm1 \n\t" // [x01,x11,x21,x31]
@@ -130,7 +141,7 @@ void myblas_dgemm_copy_n_MxK(size_t K, size_t N, const double* B, size_t k, size
 	            "addq  $16*8, %[b2]\n\t"
 	            "\n\t"
 	          :[b0]"+r"(b0),[b1]"+r"(b1),[b2]"+r"(B2)
-	          :[ldb2]"r"(ldb2));
+	          :[ldb2]"r"(ldb2),[ldb3]"r"(ldb3));
 
 	    }
 	    if( K & 2 ){
@@ -364,7 +375,8 @@ void myblas_dgemm_copy_n_NxK(size_t K, size_t N, const double* B, size_t k, size
 	const double* b0 = B;
 	const double* b1 = B + ldb;
 	size_t        ldb2 = ldb * 2 * sizeof(double);
-	size_t        ldb4 = ldb * 4 * sizeof(double);
+	size_t        ldb3 = ldb * 3 * sizeof(double);
+	size_t        ldb5 = ldb * 5 * sizeof(double);
 
 	if( NQ ){
 	  size_t n6 = NQ;
@@ -376,12 +388,19 @@ void myblas_dgemm_copy_n_NxK(size_t K, size_t N, const double* B, size_t k, size
 
 	          __asm__ __volatile__ (
 	            "\n\t"
-	            "vmovupd  0*8(%[b0]        ), %%ymm0 \n\t" // [x00,x10,x20,x30]
-	            "vmovupd  0*8(%[b1]        ), %%ymm1 \n\t" // [x01,x11,x21,x31]
-	            "vmovupd  0*8(%[b0],%[ldb2]), %%ymm2 \n\t" // [x02,x12,x22,x32]
-	            "vmovupd  0*8(%[b1],%[ldb2]), %%ymm3 \n\t" // [x03,x13,x23,x33]
-	            "vmovupd  0*8(%[b0],%[ldb4]), %%ymm4 \n\t" // [x04,x14,x24,x34]
-	            "vmovupd  0*8(%[b1],%[ldb4]), %%ymm5 \n\t" // [x05,x15,x25,x35]
+	            "prefetcht0  0*8(%[b0],%[ldb3],2) \n\t"
+	            "prefetcht0  0*8(%[b1],%[ldb3],2) \n\t"
+	            "prefetcht0  0*8(%[b0],%[ldb2],4) \n\t"
+	            "prefetcht0  0*8(%[b1],%[ldb2],4) \n\t"
+	            "prefetcht0  0*8(%[b0],%[ldb5],2) \n\t"
+	            "prefetcht0  0*8(%[b1],%[ldb5],2) \n\t"
+	            "\n\t"
+	            "vmovupd  0*8(%[b0]          ), %%ymm0 \n\t" // [x00,x10,x20,x30]
+	            "vmovupd  0*8(%[b1]          ), %%ymm1 \n\t" // [x01,x11,x21,x31]
+	            "vmovupd  0*8(%[b0],%[ldb2]  ), %%ymm2 \n\t" // [x02,x12,x22,x32]
+	            "vmovupd  0*8(%[b1],%[ldb2]  ), %%ymm3 \n\t" // [x03,x13,x23,x33]
+	            "vmovupd  0*8(%[b0],%[ldb2],2), %%ymm4 \n\t" // [x04,x14,x24,x34]
+	            "vmovupd  0*8(%[b1],%[ldb2],2), %%ymm5 \n\t" // [x05,x15,x25,x35]
 	            "\n\t"
 	            "vperm2f128  $0x20, %%ymm1 , %%ymm0 , %%ymm10\n\t" // [x00,x10,x01,x11]
 	            "vperm2f128  $0x20, %%ymm3 , %%ymm2 , %%ymm11\n\t" // [x02,x12,x03,x13]
@@ -397,12 +416,12 @@ void myblas_dgemm_copy_n_NxK(size_t K, size_t N, const double* B, size_t k, size
 	            "vmovupd  %%ymm14,  16*8(%[b2])\n\t"
 	            "vmovupd  %%ymm15,  20*8(%[b2])\n\t"
 	            "\n\t"
-	            "vmovupd  4*8(%[b0]        ), %%ymm0 \n\t" // [x40,x50,x60,x70]
-	            "vmovupd  4*8(%[b1]        ), %%ymm1 \n\t" // [x41,x51,x61,x71]
-	            "vmovupd  4*8(%[b0],%[ldb2]), %%ymm2 \n\t" // [x42,x52,x62,x72]
-	            "vmovupd  4*8(%[b1],%[ldb2]), %%ymm3 \n\t" // [x43,x53,x63,x73]
-	            "vmovupd  4*8(%[b0],%[ldb4]), %%ymm4 \n\t" // [x44,x54,x64,x74]
-	            "vmovupd  4*8(%[b1],%[ldb4]), %%ymm5 \n\t" // [x45,x55,x65,x75]
+	            "vmovupd  4*8(%[b0]          ), %%ymm0 \n\t" // [x40,x50,x60,x70]
+	            "vmovupd  4*8(%[b1]          ), %%ymm1 \n\t" // [x41,x51,x61,x71]
+	            "vmovupd  4*8(%[b0],%[ldb2]  ), %%ymm2 \n\t" // [x42,x52,x62,x72]
+	            "vmovupd  4*8(%[b1],%[ldb2]  ), %%ymm3 \n\t" // [x43,x53,x63,x73]
+	            "vmovupd  4*8(%[b0],%[ldb2],2), %%ymm4 \n\t" // [x44,x54,x64,x74]
+	            "vmovupd  4*8(%[b1],%[ldb2],2), %%ymm5 \n\t" // [x45,x55,x65,x75]
 	            "\n\t"
 	            "vperm2f128  $0x20, %%ymm1 , %%ymm0 , %%ymm10\n\t" // [x40,x50,x41,x51]
 	            "vperm2f128  $0x20, %%ymm3 , %%ymm2 , %%ymm11\n\t" // [x42,x52,x43,x53]
@@ -423,7 +442,7 @@ void myblas_dgemm_copy_n_NxK(size_t K, size_t N, const double* B, size_t k, size
 	            "addq  $48*8, %[b2]\n\t"
 	            "\n\t"
 	          :[b0]"+r"(b0),[b1]"+r"(b1),[b2]"+r"(B2)
-	          :[ldb2]"r"(ldb2),[ldb4]"r"(ldb4));
+	          :[ldb2]"r"(ldb2),[ldb3]"r"(ldb3),[ldb5]"r"(ldb5));
 
 	      }
 	    }
@@ -431,12 +450,19 @@ void myblas_dgemm_copy_n_NxK(size_t K, size_t N, const double* B, size_t k, size
 
 	          __asm__ __volatile__ (
 	            "\n\t"
-	            "vmovupd  0*8(%[b0]        ), %%ymm0 \n\t" // [x00,x10,x20,x30]
-	            "vmovupd  0*8(%[b1]        ), %%ymm1 \n\t" // [x01,x11,x21,x31]
-	            "vmovupd  0*8(%[b0],%[ldb2]), %%ymm2 \n\t" // [x02,x12,x22,x32]
-	            "vmovupd  0*8(%[b1],%[ldb2]), %%ymm3 \n\t" // [x03,x13,x23,x33]
-	            "vmovupd  0*8(%[b0],%[ldb4]), %%ymm4 \n\t" // [x04,x14,x24,x34]
-	            "vmovupd  0*8(%[b1],%[ldb4]), %%ymm5 \n\t" // [x05,x15,x25,x35]
+	            "prefetcht0  0*8(%[b0],%[ldb3],2) \n\t"
+	            "prefetcht0  0*8(%[b1],%[ldb3],2) \n\t"
+	            "prefetcht0  0*8(%[b0],%[ldb2],4) \n\t"
+	            "prefetcht0  0*8(%[b1],%[ldb2],4) \n\t"
+	            "prefetcht0  0*8(%[b0],%[ldb5],2) \n\t"
+	            "prefetcht0  0*8(%[b1],%[ldb5],2) \n\t"
+	            "\n\t"
+	            "vmovupd  0*8(%[b0]          ), %%ymm0 \n\t" // [x00,x10,x20,x30]
+	            "vmovupd  0*8(%[b1]          ), %%ymm1 \n\t" // [x01,x11,x21,x31]
+	            "vmovupd  0*8(%[b0],%[ldb2]  ), %%ymm2 \n\t" // [x02,x12,x22,x32]
+	            "vmovupd  0*8(%[b1],%[ldb2]  ), %%ymm3 \n\t" // [x03,x13,x23,x33]
+	            "vmovupd  0*8(%[b0],%[ldb2],2), %%ymm4 \n\t" // [x04,x14,x24,x34]
+	            "vmovupd  0*8(%[b1],%[ldb2],2), %%ymm5 \n\t" // [x05,x15,x25,x35]
 	            "\n\t"
 	            "vperm2f128  $0x20, %%ymm1 , %%ymm0 , %%ymm10\n\t" // [x00,x10,x01,x11]
 	            "vperm2f128  $0x20, %%ymm3 , %%ymm2 , %%ymm11\n\t" // [x02,x12,x03,x13]
@@ -457,19 +483,19 @@ void myblas_dgemm_copy_n_NxK(size_t K, size_t N, const double* B, size_t k, size
 	            "addq  $24*8, %[b2]\n\t"
 	            "\n\t"
 	          :[b0]"+r"(b0),[b1]"+r"(b1),[b2]"+r"(B2)
-	          :[ldb2]"r"(ldb2),[ldb4]"r"(ldb4));
+	          :[ldb2]"r"(ldb2),[ldb3]"r"(ldb3),[ldb5]"r"(ldb5));
 
 	    }
 	    if( K & 2 ){
 
 	          __asm__ __volatile__ (
 	            "\n\t"
-	            "vmovupd  0*8(%[b0]        ), %%xmm0 \n\t" // [x00,x10,---,---]
-	            "vmovupd  0*8(%[b1]        ), %%xmm1 \n\t" // [x01,x11,---,---]
-	            "vmovupd  0*8(%[b0],%[ldb2]), %%xmm2 \n\t" // [x02,x12,---,---]
-	            "vmovupd  0*8(%[b1],%[ldb2]), %%xmm3 \n\t" // [x03,x13,---,---]
-	            "vmovupd  0*8(%[b0],%[ldb4]), %%xmm4 \n\t" // [x04,x14,---,---]
-	            "vmovupd  0*8(%[b1],%[ldb4]), %%xmm5 \n\t" // [x05,x15,---,---]
+	            "vmovupd  0*8(%[b0]          ), %%xmm0 \n\t" // [x00,x10,---,---]
+	            "vmovupd  0*8(%[b1]          ), %%xmm1 \n\t" // [x01,x11,---,---]
+	            "vmovupd  0*8(%[b0],%[ldb2]  ), %%xmm2 \n\t" // [x02,x12,---,---]
+	            "vmovupd  0*8(%[b1],%[ldb2]  ), %%xmm3 \n\t" // [x03,x13,---,---]
+	            "vmovupd  0*8(%[b0],%[ldb2],2), %%xmm4 \n\t" // [x04,x14,---,---]
+	            "vmovupd  0*8(%[b1],%[ldb2],2), %%xmm5 \n\t" // [x05,x15,---,---]
 	            "\n\t"
 	            "vperm2f128  $0x20, %%ymm1 , %%ymm0 , %%ymm10\n\t" // [x00,x10,x01,x11]
 	            "vperm2f128  $0x20, %%ymm3 , %%ymm2 , %%ymm11\n\t" // [x02,x12,x03,x13]
@@ -484,19 +510,19 @@ void myblas_dgemm_copy_n_NxK(size_t K, size_t N, const double* B, size_t k, size
 	            "addq  $12*8, %[b2]\n\t"
 	            "\n\t"
 	          :[b0]"+r"(b0),[b1]"+r"(b1),[b2]"+r"(B2)
-	          :[ldb2]"r"(ldb2),[ldb4]"r"(ldb4));
+	          :[ldb2]"r"(ldb2),[ldb3]"r"(ldb3),[ldb5]"r"(ldb5));
 
 	    }
 	    if( K & 1 ){
 
 	          __asm__ __volatile__ (
 	            "\n\t"
-	            "movlpd  0*8(%[b0]        ), %%xmm0 \n\t" // [x00,  0,  0,  0]
-	            "movhpd  0*8(%[b1]        ), %%xmm0 \n\t" // [x00,x01,  0,  0]
-	            "movlpd  0*8(%[b0],%[ldb2]), %%xmm2 \n\t" // [x02,  0,  0,  0]
-	            "movhpd  0*8(%[b1],%[ldb2]), %%xmm2 \n\t" // [x02,x03,  0,  0]
-	            "movlpd  0*8(%[b0],%[ldb4]), %%xmm4 \n\t" // [x04,  0,  0,  0]
-	            "movhpd  0*8(%[b1],%[ldb4]), %%xmm4 \n\t" // [x04,x05,  0,  0]
+	            "movlpd  0*8(%[b0]          ), %%xmm0 \n\t" // [x00,  0,  0,  0]
+	            "movhpd  0*8(%[b1]          ), %%xmm0 \n\t" // [x00,x01,  0,  0]
+	            "movlpd  0*8(%[b0],%[ldb2]  ), %%xmm2 \n\t" // [x02,  0,  0,  0]
+	            "movhpd  0*8(%[b1],%[ldb2]  ), %%xmm2 \n\t" // [x02,x03,  0,  0]
+	            "movlpd  0*8(%[b0],%[ldb2],2), %%xmm4 \n\t" // [x04,  0,  0,  0]
+	            "movhpd  0*8(%[b1],%[ldb2],2), %%xmm4 \n\t" // [x04,x05,  0,  0]
 	            "\n\t"
 	            "vmovupd  %%xmm0 ,   0*8(%[b2])\n\t"
 	            "vmovupd  %%xmm2 ,   2*8(%[b2])\n\t"
@@ -507,7 +533,7 @@ void myblas_dgemm_copy_n_NxK(size_t K, size_t N, const double* B, size_t k, size
 	            "addq  $6*8 , %[b2]\n\t"
 	            "\n\t"
 	          :[b0]"+r"(b0),[b1]"+r"(b1),[b2]"+r"(B2)
-	          :[ldb2]"r"(ldb2),[ldb4]"r"(ldb4));
+	          :[ldb2]"r"(ldb2),[ldb3]"r"(ldb3),[ldb5]"r"(ldb5));
 
 	    }
 	    b0 = b0 - K + 6*ldb ;
