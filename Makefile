@@ -2,9 +2,13 @@ CC=gcc
 FCC=gfortran
 
 CFLAGS=-O3 -mavx2 --std=c11 -fopenmp -I./include/ -I./src/ -I./test/
-LDFLAGS=-L./lib/ #-L/usr/local/Cellar/openblas/0.3.10_1/lib/
+LDFLAGS=-L./lib/
+#LDFLAGS=-L./lib/ -L/usr/local/Cellar/openblas/0.3.10_1/lib/
+#LDFLAGS=-L./lib/ -L/usr/local/Cellar/atlas/lib/
 LIBS=-lcpuid -ltimer
 CBLASLIBS= -lcblas -lblas
+#CBLASLIBS= -lcblas -lopenblas
+#CBLASLIBS=  -lcblas_atlas -latlas
 
 
 MYBLAS_COPY_OBJS=src/myblas_dgemm_copy_n.o src/myblas_dgemm_copy_t.o src/myblas_dgemm_copy_n_detail.o src/myblas_dgemm_copy_t_detail.o

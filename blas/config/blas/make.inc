@@ -16,7 +16,7 @@ PLAT = _MACOSX
 #  desired load options for your machine.
 #
 FORTRAN  = gfortran
-OPTS     = -O3
+OPTS     = -O3 -mavx2
 DRVOPTS  = $(OPTS)
 NOOPT    =
 LOADER   = gfortran
