@@ -225,6 +225,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm0 , %%ymm2 , %%ymm14\n\t" // [c61,c61,c71,c71]
 	                "vfmadd231pd  %%ymm0 , %%ymm3 , %%ymm15\n\t" // [c62,c62,c72,c72]
 	                "\n\t"
+	                "prefetcht0   208*8(%[a])\n\t"
+	                "prefetcht0    40*8(%[b])\n\t"
+	                "\n\t"
 	                "vbroadcastf128   6*8(%[b]), %%ymm1 \n\t" // [b20,b30,b20,b30]
 	                "vbroadcastf128   8*8(%[b]), %%ymm2 \n\t" // [b21,b31,b21,b31]
 	                "vbroadcastf128  10*8(%[b]), %%ymm3 \n\t" // [b22,b32,b22,b32]
@@ -253,6 +256,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm0 , %%ymm2 , %%ymm14\n\t" // [c61,c61,c71,c71]
 	                "vfmadd231pd  %%ymm0 , %%ymm3 , %%ymm15\n\t" // [c62,c62,c72,c72]
 	                "\n\t"
+	                "prefetcht0   224*8(%[a])\n\t"
+	                "prefetcht0    56*8(%[b])\n\t"
+	                "\n\t"
 	                "vbroadcastf128  12*8(%[b]), %%ymm1 \n\t" // [b40,b50,b40,b50]
 	                "vbroadcastf128  14*8(%[b]), %%ymm2 \n\t" // [b41,b51,b41,b51]
 	                "vbroadcastf128  16*8(%[b]), %%ymm3 \n\t" // [b42,b52,b42,b52]
@@ -280,6 +286,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm0 , %%ymm1 , %%ymm13\n\t" // [c60,c60,c70,c70]
 	                "vfmadd231pd  %%ymm0 , %%ymm2 , %%ymm14\n\t" // [c61,c61,c71,c71]
 	                "vfmadd231pd  %%ymm0 , %%ymm3 , %%ymm15\n\t" // [c62,c62,c72,c72]
+	                "\n\t"
+	                "prefetcht0   240*8(%[a])\n\t"
+	                "prefetcht0    72*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128  18*8(%[b]), %%ymm1 \n\t" // [b60,b70,b60,b70]
 	                "vbroadcastf128  20*8(%[b]), %%ymm2 \n\t" // [b61,b71,b61,b71]
@@ -354,6 +363,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm0 , %%ymm1 , %%ymm13\n\t" // [c60,c60,c70,c70]
 	                "vfmadd231pd  %%ymm0 , %%ymm2 , %%ymm14\n\t" // [c61,c61,c71,c71]
 	                "vfmadd231pd  %%ymm0 , %%ymm3 , %%ymm15\n\t" // [c62,c62,c72,c72]
+	                "\n\t"
+	                "prefetcht0    48*8(%[a])\n\t"
+	                "prefetcht0    28*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   6*8(%[b]), %%ymm1 \n\t" // [b20,b30,b20,b30]
 	                "vbroadcastf128   8*8(%[b]), %%ymm2 \n\t" // [b21,b31,b21,b31]
@@ -638,6 +650,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm4 , %%ymm2 , %%ymm14\n\t" // [c21,c21,c31,c31]
 	                "vfmadd231pd  %%ymm4 , %%ymm3 , %%ymm15\n\t" // [c22,c22,c32,c32]
 	                "\n\t"
+	                "prefetcht0   112*8(%[a])\n\t"
+	                "prefetcht0    40*8(%[b])\n\t"
+	                "\n\t"
 	                "vbroadcastf128   6*8(%[b]), %%ymm6 \n\t" // [b20,b30,b20,b30]
 	                "vbroadcastf128   8*8(%[b]), %%ymm7 \n\t" // [b21,b31,b21,b31]
 	                "vbroadcastf128  10*8(%[b]), %%ymm8 \n\t" // [b22,b32,b22,b32]
@@ -652,6 +667,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm9 , %%ymm7 , %%ymm14\n\t" // [c21,c21,c31,c31]
 	                "vfmadd231pd  %%ymm9 , %%ymm8 , %%ymm15\n\t" // [c22,c22,c32,c32]
 	                "\n\t"
+	                "prefetcht0   128*8(%[a])\n\t"
+	                "prefetcht0    56*8(%[b])\n\t"
+	                "\n\t"
 	                "vbroadcastf128  12*8(%[b]), %%ymm1 \n\t" // [b40,b50,b40,b50]
 	                "vbroadcastf128  14*8(%[b]), %%ymm2 \n\t" // [b41,b51,b41,b51]
 	                "vbroadcastf128  16*8(%[b]), %%ymm3 \n\t" // [b42,b52,b42,b52]
@@ -665,6 +683,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm4 , %%ymm1 , %%ymm13\n\t" // [c20,c20,c30,c30]
 	                "vfmadd231pd  %%ymm4 , %%ymm2 , %%ymm14\n\t" // [c21,c21,c31,c31]
 	                "vfmadd231pd  %%ymm4 , %%ymm3 , %%ymm15\n\t" // [c22,c22,c32,c32]
+	                "\n\t"
+	                "prefetcht0   144*8(%[a])\n\t"
+	                "prefetcht0    72*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128  18*8(%[b]), %%ymm6 \n\t" // [b60,b70,b60,b70]
 	                "vbroadcastf128  20*8(%[b]), %%ymm7 \n\t" // [b61,b71,b61,b71]
@@ -711,6 +732,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm4 , %%ymm1 , %%ymm13\n\t" // [c20,c20,c30,c30]
 	                "vfmadd231pd  %%ymm4 , %%ymm2 , %%ymm14\n\t" // [c21,c21,c31,c31]
 	                "vfmadd231pd  %%ymm4 , %%ymm3 , %%ymm15\n\t" // [c22,c22,c32,c32]
+	                "\n\t"
+	                "prefetcht0    32*8(%[a])\n\t"
+	                "prefetcht0    28*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   6*8(%[b]), %%ymm6 \n\t" // [b20,b30,b20,b30]
 	                "vbroadcastf128   8*8(%[b]), %%ymm7 \n\t" // [b21,b31,b21,b31]
@@ -905,6 +929,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm4 , %%ymm5 , %%ymm13\n\t" // [c00,c00,c10,c10]
 	                "vfmadd231pd  %%ymm4 , %%ymm6 , %%ymm14\n\t" // [c01,c01,c11,c11]
 	                "vfmadd231pd  %%ymm4 , %%ymm7 , %%ymm15\n\t" // [c02,c02,c12,c12]
+	                "\n\t"
+	                "prefetcht0    64*8(%[a])\n\t"
+	                "prefetcht0    40*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128  12*8(%[b]), %%ymm1 \n\t" // [b40,b50,b40,b50]
 	                "vbroadcastf128  14*8(%[b]), %%ymm2 \n\t" // [b41,b51,b41,b51]
@@ -1119,6 +1146,8 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%xmm4 , %%xmm6 , %%xmm14\n\t" // [c01,c01,  0,  0]
 	                "vfmadd231pd  %%xmm4 , %%xmm7 , %%xmm15\n\t" // [c02,c02,  0,  0]
 	                "\n\t"
+	                "prefetcht0    40*8(%[b])\n\t"
+	                "\n\t"
 	                "vmovupd  12*8(%[b]), %%xmm1 \n\t" // [b40,b50,  0,  0]
 	                "vmovupd  14*8(%[b]), %%xmm2 \n\t" // [b41,b51,  0,  0]
 	                "vmovupd  16*8(%[b]), %%xmm3 \n\t" // [b42,b52,  0,  0]
@@ -1321,6 +1350,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm3 , %%ymm4 , %%ymm14\n\t" // [c60,c60,c70,c70]
 	                "vfmadd231pd  %%ymm3 , %%ymm5 , %%ymm15\n\t" // [c61,c61,c71,c71]
 	                "\n\t"
+	                "prefetcht0   208*8(%[a])\n\t"
+	                "prefetcht0    32*8(%[b])\n\t"
+	                "\n\t"
 	                "vbroadcastf128   4*8(%[b]), %%ymm6 \n\t" // [b20,b30,b20,b30]
 	                "vbroadcastf128   6*8(%[b]), %%ymm7 \n\t" // [b21,b31,b21,b31]
 	                "\n\t"
@@ -1338,6 +1370,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm3 , %%ymm6 , %%ymm14\n\t" // [c60,c60,c70,c70]
 	                "vfmadd231pd  %%ymm3 , %%ymm7 , %%ymm15\n\t" // [c61,c61,c71,c71]
 	                "\n\t"
+	                "prefetcht0   224*8(%[a])\n\t"
+	                "prefetcht0    48*8(%[b])\n\t"
+	                "\n\t"
 	                "vbroadcastf128   8*8(%[b]), %%ymm4 \n\t" // [b40,b50,b40,b50]
 	                "vbroadcastf128  10*8(%[b]), %%ymm5 \n\t" // [b41,b51,b41,b51]
 	                "\n\t"
@@ -1354,6 +1389,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm2 , %%ymm5 , %%ymm13\n\t" // [c41,c41,c51,c51]
 	                "vfmadd231pd  %%ymm3 , %%ymm4 , %%ymm14\n\t" // [c60,c60,c70,c70]
 	                "vfmadd231pd  %%ymm3 , %%ymm5 , %%ymm15\n\t" // [c61,c61,c71,c71]
+	                "\n\t"
+	                "prefetcht0   240*8(%[a])\n\t"
+	                "prefetcht0    64*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128  12*8(%[b]), %%ymm6 \n\t" // [b60,b70,b60,b70]
 	                "vbroadcastf128  14*8(%[b]), %%ymm7 \n\t" // [b61,b71,b61,b71]
@@ -1406,6 +1444,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm2 , %%ymm5 , %%ymm13\n\t" // [c41,c41,c51,c51]
 	                "vfmadd231pd  %%ymm3 , %%ymm4 , %%ymm14\n\t" // [c60,c60,c70,c70]
 	                "vfmadd231pd  %%ymm3 , %%ymm5 , %%ymm15\n\t" // [c61,c61,c71,c71]
+	                "\n\t"
+	                "prefetcht0    48*8(%[a])\n\t"
+	                "prefetcht0    24*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   4*8(%[b]), %%ymm6 \n\t" // [b20,b30,b20,b30]
 	                "vbroadcastf128   6*8(%[b]), %%ymm7 \n\t" // [b21,b31,b21,b31]
@@ -1599,6 +1640,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm1 , %%ymm4 , %%ymm14\n\t" // [c20,c20,c30,c30]
 	                "vfmadd231pd  %%ymm1 , %%ymm5 , %%ymm15\n\t" // [c21,c21,c31,c31]
 	                "\n\t"
+	                "prefetcht0   112*8(%[a])\n\t"
+	                "prefetcht0    32*8(%[b])\n\t"
+	                "\n\t"
 	                "vbroadcastf128   4*8(%[b]), %%ymm6 \n\t" // [b20,b30,b20,b30]
 	                "vbroadcastf128   6*8(%[b]), %%ymm7 \n\t" // [b21,b31,b21,b31]
 	                "\n\t"
@@ -1610,6 +1654,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm3 , %%ymm6 , %%ymm14\n\t" // [c20,c20,c30,c30]
 	                "vfmadd231pd  %%ymm3 , %%ymm7 , %%ymm15\n\t" // [c21,c21,c31,c31]
 	                "\n\t"
+	                "prefetcht0   128*8(%[a])\n\t"
+	                "prefetcht0    48*8(%[b])\n\t"
+	                "\n\t"
 	                "vbroadcastf128   8*8(%[b]), %%ymm4 \n\t" // [b40,b50,b40,b50]
 	                "vbroadcastf128  10*8(%[b]), %%ymm5 \n\t" // [b41,b51,b41,b51]
 	                "\n\t"
@@ -1620,6 +1667,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm0 , %%ymm5 , %%ymm13\n\t" // [c01,c01,c11,c11]
 	                "vfmadd231pd  %%ymm1 , %%ymm4 , %%ymm14\n\t" // [c20,c20,c30,c30]
 	                "vfmadd231pd  %%ymm1 , %%ymm5 , %%ymm15\n\t" // [c21,c21,c31,c31]
+	                "\n\t"
+	                "prefetcht0   144*8(%[a])\n\t"
+	                "prefetcht0    64*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128  12*8(%[b]), %%ymm6 \n\t" // [b60,b70,b60,b70]
 	                "vbroadcastf128  14*8(%[b]), %%ymm7 \n\t" // [b61,b71,b61,b71]
@@ -1660,6 +1710,8 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm0 , %%ymm5 , %%ymm13\n\t" // [c01,c01,c11,c11]
 	                "vfmadd231pd  %%ymm1 , %%ymm4 , %%ymm14\n\t" // [c20,c20,c30,c30]
 	                "vfmadd231pd  %%ymm1 , %%ymm5 , %%ymm15\n\t" // [c21,c21,c31,c31]
+	                "\n\t"
+	                "prefetcht0    64*8(%[a])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   4*8(%[b]), %%ymm6 \n\t" // [b20,b30,b20,b30]
 	                "vbroadcastf128   6*8(%[b]), %%ymm7 \n\t" // [b21,b31,b21,b31]
@@ -2192,6 +2244,8 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm2 , %%ymm4 , %%ymm14\n\t" // [c40,c40,c50,c50]
 	                "vfmadd231pd  %%ymm3 , %%ymm4 , %%ymm15\n\t" // [c60,c60,c70,c70]
 	                "\n\t"
+	                "prefetcht0   208*8(%[a])\n\t"
+	                "\n\t"
 	                "vmovapd  16*8(%[a]), %%ymm0 \n\t" // [a20,a30,a21,a31]
 	                "vmovapd  20*8(%[a]), %%ymm1 \n\t" // [a22,a32,a23,a33]
 	                "vmovapd  24*8(%[a]), %%ymm2 \n\t" // [a24,a34,a25,a35]
@@ -2202,6 +2256,8 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm2 , %%ymm5 , %%ymm14\n\t" // [c40,c40,c50,c50]
 	                "vfmadd231pd  %%ymm3 , %%ymm5 , %%ymm15\n\t" // [c60,c60,c70,c70]
 	                "\n\t"
+	                "prefetcht0   224*8(%[a])\n\t"
+	                "\n\t"
 	                "vmovapd  32*8(%[a]), %%ymm0 \n\t" // [a40,a50,a41,a51]
 	                "vmovapd  36*8(%[a]), %%ymm1 \n\t" // [a42,a52,a43,a53]
 	                "vmovapd  40*8(%[a]), %%ymm2 \n\t" // [a44,a54,a45,a55]
@@ -2211,6 +2267,8 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm1 , %%ymm6 , %%ymm13\n\t" // [c20,c20,c30,c30]
 	                "vfmadd231pd  %%ymm2 , %%ymm6 , %%ymm14\n\t" // [c40,c40,c50,c50]
 	                "vfmadd231pd  %%ymm3 , %%ymm6 , %%ymm15\n\t" // [c60,c60,c70,c70]
+	                "\n\t"
+	                "prefetcht0   240*8(%[a])\n\t"
 	                "\n\t"
 	                "vmovapd  48*8(%[a]), %%ymm0 \n\t" // [a60,a70,a61,a71]
 	                "vmovapd  52*8(%[a]), %%ymm1 \n\t" // [a62,a72,a63,a73]
@@ -2251,6 +2309,8 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd  %%ymm1 , %%ymm4 , %%ymm13\n\t" // [c20,c20,c30,c30]
 	                "vfmadd231pd  %%ymm2 , %%ymm4 , %%ymm14\n\t" // [c40,c40,c50,c50]
 	                "vfmadd231pd  %%ymm3 , %%ymm4 , %%ymm15\n\t" // [c60,c60,c70,c70]
+	                "\n\t"
+	                "prefetcht0    48*8(%[a])\n\t"
 	                "\n\t"
 	                "vmovapd  16*8(%[a]), %%ymm0 \n\t" // [a20,a30,a21,a31]
 	                "vmovapd  20*8(%[a]), %%ymm1 \n\t" // [a22,a32,a23,a33]
@@ -2399,6 +2459,8 @@ void myblas_dgemm_kernel_detail(
 	                "vbroadcastf128   2*8(%[b]), %%ymm9 \n\t" // [b20,b30,b20,b30]
 	                "vbroadcastf128   4*8(%[b]), %%ymm10\n\t" // [b40,b50,b40,b50]
 	                "vbroadcastf128   6*8(%[b]), %%ymm11\n\t" // [b60,b70,b60,b70]
+	                "\n\t"
+	                "prefetcht0   112*8(%[a])\n\t"
 	                "\n\t"
 	                "vmovapd   0*8(%[a]), %%ymm0 \n\t" // [a00,a10,a01,a11]
 	                "vmovapd   4*8(%[a]), %%ymm1 \n\t" // [a02,a12,a03,a13]
