@@ -605,11 +605,24 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0 0*8(%[c0]          )\n\t"
+	            "prefetcht0 0*8(%[c0],%[ldc1]  )\n\t"
+	            "prefetcht0 0*8(%[c0],%[ldc1],2)\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0)
+	            :[ldc1]"r"(ldc1)
+	        );
+
 	        if( K >> 3 ){
 	          size_t k8 = ( K >> 3 ); // Unrolling K
 	          while( k8-- ){
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0    96*8(%[a])\n\t"
+	                "prefetcht0    24*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   0*8(%[b]), %%ymm1 \n\t" // [b00,b10,b00,b10]
 	                "vbroadcastf128   2*8(%[b]), %%ymm2 \n\t" // [b01,b11,b01,b11]
@@ -681,6 +694,9 @@ void myblas_dgemm_kernel_detail(
 	        //  while( k4-- ){
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0    16*8(%[a])\n\t"
+	                "prefetcht0    12*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   0*8(%[b]), %%ymm1 \n\t" // [b00,b10,b00,b10]
 	                "vbroadcastf128   2*8(%[b]), %%ymm2 \n\t" // [b01,b11,b01,b11]
@@ -854,11 +870,24 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0 0*8(%[c0]          )\n\t"
+	            "prefetcht0 0*8(%[c0],%[ldc1]  )\n\t"
+	            "prefetcht0 0*8(%[c0],%[ldc1],2)\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0)
+	            :[ldc1]"r"(ldc1)
+	        );
+
 	        if( K >> 3 ){
 	          size_t k8 = ( K >> 3 ); // Unrolling K
 	          while( k8-- ){
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0    48*8(%[a])\n\t"
+	                "prefetcht0    24*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   0*8(%[b]), %%ymm1 \n\t" // [b00,b10,b00,b10]
 	                "vbroadcastf128   2*8(%[b]), %%ymm2 \n\t" // [b01,b11,b01,b11]
@@ -908,6 +937,8 @@ void myblas_dgemm_kernel_detail(
 	        //  while( k4-- ){
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0    12*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   0*8(%[b]), %%ymm1 \n\t" // [b00,b10,b00,b10]
 	                "vbroadcastf128   2*8(%[b]), %%ymm2 \n\t" // [b01,b11,b01,b11]
@@ -1053,11 +1084,23 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0 0*8(%[c0]          )\n\t"
+	            "prefetcht0 0*8(%[c0],%[ldc1]  )\n\t"
+	            "prefetcht0 0*8(%[c0],%[ldc1],2)\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0)
+	            :[ldc1]"r"(ldc1)
+	        );
+
 	        if( K >> 3 ){
 	          size_t k8 = ( K >> 3 ); // Unrolling K
 	          while( k8-- ){
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0    24*8(%[b])\n\t"
 	                "\n\t"
 	                "vmovupd   0*8(%[b]), %%xmm1 \n\t" // [b00,b10,  0,  0]
 	                "vmovupd   2*8(%[b]), %%xmm2 \n\t" // [b01,b11,  0,  0]
@@ -1107,6 +1150,8 @@ void myblas_dgemm_kernel_detail(
 	        //  while( k4-- ){
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0    12*8(%[b])\n\t"
 	                "\n\t"
 	                "vmovupd   0*8(%[b]), %%xmm1 \n\t" // [b00,b10,  0,  0]
 	                "vmovupd   2*8(%[b]), %%xmm2 \n\t" // [b01,b11,  0,  0]
@@ -1238,11 +1283,26 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0 0*8(%[c0]          )\n\t"
+	            "prefetcht0 4*8(%[c0]          )\n\t"
+	            "prefetcht0 0*8(%[c0],%[ldc1]  )\n\t"
+	            "prefetcht0 4*8(%[c0],%[ldc1]  )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0)
+	            :[ldc1]"r"(ldc1)
+	        );
+
+
 	        if( K >> 3 ){
 	          size_t k8 = ( K >> 3 ); // Unrolling K
 	          while( k8-- ){
 	            //
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0   192*8(%[a])\n\t"
+	                "prefetcht0    16*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   0*8(%[b]), %%ymm4 \n\t" // [b00,b10,b00,b10]
 	                "vbroadcastf128   2*8(%[b]), %%ymm5 \n\t" // [b01,b11,b01,b11]
@@ -1326,6 +1386,9 @@ void myblas_dgemm_kernel_detail(
 	        //  while( k4-- ){
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0    32*8(%[a])\n\t"
+	                "prefetcht0     8*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   0*8(%[b]), %%ymm4 \n\t" // [b00,b10,b00,b10]
 	                "vbroadcastf128   2*8(%[b]), %%ymm5 \n\t" // [b01,b11,b01,b11]
@@ -1507,11 +1570,23 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0 0*8(%[c0]          )\n\t"
+	            "prefetcht0 0*8(%[c0],%[ldc1]  )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0)
+	            :[ldc1]"r"(ldc1)
+	        );
+
 	        if( K >> 3 ){
 	          size_t k8 = ( K >> 3 ); // Unrolling K
 	          while( k8-- ){
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0    96*8(%[a])\n\t"
+	                "prefetcht0    16*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   0*8(%[b]), %%ymm4 \n\t" // [b00,b10,b00,b10]
 	                "vbroadcastf128   2*8(%[b]), %%ymm5 \n\t" // [b01,b11,b01,b11]
@@ -1572,6 +1647,8 @@ void myblas_dgemm_kernel_detail(
 	        //  while( k4-- ){
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0    48*8(%[a])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   0*8(%[b]), %%ymm4 \n\t" // [b00,b10,b00,b10]
 	                "vbroadcastf128   2*8(%[b]), %%ymm5 \n\t" // [b01,b11,b01,b11]
@@ -1724,11 +1801,24 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0 0*8(%[c0]          )\n\t"
+	            "prefetcht0 0*8(%[c0],%[ldc1]  )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0)
+	            :[ldc1]"r"(ldc1)
+	        );
+
+
 	        if( K >> 3 ){
 	          size_t k8 = ( K >> 3 ); // Unrolling K
 	          while( k8-- ){
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0    48*8(%[a])\n\t"
+	                "prefetcht0    16*8(%[b])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   0*8(%[b]), %%ymm4 \n\t" // [b00,b10,b00,b10]
 	                "vbroadcastf128   2*8(%[b]), %%ymm5 \n\t" // [b01,b11,b01,b11]
@@ -1893,11 +1983,22 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0 0*8(%[c0]          )\n\t"
+	            "prefetcht0 0*8(%[c0],%[ldc1]  )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0)
+	            :[ldc1]"r"(ldc1)
+	        );
+
 	        if( K >> 3 ){
 	          size_t k8 = ( K >> 3 ); // Unrolling K
 	          while( k8-- ){
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0    16*8(%[b])\n\t"
 	                "\n\t"
 	                "vmovupd   0*8(%[b]), %%xmm4 \n\t" // [b00,b10,  0,  0]
 	                "vmovupd   2*8(%[b]), %%xmm5 \n\t" // [b01,b11,  0,  0]
@@ -2058,11 +2159,23 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0 0*8(%[c0]          )\n\t"
+	            "prefetcht0 4*8(%[c0]          )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0)
+	            :[ldc1]"r"(ldc1)
+	        );
+
+
 	        if( K >> 3 ){
 	          size_t k8 = ( K >> 3 ); // Unrolling K
 	          while( k8-- ){
 	            //
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0   192*8(%[a])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   0*8(%[b]), %%ymm4 \n\t" // [b00,b10,b00,b10]
 	                "vbroadcastf128   2*8(%[b]), %%ymm5 \n\t" // [b20,b30,b20,b30]
@@ -2123,6 +2236,8 @@ void myblas_dgemm_kernel_detail(
 	        //  while( k4-- ){
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0    32*8(%[a])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   0*8(%[b]), %%ymm4 \n\t" // [b00,b10,b00,b10]
 	                "vbroadcastf128   2*8(%[b]), %%ymm5 \n\t" // [b20,b30,b20,b30]
@@ -2263,11 +2378,22 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0 0*8(%[c0]          )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0)
+	            :[ldc1]"r"(ldc1)
+	        );
+
+
 	        if( K >> 3 ){
 	          size_t k8 = ( K >> 3 ); // Unrolling K
 	          while( k8-- ){
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0    96*8(%[a])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   0*8(%[b]), %%ymm8 \n\t" // [b00,b10,b00,b10]
 	                "vbroadcastf128   2*8(%[b]), %%ymm9 \n\t" // [b20,b30,b20,b30]
@@ -2306,6 +2432,8 @@ void myblas_dgemm_kernel_detail(
 	        //  while( k4-- ){
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0    16*8(%[a])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   0*8(%[b]), %%ymm8 \n\t" // [b00,b10,b00,b10]
 	                "vbroadcastf128   2*8(%[b]), %%ymm9 \n\t" // [b20,b30,b20,b30]
@@ -2428,11 +2556,22 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0 0*8(%[c0]          )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0)
+	            :[ldc1]"r"(ldc1)
+	        );
+
+
 	        if( K >> 3 ){
 	          size_t k8 = ( K >> 3 ); // Unrolling K
 	          while( k8-- ){
 
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                "prefetcht0    48*8(%[a])\n\t"
 	                "\n\t"
 	                "vbroadcastf128   0*8(%[b]), %%ymm8 \n\t" // [b00,b10,b00,b10]
 	                "vbroadcastf128   2*8(%[b]), %%ymm9 \n\t" // [b20,b30,b20,b30]
@@ -2573,6 +2712,14 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm14, %%ymm14, %%ymm14\n\t"
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
+
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0 0*8(%[c0]          )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0)
+	            :[ldc1]"r"(ldc1)
+	        );
 
 	        if( K >> 3 ){
 	          size_t k8 = ( K >> 3 ); // Unrolling K
