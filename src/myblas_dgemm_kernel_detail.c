@@ -57,6 +57,25 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[c0]          )\n\t"
+	            "prefetcht0  4*8(%[c0]          )\n\t"
+	            "prefetcht0  0*8(%[c1]          )\n\t"
+	            "prefetcht0  4*8(%[c1]          )\n\t"
+	            "prefetcht0  0*8(%[c0],%[ldc2]  )\n\t"
+	            "prefetcht0  4*8(%[c0],%[ldc2]  )\n\t"
+	            "prefetcht0  0*8(%[c1],%[ldc2]  )\n\t"
+	            "prefetcht0  4*8(%[c1],%[ldc2]  )\n\t"
+	            "prefetcht0  0*8(%[c0],%[ldc2],2)\n\t"
+	            "prefetcht0  4*8(%[c0],%[ldc2],2)\n\t"
+	            "prefetcht0  0*8(%[c1],%[ldc2],2)\n\t"
+	            "prefetcht0  4*8(%[c1],%[ldc2],2)\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0),[c1]"+r"(c1)
+	            :[ldc2]"r"(ldc2)
+	        );
+
 	        if( K >> 2 ){
 	          size_t k = ( K >> 2 );
 	          while( k-- ){
@@ -364,6 +383,19 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[c0]          )\n\t"
+	            "prefetcht0  0*8(%[c1]          )\n\t"
+	            "prefetcht0  0*8(%[c0],%[ldc2]  )\n\t"
+	            "prefetcht0  0*8(%[c1],%[ldc2]  )\n\t"
+	            "prefetcht0  0*8(%[c0],%[ldc2],2)\n\t"
+	            "prefetcht0  0*8(%[c1],%[ldc2],2)\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0),[c1]"+r"(c1)
+	            :[ldc2]"r"(ldc2)
+	        );
+
 	        if( K >> 2 ){
 	          size_t k = ( K >> 2 );
 	          while( k-- ){
@@ -568,6 +600,19 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[c0]          )\n\t"
+	            "prefetcht0  0*8(%[c1]          )\n\t"
+	            "prefetcht0  0*8(%[c0],%[ldc2]  )\n\t"
+	            "prefetcht0  0*8(%[c1],%[ldc2]  )\n\t"
+	            "prefetcht0  0*8(%[c0],%[ldc2],2)\n\t"
+	            "prefetcht0  0*8(%[c1],%[ldc2],2)\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0),[c1]"+r"(c1)
+	            :[ldc2]"r"(ldc2)
+	        );
+
 	        if( K >> 2 ){
 	          size_t k = ( K >> 2 );
 	          while( k-- ){
@@ -768,6 +813,19 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[c0]          )\n\t"
+	            "prefetcht0  0*8(%[c1]          )\n\t"
+	            "prefetcht0  0*8(%[c0],%[ldc2]  )\n\t"
+	            "prefetcht0  0*8(%[c1],%[ldc2]  )\n\t"
+	            "prefetcht0  0*8(%[c0],%[ldc2],2)\n\t"
+	            "prefetcht0  0*8(%[c1],%[ldc2],2)\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0),[c1]"+r"(c1)
+	            :[ldc2]"r"(ldc2)
+	        );
+
 	        if( K >> 2 ){
 	          size_t k = ( K >> 2 );
 	          while( k-- ){
@@ -935,6 +993,22 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm14, %%ymm14, %%ymm14\n\t"
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
+
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[c0]          )\n\t"
+	            "prefetcht0  4*8(%[c0]          )\n\t"
+	            "prefetcht0  0*8(%[c1]          )\n\t"
+	            "prefetcht0  4*8(%[c1]          )\n\t"
+	            "prefetcht0  0*8(%[c0],%[ldc2]  )\n\t"
+	            "prefetcht0  4*8(%[c0],%[ldc2]  )\n\t"
+	            "prefetcht0  0*8(%[c1],%[ldc2]  )\n\t"
+	            "prefetcht0  4*8(%[c1],%[ldc2]  )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0),[c1]"+r"(c1)
+	            :[ldc2]"r"(ldc2)
+	        );
+
 
 	        if( K >> 2 ){
 	          size_t k = ( K >> 2 );
@@ -1146,6 +1220,18 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[c0]          )\n\t"
+	            "prefetcht0  0*8(%[c1]          )\n\t"
+	            "prefetcht0  0*8(%[c0],%[ldc2]  )\n\t"
+	            "prefetcht0  0*8(%[c1],%[ldc2]  )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0),[c1]"+r"(c1)
+	            :[ldc2]"r"(ldc2)
+	        );
+
+
 	        if( K >> 2 ){
 	          size_t k = ( K >> 2 );
 	          while( k-- ){
@@ -1311,6 +1397,18 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[c0]          )\n\t"
+	            "prefetcht0  0*8(%[c1]          )\n\t"
+	            "prefetcht0  0*8(%[c0],%[ldc2]  )\n\t"
+	            "prefetcht0  0*8(%[c1],%[ldc2]  )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0),[c1]"+r"(c1)
+	            :[ldc2]"r"(ldc2)
+	        );
+
+
 	        if( K >> 2 ){
 	          size_t k = ( K >> 2 );
 	          while( k-- ){
@@ -1472,6 +1570,17 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[c0]          )\n\t"
+	            "prefetcht0  0*8(%[c1]          )\n\t"
+	            "prefetcht0  0*8(%[c0],%[ldc2]  )\n\t"
+	            "prefetcht0  0*8(%[c1],%[ldc2]  )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0),[c1]"+r"(c1)
+	            :[ldc2]"r"(ldc2)
+	        );
+
 	        if( K >> 2 ){
 	          size_t k = ( K >> 2 );
 	          while( k-- ){
@@ -1619,6 +1728,17 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm14, %%ymm14, %%ymm14\n\t"
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
+
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[c0]          )\n\t"
+	            "prefetcht0  4*8(%[c0]          )\n\t"
+	            "prefetcht0  0*8(%[c1]          )\n\t"
+	            "prefetcht0  4*8(%[c1]          )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0),[c1]"+r"(c1)
+	        :);
+
 
 	        if( K >> 2 ){
 	          size_t k = ( K >> 2 );
@@ -1773,6 +1893,15 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[c0]          )\n\t"
+	            "prefetcht0  0*8(%[c1]          )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0),[c1]"+r"(c1)
+	        :);
+
+
 	        if( K >> 2 ){
 	          size_t k = ( K >> 2 );
 	          while( k-- ){
@@ -1898,6 +2027,14 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm14, %%ymm14, %%ymm14\n\t"
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[c0]          )\n\t"
+	            "prefetcht0  0*8(%[c1]          )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0),[c1]"+r"(c1)
+	        :);
+
 
 	        if( K >> 2 ){
 	          size_t k = ( K >> 2 );
@@ -2020,6 +2157,14 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm14, %%ymm14, %%ymm14\n\t"
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[c0]          )\n\t"
+	            "prefetcht0  0*8(%[c1]          )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0),[c1]"+r"(c1)
+	        :);
+
 
 	        if( K >> 2 ){
 	          size_t k = ( K >> 2 );
@@ -2149,6 +2294,15 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
 
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[c0]          )\n\t"
+	            "prefetcht0  4*8(%[c0]          )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0)
+	        :);
+
+
 	        if( K >> 2 ){
 	          size_t k = ( K >> 2 );
 	          while( k-- ){
@@ -2269,6 +2423,13 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm14, %%ymm14, %%ymm14\n\t"
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[c0]          )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0)
+	        :);
+
 
 	        if( K >> 2 ){
 	          size_t k = ( K >> 2 );
@@ -2372,6 +2533,13 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm14, %%ymm14, %%ymm14\n\t"
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[c0]          )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0)
+	        :);
+
 
 	        if( K >> 2 ){
 	          size_t k = ( K >> 2 );
@@ -2478,6 +2646,13 @@ void myblas_dgemm_kernel_detail(
 	            "vpxor  %%ymm14, %%ymm14, %%ymm14\n\t"
 	            "vpxor  %%ymm15, %%ymm15, %%ymm15\n\t"
 	        ::);
+	        __asm__ __volatile__ (
+	            "\n\t"
+	            "prefetcht0  0*8(%[c0]          )\n\t"
+	            "\n\t"
+	            :[c0]"+r"(c0)
+	        :);
+
 
 	        if( K >> 2 ){
 	          size_t k = ( K >> 2 );
