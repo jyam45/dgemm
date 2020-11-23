@@ -118,6 +118,9 @@ void myblas_dgemm_kernel_detail(
 	           // 
 	            __asm__ __volatile__ (
 	                "\n\t" // k=0
+	                "prefetcht0    96*8(%[a])\n\t"
+	                "prefetcht0    24*8(%[b])\n\t"
+	                "\n\t"
 	                "vmovapd              0*8(%[a]), %%ymm0 \n\t" // [a0k,a1k,a2k,a3k]
 	                "vmovapd              4*8(%[a]), %%ymm1 \n\t" // [a4k,a5k,a6k,a7k]
 	                "vbroadcastf128       0*8(%[b]), %%ymm3 \n\t" // [b0k,b1k,b0k,b1k]
@@ -142,6 +145,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd   %%ymm0 , %%ymm3 , %%ymm14\n\t" // [c05,c15,c25,c35]
 	                "vfmadd231pd   %%ymm1 , %%ymm3 , %%ymm15\n\t" // [c45,c55,c65,c75]
 	                "\n\t" // k=1
+	                "prefetcht0   104*8(%[a])\n\t"
+	                "prefetcht0    32*8(%[b])\n\t"
+	                "\n\t"
 	                "vmovapd              8*8(%[a]), %%ymm0 \n\t" // [a0k,a1k,a2k,a3k]
 	                "vmovapd             12*8(%[a]), %%ymm1 \n\t" // [a4k,a5k,a6k,a7k]
 	                "vbroadcastf128       6*8(%[b]), %%ymm3 \n\t" // [b0k,b1k,b0k,b1k]
@@ -166,6 +172,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd   %%ymm0 , %%ymm3 , %%ymm14\n\t" // [c05,c15,c25,c35]
 	                "vfmadd231pd   %%ymm1 , %%ymm3 , %%ymm15\n\t" // [c45,c55,c65,c75]
 	                "\n\t" // k=2
+	                "prefetcht0   112*8(%[a])\n\t"
+	                "prefetcht0    40*8(%[b])\n\t"
+	                "\n\t"
 	                "vmovapd             16*8(%[a]), %%ymm0 \n\t" // [a0k,a1k,a2k,a3k]
 	                "vmovapd             20*8(%[a]), %%ymm1 \n\t" // [a4k,a5k,a6k,a7k]
 	                "vbroadcastf128      12*8(%[b]), %%ymm3 \n\t" // [b0k,b1k,b0k,b1k]
@@ -190,6 +199,9 @@ void myblas_dgemm_kernel_detail(
 	                "vfmadd231pd   %%ymm0 , %%ymm3 , %%ymm14\n\t" // [c05,c15,c25,c35]
 	                "vfmadd231pd   %%ymm1 , %%ymm3 , %%ymm15\n\t" // [c45,c55,c65,c75]
 	                "\n\t" // k=3
+	                "prefetcht0   120*8(%[a])\n\t"
+	                "prefetcht0    48*8(%[b])\n\t"
+	                "\n\t"
 	                "vmovapd             24*8(%[a]), %%ymm0 \n\t" // [a0k,a1k,a2k,a3k]
 	                "vmovapd             28*8(%[a]), %%ymm1 \n\t" // [a4k,a5k,a6k,a7k]
 	                "vbroadcastf128      18*8(%[b]), %%ymm3 \n\t" // [b0k,b1k,b0k,b1k]
