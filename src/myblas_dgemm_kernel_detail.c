@@ -637,8 +637,29 @@ void myblas_dgemm_kernel_detail(
 	            // 2x6x4x2  LD+PM/FMA = 8/12 = 0.66
 	            __asm__ __volatile__ (
 	                "\n\t"
-	                //"prefetcht0   8*8(%[a])\n\t"
-	                //"prefetcht0  24*8(%[b])\n\t"
+	                //"vmovapd   0*8(%[a]), %%ymm0 \n\t" // [a00,a10,a01,a11]
+	                //"vmovupd   0*8(%[b]), %%ymm4 \n\t" // [b00,b10,b01,b11]
+	                //"vmovupd   4*8(%[b]), %%ymm5 \n\t" // [b02,b12,b03,b13]
+	                //"vperm2f128 $0x01 , %%ymm0 , %%ymm0 , %%ymm1 \n\t" // [a01,a11,a00,a10]
+	                //"vfmadd231pd  %%ymm0 , %%ymm4 , %%ymm10\n\t" // [c00,c00,c11,c11]
+	                //"vfmadd231pd  %%ymm1 , %%ymm4 , %%ymm11\n\t" // [c10,c10,c01,c01]
+	                //"vmovupd   8*8(%[b]), %%ymm6 \n\t" // [b04,b14,b05,b15]
+	                //"vfmadd231pd  %%ymm0 , %%ymm5 , %%ymm12\n\t" // [c02,c02,c13,c13]
+	                //"vfmadd231pd  %%ymm1 , %%ymm5 , %%ymm13\n\t" // [c12,c12,c03,c03]
+	                //"vmovupd   4*8(%[a]), %%ymm2 \n\t" // [a20,a30,a21,a31]
+	                //"vfmadd231pd  %%ymm0 , %%ymm6 , %%ymm14\n\t" // [c04,c04,c15,c15]
+	                //"vfmadd231pd  %%ymm1 , %%ymm6 , %%ymm15\n\t" // [c14,c14,c05,c05]
+	                //"\n\t"
+	                //"vmovupd  12*8(%[b]), %%ymm7 \n\t" // [b20,b30,b21,b31]
+	                //"vmovupd  16*8(%[b]), %%ymm8 \n\t" // [b22,b32,b23,b33]
+	                //"vperm2f128 $0x01 , %%ymm2 , %%ymm2 , %%ymm3 \n\t" // [a21,a31,a20,a30]
+	                //"vmovupd  20*8(%[b]), %%ymm9 \n\t" // [b24,b34,b25,b35]
+	                //"vfmadd231pd  %%ymm2 , %%ymm7 , %%ymm10\n\t" // [c00,c00,c11,c11]
+	                //"vfmadd231pd  %%ymm3 , %%ymm7 , %%ymm11\n\t" // [c10,c10,c01,c01]
+	                //"vfmadd231pd  %%ymm2 , %%ymm8 , %%ymm12\n\t" // [c02,c02,c13,c13]
+	                //"vfmadd231pd  %%ymm3 , %%ymm8 , %%ymm13\n\t" // [c12,c12,c03,c03]
+	                //"vfmadd231pd  %%ymm2 , %%ymm9 , %%ymm14\n\t" // [c04,c04,c15,c15]
+	                //"vfmadd231pd  %%ymm3 , %%ymm9 , %%ymm15\n\t" // [c14,c14,c05,c05]
 	                "\n\t"
 	                "vmovapd   0*8(%[a]), %%ymm0 \n\t" // [a00,a10,a01,a11]
 	                "vmovupd   4*8(%[a]), %%ymm2 \n\t" // [a20,a30,a21,a31]
@@ -675,6 +696,18 @@ void myblas_dgemm_kernel_detail(
 	        if( K & 2 ){
 	            
 	            __asm__ __volatile__ (
+	                "\n\t"
+	                //"vmovapd   0*8(%[a]), %%ymm0 \n\t" // [a00,a10,a01,a11]
+	                //"vmovupd   0*8(%[b]), %%ymm4 \n\t" // [b00,b10,b01,b11]
+	                //"vmovupd   4*8(%[b]), %%ymm5 \n\t" // [b02,b12,b03,b13]
+	                //"vperm2f128 $0x01 , %%ymm0 , %%ymm0 , %%ymm1 \n\t" // [a01,a11,a00,a10]
+	                //"vfmadd231pd  %%ymm0 , %%ymm4 , %%ymm10\n\t" // [c00,c00,c11,c11]
+	                //"vfmadd231pd  %%ymm1 , %%ymm4 , %%ymm11\n\t" // [c10,c10,c01,c01]
+	                //"vmovupd   8*8(%[b]), %%ymm6 \n\t" // [b04,b14,b05,b15]
+	                //"vfmadd231pd  %%ymm0 , %%ymm5 , %%ymm12\n\t" // [c02,c02,c13,c13]
+	                //"vfmadd231pd  %%ymm1 , %%ymm5 , %%ymm13\n\t" // [c12,c12,c03,c03]
+	                //"vfmadd231pd  %%ymm0 , %%ymm6 , %%ymm14\n\t" // [c04,c04,c15,c15]
+	                //"vfmadd231pd  %%ymm1 , %%ymm6 , %%ymm15\n\t" // [c14,c14,c05,c05]
 	                "\n\t"
 	                "vmovapd   0*8(%[a]), %%ymm0 \n\t" // [a00,a10,a01,a11]
 	                "vmovupd   0*8(%[b]), %%ymm4 \n\t" // [b00,b10,b01,b11]
@@ -818,49 +851,45 @@ void myblas_dgemm_kernel_detail(
 	                "\n\t"
 	                //"prefetcht0  24*8(%[a])\n\t"
 	                //"prefetcht0 144*8(%[b])\n\t"
+	                //"prefetcht0 152*8(%[b])\n\t"
+	                //"prefetcht0 160*8(%[b])\n\t"
+	                //"prefetcht0 168*8(%[b])\n\t"
+	                //"prefetcht0 176*8(%[b])\n\t"
 	                "\n\t"
 	                "vmovupd   0*8(%[a]), %%ymm0 \n\t" // [a00,a10,a20,a30]
-	                "vmovupd   0*8(%[b]), %%ymm5 \n\t" // [b00,b10,b01,b11]
-	                "vmovupd   4*8(%[b]), %%ymm7 \n\t" // [b02,b12,b03,b13]
-	                "vmovupd   8*8(%[b]), %%ymm9 \n\t" // [b04,b14,b05,b15]
-	                "vmovupd  12*8(%[b]), %%ymm1 \n\t" // [b20,b30,b21,b31]
-	                "vmovupd  16*8(%[b]), %%ymm2 \n\t" // [b22,b32,b23,b33]
-	                "vmovupd  20*8(%[b]), %%ymm3 \n\t" // [b24,b34,b25,b35]
-	                "vperm2f128 $0x20 , %%ymm1 , %%ymm5 , %%ymm4 \n\t" // [b00,b10,b20,b30]
-	                "vperm2f128 $0x31 , %%ymm1 , %%ymm5 , %%ymm5 \n\t" // [b01,b11,b21,b31]
-	                "vperm2f128 $0x20 , %%ymm2 , %%ymm7 , %%ymm6 \n\t" // [b02,b12,b22,b32]
-	                "vperm2f128 $0x31 , %%ymm2 , %%ymm7 , %%ymm7 \n\t" // [b03,b13,b23,b33]
-	                "vperm2f128 $0x20 , %%ymm3 , %%ymm9 , %%ymm8 \n\t" // [b04,b14,b24,b34]
-	                "vperm2f128 $0x31 , %%ymm3 , %%ymm9 , %%ymm9 \n\t" // [b05,b15,b25,b35]
-	                "vfmadd231pd  %%ymm0 , %%ymm4 , %%ymm10\n\t" // [c00,c00,c00,c00]
-	                "vfmadd231pd  %%ymm0 , %%ymm5 , %%ymm11\n\t" // [c01,c01,c01,c01]
-	                "vfmadd231pd  %%ymm0 , %%ymm6 , %%ymm12\n\t" // [c02,c02,c02,c02]
-	                "vfmadd231pd  %%ymm0 , %%ymm7 , %%ymm13\n\t" // [c03,c03,c03,c03]
-	                "vfmadd231pd  %%ymm0 , %%ymm8 , %%ymm14\n\t" // [c04,c04,c04,c04]
-	                "vfmadd231pd  %%ymm0 , %%ymm9 , %%ymm15\n\t" // [c05,c05,c05,c05]
+	                "vperm2f128 $0x11 , %%ymm0 , %%ymm0 , %%ymm1 \n\t" // [a20,a30,a20,a30]
+	                "vperm2f128 $0x00 , %%ymm0 , %%ymm0 , %%ymm0 \n\t" // [a00,a10,a00,a10]
+	                "vmovupd   0*8(%[b]), %%ymm4 \n\t" // [b00,b10,b01,b11]
+	                "vmovupd   4*8(%[b]), %%ymm5 \n\t" // [b02,b12,b03,b13]
+	                "vmovupd   8*8(%[b]), %%ymm6 \n\t" // [b04,b14,b05,b15]
+	                "vmovupd  12*8(%[b]), %%ymm7 \n\t" // [b20,b30,b21,b31]
+	                "vmovupd  16*8(%[b]), %%ymm8 \n\t" // [b22,b32,b23,b33]
+	                "vmovupd  20*8(%[b]), %%ymm9 \n\t" // [b24,b34,b25,b35]
+	                "vfmadd231pd  %%ymm0 , %%ymm4 , %%ymm13\n\t" // [c00,c00,c01,c01]
+	                "vfmadd231pd  %%ymm0 , %%ymm5 , %%ymm14\n\t" // [c02,c02,c03,c03]
+	                "vfmadd231pd  %%ymm0 , %%ymm6 , %%ymm15\n\t" // [c04,c04,c05,c05]
+	                "vfmadd231pd  %%ymm1 , %%ymm7 , %%ymm13\n\t" // [c00,c00,c01,c01]
+	                "vfmadd231pd  %%ymm1 , %%ymm8 , %%ymm14\n\t" // [c02,c02,c03,c03]
+	                "vfmadd231pd  %%ymm1 , %%ymm9 , %%ymm15\n\t" // [c04,c04,c05,c05]
 	                "\n\t"
-	                //"prefetcht0  40*8(%[a])\n\t"
-	                //"prefetcht0 160*8(%[b])\n\t"
 	                "\n\t"
-	                "vmovupd   4*8(%[a]), %%ymm0 \n\t" // [a40,a50,a60,a70]
-	                "vmovupd  24*8(%[b]), %%ymm5 \n\t" // [b40,b50,b41,b51]
-	                "vmovupd  28*8(%[b]), %%ymm7 \n\t" // [b42,b52,b43,b53]
-	                "vmovupd  32*8(%[b]), %%ymm9 \n\t" // [b44,b54,b45,b55]
-	                "vmovupd  36*8(%[b]), %%ymm1 \n\t" // [b60,b70,b61,b71]
-	                "vmovupd  40*8(%[b]), %%ymm2 \n\t" // [b62,b72,b63,b73]
-	                "vmovupd  44*8(%[b]), %%ymm3 \n\t" // [b64,b74,b65,b75]
-	                "vperm2f128 $0x20 , %%ymm1 , %%ymm5 , %%ymm4 \n\t" // [b40,b50,b60,b70]
-	                "vperm2f128 $0x31 , %%ymm1 , %%ymm5 , %%ymm5 \n\t" // [b41,b51,b61,b71]
-	                "vperm2f128 $0x20 , %%ymm2 , %%ymm7 , %%ymm6 \n\t" // [b42,b52,b62,b72]
-	                "vperm2f128 $0x31 , %%ymm2 , %%ymm7 , %%ymm7 \n\t" // [b43,b53,b63,b73]
-	                "vperm2f128 $0x20 , %%ymm3 , %%ymm9 , %%ymm8 \n\t" // [b44,b54,b64,b74]
-	                "vperm2f128 $0x31 , %%ymm3 , %%ymm9 , %%ymm9 \n\t" // [b45,b55,b65,b75]
-	                "vfmadd231pd  %%ymm0 , %%ymm4 , %%ymm10\n\t" // [c00,c00,c00,c00]
-	                "vfmadd231pd  %%ymm0 , %%ymm5 , %%ymm11\n\t" // [c01,c01,c01,c01]
-	                "vfmadd231pd  %%ymm0 , %%ymm6 , %%ymm12\n\t" // [c02,c02,c02,c02]
-	                "vfmadd231pd  %%ymm0 , %%ymm7 , %%ymm13\n\t" // [c03,c03,c03,c03]
-	                "vfmadd231pd  %%ymm0 , %%ymm8 , %%ymm14\n\t" // [c04,c04,c04,c04]
-	                "vfmadd231pd  %%ymm0 , %%ymm9 , %%ymm15\n\t" // [c05,c05,c05,c05]
+	                "vmovupd   4*8(%[a]), %%ymm2 \n\t" // [a40,a50,a60,a70]
+	                "vperm2f128 $0x11 , %%ymm2 , %%ymm2 , %%ymm3 \n\t" // [a60,a70,a60,a70]
+	                "vperm2f128 $0x00 , %%ymm2 , %%ymm2 , %%ymm2 \n\t" // [a40,a50,a40,a50]
+	                "vmovupd   0*8(%[b]), %%ymm4 \n\t" // [b40,b50,b41,b51]
+	                "vmovupd   4*8(%[b]), %%ymm5 \n\t" // [b42,b52,b43,b53]
+	                "vmovupd   8*8(%[b]), %%ymm6 \n\t" // [b44,b54,b45,b55]
+	                "vmovupd  12*8(%[b]), %%ymm7 \n\t" // [b60,b70,b61,b71]
+	                "vmovupd  16*8(%[b]), %%ymm8 \n\t" // [b62,b72,b63,b73]
+	                "vmovupd  20*8(%[b]), %%ymm9 \n\t" // [b64,b74,b65,b75]
+	                "vfmadd231pd  %%ymm2 , %%ymm4 , %%ymm13\n\t" // [c00,c00,c01,c01]
+	                "vfmadd231pd  %%ymm2 , %%ymm5 , %%ymm14\n\t" // [c02,c02,c03,c03]
+	                "vfmadd231pd  %%ymm2 , %%ymm6 , %%ymm15\n\t" // [c04,c04,c05,c05]
+	                "vfmadd231pd  %%ymm3 , %%ymm7 , %%ymm13\n\t" // [c00,c00,c01,c01]
+	                "vfmadd231pd  %%ymm3 , %%ymm8 , %%ymm14\n\t" // [c02,c02,c03,c03]
+	                "vfmadd231pd  %%ymm3 , %%ymm9 , %%ymm15\n\t" // [c04,c04,c05,c05]
+	                "\n\t"
+	                "\n\t"
 	                "\n\t"
 	                "addq  $8*8 , %[a]\n\t"
 	                "addq  $48*8, %[b]\n\t"
@@ -879,29 +908,21 @@ void myblas_dgemm_kernel_detail(
 	            // 1x6x4x2  LD+PM/FMA = 7/6 = 1.17
 	            __asm__ __volatile__ (
 	                "\n\t"
-	                "\n\t"
-	                //"prefetcht0   4*8(%[a])\n\t"
-	                //"prefetcht0  24*8(%[b])\n\t"
-	                "\n\t"
 	                "vmovupd   0*8(%[a]), %%ymm0 \n\t" // [a00,a10,a20,a30]
-	                "vmovupd   0*8(%[b]), %%ymm5 \n\t" // [b00,b10,b01,b11]
-	                "vmovupd   4*8(%[b]), %%ymm7 \n\t" // [b02,b12,b03,b13]
-	                "vmovupd   8*8(%[b]), %%ymm9 \n\t" // [b04,b14,b05,b15]
-	                "vmovupd  12*8(%[b]), %%ymm1 \n\t" // [b20,b30,b21,b31]
-	                "vmovupd  16*8(%[b]), %%ymm2 \n\t" // [b22,b32,b23,b33]
-	                "vmovupd  20*8(%[b]), %%ymm3 \n\t" // [b24,b34,b25,b35]
-	                "vperm2f128 $0x20 , %%ymm1 , %%ymm5 , %%ymm4 \n\t" // [b00,b10,b20,b30]
-	                "vperm2f128 $0x31 , %%ymm1 , %%ymm5 , %%ymm5 \n\t" // [b01,b11,b21,b31]
-	                "vperm2f128 $0x20 , %%ymm2 , %%ymm7 , %%ymm6 \n\t" // [b02,b12,b22,b32]
-	                "vperm2f128 $0x31 , %%ymm2 , %%ymm7 , %%ymm7 \n\t" // [b03,b13,b23,b33]
-	                "vperm2f128 $0x20 , %%ymm3 , %%ymm9 , %%ymm8 \n\t" // [b04,b14,b24,b34]
-	                "vperm2f128 $0x31 , %%ymm3 , %%ymm9 , %%ymm9 \n\t" // [b05,b15,b25,b35]
-	                "vfmadd231pd  %%ymm0 , %%ymm4 , %%ymm10\n\t" // [c00,c00,c00,c00]
-	                "vfmadd231pd  %%ymm0 , %%ymm5 , %%ymm11\n\t" // [c01,c01,c01,c01]
-	                "vfmadd231pd  %%ymm0 , %%ymm6 , %%ymm12\n\t" // [c02,c02,c02,c02]
-	                "vfmadd231pd  %%ymm0 , %%ymm7 , %%ymm13\n\t" // [c03,c03,c03,c03]
-	                "vfmadd231pd  %%ymm0 , %%ymm8 , %%ymm14\n\t" // [c04,c04,c04,c04]
-	                "vfmadd231pd  %%ymm0 , %%ymm9 , %%ymm15\n\t" // [c05,c05,c05,c05]
+	                "vperm2f128 $0x11 , %%ymm0 , %%ymm0 , %%ymm1 \n\t" // [a20,a30,a20,a30]
+	                "vperm2f128 $0x00 , %%ymm0 , %%ymm0 , %%ymm0 \n\t" // [a00,a10,a00,a10]
+	                "vmovupd   0*8(%[b]), %%ymm4 \n\t" // [b00,b10,b01,b11]
+	                "vmovupd   4*8(%[b]), %%ymm5 \n\t" // [b02,b12,b03,b13]
+	                "vmovupd   8*8(%[b]), %%ymm6 \n\t" // [b04,b14,b05,b15]
+	                "vmovupd  12*8(%[b]), %%ymm7 \n\t" // [b20,b30,b21,b31]
+	                "vmovupd  16*8(%[b]), %%ymm8 \n\t" // [b22,b32,b23,b33]
+	                "vmovupd  20*8(%[b]), %%ymm9 \n\t" // [b24,b34,b25,b35]
+	                "vfmadd231pd  %%ymm0 , %%ymm4 , %%ymm13\n\t" // [c00,c00,c01,c01]
+	                "vfmadd231pd  %%ymm0 , %%ymm5 , %%ymm14\n\t" // [c02,c02,c03,c03]
+	                "vfmadd231pd  %%ymm0 , %%ymm6 , %%ymm15\n\t" // [c04,c04,c05,c05]
+	                "vfmadd231pd  %%ymm1 , %%ymm7 , %%ymm13\n\t" // [c00,c00,c01,c01]
+	                "vfmadd231pd  %%ymm1 , %%ymm8 , %%ymm14\n\t" // [c02,c02,c03,c03]
+	                "vfmadd231pd  %%ymm1 , %%ymm9 , %%ymm15\n\t" // [c04,c04,c05,c05]
 	                "\n\t"
 	                "addq  $4*8 , %[a]\n\t"
 	                "addq  $24*8, %[b]\n\t"
@@ -918,19 +939,14 @@ void myblas_dgemm_kernel_detail(
 	            // 1x6x4x2  LD+PM/FMA = 7/6 = 1.17
 	            __asm__ __volatile__ (
 	                "\n\t"
-	                "vmovapd   0*8(%[a]), %%xmm0 \n\t" // [a00,a10,  0,  0]
-	                "vmovapd   0*8(%[b]), %%xmm4 \n\t" // [b00,b10,  0,  0]
-	                "vmovapd   2*8(%[b]), %%xmm5 \n\t" // [b01,b11,  0,  0]
-	                "vmovapd   4*8(%[b]), %%xmm6 \n\t" // [b02,b12,  0,  0]
-	                "vmovapd   6*8(%[b]), %%xmm7 \n\t" // [b03,b13,  0,  0]
-	                "vmovapd   8*8(%[b]), %%xmm8 \n\t" // [b04,b14,  0,  0]
-	                "vmovapd  10*8(%[b]), %%xmm9 \n\t" // [b05,b15,  0,  0]
-	                "vfmadd231pd  %%ymm0 , %%ymm4 , %%ymm10\n\t" // [c00,c00,c00,c00]
-	                "vfmadd231pd  %%ymm0 , %%ymm5 , %%ymm11\n\t" // [c01,c01,c01,c01]
-	                "vfmadd231pd  %%ymm0 , %%ymm6 , %%ymm12\n\t" // [c02,c02,c02,c02]
-	                "vfmadd231pd  %%ymm0 , %%ymm7 , %%ymm13\n\t" // [c03,c03,c03,c03]
-	                "vfmadd231pd  %%ymm0 , %%ymm8 , %%ymm14\n\t" // [c04,c04,c04,c04]
-	                "vfmadd231pd  %%ymm0 , %%ymm9 , %%ymm15\n\t" // [c05,c05,c05,c05]
+	                "vmovupd   0*8(%[a]), %%xmm0 \n\t" // [a00,a10,---,---]
+	                "vperm2f128 $0x00 , %%ymm0 , %%ymm0 , %%ymm0 \n\t" // [a00,a10,a00,a10]
+	                "vmovupd   0*8(%[b]), %%ymm4 \n\t" // [b00,b10,b01,b11]
+	                "vmovupd   4*8(%[b]), %%ymm5 \n\t" // [b02,b12,b03,b13]
+	                "vmovupd   8*8(%[b]), %%ymm6 \n\t" // [b04,b14,b05,b15]
+	                "vfmadd231pd  %%ymm0 , %%ymm4 , %%ymm13\n\t" // [c00,c00,c01,c01]
+	                "vfmadd231pd  %%ymm0 , %%ymm5 , %%ymm14\n\t" // [c02,c02,c03,c03]
+	                "vfmadd231pd  %%ymm0 , %%ymm6 , %%ymm15\n\t" // [c04,c04,c05,c05]
 	                "\n\t"
 	                "addq  $2*8 , %[a]\n\t"
 	                "addq  $12*8, %[b]\n\t"
@@ -944,19 +960,20 @@ void myblas_dgemm_kernel_detail(
 	            
 	            __asm__ __volatile__ (
 	                "\n\t"
-	                "vmovsd   0*8(%[a]), %%xmm0 \n\t" // [a00,  0,  0,  0]
+	                "vmovsd    0*8(%[a]), %%xmm0 \n\t" // [a00,  0,---,---]
+	                "vperm2f128 $0x00 , %%ymm0 , %%ymm0 , %%ymm0 \n\t" // [a00,  0,a00,  0]
 	                "vmovsd   0*8(%[b]), %%xmm4 \n\t" // [b00,  0,  0,  0]
-	                "vmovsd   1*8(%[b]), %%xmm5 \n\t" // [b01,  0,  0,  0]
-	                "vmovsd   2*8(%[b]), %%xmm6 \n\t" // [b02,  0,  0,  0]
-	                "vmovsd   3*8(%[b]), %%xmm7 \n\t" // [b03,  0,  0,  0]
-	                "vmovsd   4*8(%[b]), %%xmm8 \n\t" // [b04,  0,  0,  0]
+	                "vmovsd   1*8(%[b]), %%xmm7 \n\t" // [b01,  0,  0,  0]
+	                "vmovsd   2*8(%[b]), %%xmm5 \n\t" // [b02,  0,  0,  0]
+	                "vmovsd   3*8(%[b]), %%xmm8 \n\t" // [b03,  0,  0,  0]
+	                "vmovsd   4*8(%[b]), %%xmm6 \n\t" // [b04,  0,  0,  0]
 	                "vmovsd   5*8(%[b]), %%xmm9 \n\t" // [b05,  0,  0,  0]
-	                "vfmadd231pd  %%ymm0 , %%ymm4 , %%ymm10\n\t" // [c00,c00,c00,c00]
-	                "vfmadd231pd  %%ymm0 , %%ymm5 , %%ymm11\n\t" // [c01,c01,c01,c01]
-	                "vfmadd231pd  %%ymm0 , %%ymm6 , %%ymm12\n\t" // [c02,c02,c02,c02]
-	                "vfmadd231pd  %%ymm0 , %%ymm7 , %%ymm13\n\t" // [c03,c03,c03,c03]
-	                "vfmadd231pd  %%ymm0 , %%ymm8 , %%ymm14\n\t" // [c04,c04,c04,c04]
-	                "vfmadd231pd  %%ymm0 , %%ymm9 , %%ymm15\n\t" // [c05,c05,c05,c05]
+	                "vperm2f128 $0x00 , %%ymm7 , %%ymm4 , %%ymm4 \n\t" // [b00,  0,b01,  0]
+	                "vperm2f128 $0x00 , %%ymm8 , %%ymm5 , %%ymm5 \n\t" // [b02,  0,b03,  0]
+	                "vperm2f128 $0x00 , %%ymm9 , %%ymm6 , %%ymm6 \n\t" // [b04,  0,b05,  0]
+	                "vfmadd231pd  %%ymm0 , %%ymm4 , %%ymm13\n\t" // [c00,c00,c01,c01]
+	                "vfmadd231pd  %%ymm0 , %%ymm5 , %%ymm14\n\t" // [c02,c02,c03,c03]
+	                "vfmadd231pd  %%ymm0 , %%ymm6 , %%ymm15\n\t" // [c04,c04,c05,c05]
 	                "\n\t"
 	                "addq  $1*8  , %[a]\n\t"
 	                "addq  $6*8  , %[b]\n\t"
@@ -970,44 +987,37 @@ void myblas_dgemm_kernel_detail(
 
 	        __asm__ __volatile__ (
 	            "\n\t"
-	            // %%ymm10 [c00,c00,c00,c00]
-	            // %%ymm11 [c01,c01,c01,c01]
-	            // %%ymm12 [c02,c02,c02,c02]
-	            // %%ymm13 [c03,c03,c03,c03]
-	            // %%ymm14 [c04,c04,c04,c04]
-	            // %%ymm15 [c05,c05,c05,c05]
+	            // %%ymm13 [c00,c00,c01,c01]
+	            // %%ymm14 [c02,c02,c03,c03]
+	            // %%ymm15 [c04,c04,c05,c05]
 	            "\n\t"
 	            "vmovupd %[alpha], %%ymm0\n\t"
 	            "\n\t"
-	            "movlpd   0*8(%[c0]        ), %%xmm1\n\t" // [c00,---,---,---]
-	            "movhpd   0*8(%[c1]        ), %%xmm1\n\t" // [c00,c01,---,---]
-	            "movlpd   0*8(%[c0],%[ldc2]), %%xmm2\n\t" // [c02,---,---,---]
-	            "movhpd   0*8(%[c1],%[ldc2]), %%xmm2\n\t" // [c02,c03,---,---]
+	            "movlpd   0*8(%[c0]          ), %%xmm1\n\t" // [c00,---,---,---]
+	            "movhpd   0*8(%[c1]          ), %%xmm1\n\t" // [c00,c01,---,---]
+	            "movlpd   0*8(%[c0],%[ldc2]  ), %%xmm2\n\t" // [c02,---,---,---]
+	            "movhpd   0*8(%[c1],%[ldc2]  ), %%xmm2\n\t" // [c02,c03,---,---]
 	            "movlpd   0*8(%[c0],%[ldc2],2), %%xmm3\n\t" // [c04,---,---,---]
 	            "movhpd   0*8(%[c1],%[ldc2],2), %%xmm3\n\t" // [c04,c05,---,---]
 	            "\n\t"
-	            "vshufpd    $0x00 , %%ymm11, %%ymm10, %%ymm4 \n\t" // [c00,c01,c00,c01]
-	            "vshufpd    $0x0f , %%ymm11, %%ymm10, %%ymm5 \n\t" // [c00,c01,c00,c01]
-	            "vshufpd    $0x00 , %%ymm13, %%ymm12, %%ymm6 \n\t" // [c02,c03,c02,c03]
-	            "vshufpd    $0x0f , %%ymm13, %%ymm12, %%ymm7 \n\t" // [c02,c03,c02,c03]
-	            "vshufpd    $0x00 , %%ymm15, %%ymm14, %%ymm8 \n\t" // [c04,c05,c04,c05]
-	            "vshufpd    $0x0f , %%ymm15, %%ymm14, %%ymm9 \n\t" // [c04,c05,c04,c05]
-	            "vaddpd             %%ymm5 , %%ymm4 , %%ymm10\n\t" // [c00,c01,c00,c01]
-	            "vaddpd             %%ymm7 , %%ymm6 , %%ymm11\n\t" // [c02,c03,c02,c03]
-	            "vaddpd             %%ymm9 , %%ymm8 , %%ymm12\n\t" // [c04,c05,c04,c05]
-	            "vperm2f128 $0x01 , %%ymm10, %%ymm10, %%ymm13\n\t" // [c00,c01,c00,c01]
-	            "vperm2f128 $0x01 , %%ymm11, %%ymm11, %%ymm14\n\t" // [c02,c03,c02,c03]
-	            "vperm2f128 $0x01 , %%ymm12, %%ymm12, %%ymm15\n\t" // [c04,c05,c04,c05]
+	            "vperm2f128 $0x01 , %%ymm13, %%ymm13, %%ymm10\n\t" // [c01,c01,c00,c00]
+	            "vperm2f128 $0x01 , %%ymm14, %%ymm14, %%ymm11\n\t" // [c03,c03,c02,c02]
+	            "vperm2f128 $0x01 , %%ymm15, %%ymm15, %%ymm12\n\t" // [c05,c05,c04,c04]
 	            "\n\t"
-	            "addpd    %%xmm10, %%xmm13\n\t" // [c00,c01,---,---]
-	            "addpd    %%xmm11, %%xmm14\n\t" // [c02,c03,---,---]
-	            "addpd    %%xmm12, %%xmm15\n\t" // [c04,c05,---,---]
-	            "mulpd    %%xmm0 , %%xmm13\n\t" // [c00,c01,---,---]
-	            "mulpd    %%xmm0 , %%xmm14\n\t" // [c02,c03,---,---]
-	            "mulpd    %%xmm0 , %%xmm15\n\t" // [c04,c05,---,---]
-	            "addpd    %%xmm1 , %%xmm13\n\t" // [c00,c01,---,---]
-	            "addpd    %%xmm2 , %%xmm14\n\t" // [c02,c03,---,---]
-	            "addpd    %%xmm3 , %%xmm15\n\t" // [c04,c05,---,---]
+	            "vshufpd    $0x00 , %%ymm10, %%ymm13, %%ymm4 \n\t" // [c00,c01,---,---]
+	            "vshufpd    $0x0f , %%ymm10, %%ymm13, %%ymm7 \n\t" // [c00,c01,---,---]
+	            "vshufpd    $0x00 , %%ymm11, %%ymm14, %%ymm5 \n\t" // [c02,c03,---,---]
+	            "vshufpd    $0x0f , %%ymm11, %%ymm14, %%ymm8 \n\t" // [c02,c03,---,---]
+	            "vshufpd    $0x00 , %%ymm12, %%ymm15, %%ymm6 \n\t" // [c04,c05,---,---]
+	            "vshufpd    $0x0f , %%ymm12, %%ymm15, %%ymm9 \n\t" // [c04,c05,---,---]
+	            "\n\t"
+	            "vaddpd             %%ymm7 , %%ymm4 , %%ymm13\n\t" // [c00,c01,---,---]
+	            "vaddpd             %%ymm8 , %%ymm5 , %%ymm14\n\t" // [c02,c03,---,---]
+	            "vaddpd             %%ymm9 , %%ymm6 , %%ymm15\n\t" // [c04,c05,---,---]
+	            "\n\t"
+	            "vfmadd213pd  %%ymm1, %%ymm0, %%ymm13\n\t"
+	            "vfmadd213pd  %%ymm2, %%ymm0, %%ymm14\n\t"
+	            "vfmadd213pd  %%ymm3, %%ymm0, %%ymm15\n\t"
 	            "\n\t"
 	            "movlpd   %%xmm13, 0*8(%[c0]          )\n\t"
 	            "movhpd   %%xmm13, 0*8(%[c1]          )\n\t"
