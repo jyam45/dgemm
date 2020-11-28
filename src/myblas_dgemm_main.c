@@ -15,7 +15,7 @@
 #define MYBLAS_BLOCK_K  256
 
 #define MYBLAS_TILE_M    16
-#define MYBLAS_TILE_N    16
+#define MYBLAS_TILE_N    12
 #define MYBLAS_TILE_K   128
 
 #define ALIGNMENT_B      32  // for AVX
